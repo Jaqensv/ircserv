@@ -173,11 +173,55 @@ std::vector<Oper>&	Server::getOperators() {
 
 void	Server::run(){
 
-	// Server	&server = Server::getInstance();
+	Server	&server = Server::getInstance();
 
-	// struct epoll_event	events[this->_backLogSize];
+	struct epoll_event	events[this->_backLogSize];
+	int					eventCount, clientFd;
 
+	server._addrlen = sizeof(server._serverAddres);
 	while(true){
+		eventCount = epoll_wait(server._epollFd, events, this->_backLogSize, -1);
+		if(eventCount == -1){
+			std::cerr << "ERROR EPOLL_WAIT : epoll_wait doesn't work." << std::endl;
+			close(server._serverSocket);
+			close(server._epollFd);
+			exit(1);
+		}
 
+		for(int n = 0; n < eventCount; n++){
+			if (events[n].data.fd == server._serverSocket){ //if connection is about main socket, a new client connection is pending
+			//accept client connection
+				clientFd = accept(server._serverSocket, (struct sockaddr *)&server._serverAddres, &server._addrlen);
+				if(clientFd == -1){
+					std::cerr << "ERROR ACCEPT : can't connect to socket." << std::endl;
+					close(server._serverSocket);
+					close(server._epollFd);
+					exit(1);
+				}
+				if (socketNonBlocking(clientFd) < 0){
+					std::cerr << "ERROR: Unable to set server socket to non-blocking mode." << std::endl;
+					close(server._serverSocket);
+					close(server._epollFd);
+					exit(1);
+				}
+
+			//add client to epoll
+				struct epoll_event	clientEvent;
+				clientEvent.data.fd = clientFd;
+				clientEvent.events = EPOLLIN;
+				if(epoll_ctl(server._epollFd, EPOLL_CTL_ADD, clientFd, &clientEvent) == -1){
+					std::cerr << "ERROR EPOLL : epoll_ctl_add failed." << std::endl;
+					close(server._serverSocket);
+					close(server._epollFd);
+					exit(1);
+				}
+
+			//add client to client array
+				User	newUser(clientFd);
+				createUser(clientFd, newUser);
+
+				std::cout << "New client connected : " << clientFd << std::endl;
+			}
+		}
 	}
 }
