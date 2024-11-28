@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
-#include "Server.hpp"
+#include "../includes/Server.hpp"
 
 
 static void	checkParam(int argc, char **argv){

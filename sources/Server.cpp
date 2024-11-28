@@ -8,9 +8,9 @@
 #include <poll.h>
 #include <fcntl.h>
 #include <algorithm>
-#include "Server.hpp"
-#include "Operator.hpp"
-#include "Channel.hpp"
+#include "../includes/Server.hpp"
+#include "../includes/Operator.hpp"
+#include "../includes/Channel.hpp"
 
 //Constructor
 	Server::Server() : _port(0){

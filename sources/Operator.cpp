@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
-#include "Operator.hpp"
-#include "Server.hpp"
+#include "../includes/Operator.hpp"
+#include "../includes/Server.hpp"
 
 
 void	Oper::kick(unsigned int fd){

@@ -1,26 +1,22 @@
-NAME			= ircserv
-CXXFLAGS		= -Wall -Wextra -Werror -g -Wshadow -std=c++98
-CXX				= c++
+NAME		= ircserv
+CXXFLAGS	= -Wall -Wextra -Werror -g -Wshadow -std=c++98
+CXX			= c++
 
-SRC_FILES	= main.cpp \
-				Server.cpp \
-				User.cpp \
-				Operator.cpp \
-				Parsing.cpp \
-				Channel.cpp \
+SRC_DIR		= sources
+OBJ_DIR		= object
+INC_DIR		= includes
 
-
-OBJ_FILES	= $(SRC_FILES:%.cpp=object/%.o)
-OBJ_DIR = object
-
+SRC_FILES	= $(wildcard $(SRC_DIR)/*.cpp)
+OBJ_FILES	= $(SRC_FILES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
 all: $(NAME)
 
-$(NAME): $(OBJ_DIR) $(OBJ_FILES)
+$(NAME): $(OBJ_FILES)
 	@$(CXX) $(OBJ_FILES) $(CXXFLAGS) -o $(NAME)
 
-$(OBJ_DIR)/%.o: %.cpp | $(OBJ_DIR)
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+	@mkdir -p $(@D)  # Crée le répertoire parent si nécessaire
+	@$(CXX) $(CXXFLAGS) -I $(INC_DIR) -c $< -o $@
 
 $(OBJ_DIR):
 	@mkdir -p $(OBJ_DIR)

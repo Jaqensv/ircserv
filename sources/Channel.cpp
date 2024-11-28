@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
-#include "Server.hpp"
-#include "Channel.hpp"
-#include "User.hpp"
-#include "Operator.hpp"
+#include "../includes/Server.hpp"
+#include "../includes/Channel.hpp"
+#include "../includes/User.hpp"
+#include "../includes/Operator.hpp"
 
 //Constructor & Destructor
 	Channel::Channel(){}

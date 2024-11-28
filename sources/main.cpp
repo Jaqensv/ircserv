@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
-#include "Server.hpp"
-#include "handleInclude.hpp"
+#include "../includes/Server.hpp"
+#include "../includes/handleInclude.hpp"
 
 int	main(int argc, char ** argv){
 
