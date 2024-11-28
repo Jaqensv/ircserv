@@ -23,3 +23,4 @@
 
 //Member function
 	void	Channel::mode(){}
+	void	Channel::addUser(unsigned int fd, User &user){_users.insert(std::make_pair(fd, &user));}

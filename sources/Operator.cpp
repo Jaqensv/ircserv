@@ -3,9 +3,8 @@
 #include "../includes/Operator.hpp"
 #include "../includes/Server.hpp"
 
-
-void	Oper::kick(unsigned int fd){
-	(void)fd;
+void	Oper::kick(unsigned int	fd){
+	
 }
 
 
@@ -33,3 +32,5 @@ void	Oper::useTopic(){
 	//else
 		//implementer : Modifier ou afficher le thème du channel
 }
+
+//void	Oper::addPrivilege(std::string channel_name){_pChannels.push_back(channel_name);}
