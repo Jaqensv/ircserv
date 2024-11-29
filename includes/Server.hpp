@@ -13,7 +13,7 @@ class Server{
 
 	public :
 
-	//Instance unique
+	//Instance unique, singleton
 	static Server &getInstance() {
 		static Server instance;
 		return instance;
@@ -74,7 +74,7 @@ class Server{
 
 	//Array of : Channel, User and Operator
 		std::vector<Channel>	_arrayChannel;
-		std::map<int, User*>		_arrayUser;
+		std::map<int, User*>	_arrayUser;
 		std::vector<Oper>		_arrayOperator;
 
 };

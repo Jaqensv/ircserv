@@ -174,6 +174,7 @@ std::vector<Oper>&	Server::getOperators() {
 void	Server::run(){
 
 	Server	&server = Server::getInstance();
+	server.initEpoll();
 
 	struct epoll_event	events[this->_backLogSize];
 	int					eventCount, clientFd;
@@ -221,6 +222,28 @@ void	Server::run(){
 				createUser(clientFd, newUser);
 
 				std::cout << "New client connected : " << clientFd << std::endl;
+			}
+			else{
+			//handle client message
+				clientFd = events[n].data.fd;
+				char	buffer[1024];
+
+				memset(buffer, 0, sizeof(buffer));
+				ssize_t	bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
+				if(bytesRead <= 0){
+					std::cout << "Client disconnected: " << clientFd << std::endl;
+					close(clientFd);
+					close(server._serverSocket);
+					close(server._epollFd);
+					epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+					deleteUser(clientFd);
+					exit(1);
+				}
+				else{
+					(void)clientFd;
+					std::string message = buffer;
+					std::cout << "Message from client " << clientFd << ": " << buffer;
+				}
 			}
 		}
 	}
