@@ -171,6 +171,19 @@ std::vector<Oper>&	Server::getOperators() {
 	return this->_arrayOperator;
 }
 
+void	Server::broadcast(int senderFd, std::string &message){
+	for(std::map<int, User*>::iterator it =this->_arrayUser.begin(); it != _arrayUser.end(); it++){
+		int clientFd = it->first;
+		if(clientFd != senderFd){
+			ssize_t bytesSent = send(clientFd, message.c_str(), message.size(), 0);
+			if (bytesSent == -1) {
+				std::cerr << "ERROR BROADCAST : Failed to send message to client " << clientFd << std::endl;
+				exit(1);
+			}
+		}
+	}
+}
+
 void	Server::run(){
 
 	Server	&server = Server::getInstance();
@@ -240,9 +253,9 @@ void	Server::run(){
 					exit(1);
 				}
 				else{
-					(void)clientFd;
 					std::string message = buffer;
 					std::cout << "Message from client " << clientFd << ": " << buffer;
+					broadcast(clientFd, message);
 				}
 			}
 		}

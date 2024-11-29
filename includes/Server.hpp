@@ -58,6 +58,8 @@ class Server{
 		void	createOperator(Oper &op);
 		void	deleteOperator(int fd);
 
+		void	broadcast(int senderFd, std::string &message);
+
 
 	private :
 	//Variable member
