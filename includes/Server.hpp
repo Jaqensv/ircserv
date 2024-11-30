@@ -67,6 +67,7 @@ class Server{
 		struct sockaddr_in	_serverAddres;
 		int					_epollFd;
 		struct epoll_event	_event;
+		socklen_t			_addrlen;
 		unsigned short		_backLogSize;
 		bool				_invitationOnly;
 		bool				_needPassw;
