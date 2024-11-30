@@ -26,5 +26,3 @@ void	Oper::useTopic(){
 	//else
 		//implementer : Modifier ou afficher le thème du channel
 }
-
-//void	Oper::addChannel(std::string channel_name){_channels.push_back(channel_name);}

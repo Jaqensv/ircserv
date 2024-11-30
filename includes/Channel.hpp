@@ -28,11 +28,12 @@ class Channel{
 		void	mode();
 		void	addUser(unsigned int fd, User &user);
 		void	removeUser(unsigned int fd);
+		void	addOperator(unsigned int fd, Oper &oper);
 
 	private :
 	//Member variable
 		std::string				_name;
 		std::string				_topic;
 		std::map<int, User*> 	_users;
-		std::vector<Oper>		_operators;
+		std::map<int, Oper*>	_operators;
 };

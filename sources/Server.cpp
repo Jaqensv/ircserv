@@ -128,7 +128,13 @@ void	Server::initEpoll(){
 }
 
 //Channel
-void	Server::createChannel(Channel &chan){
+// void	Server::createChannel(Channel &chan){
+// 	this->_arrayChannel.push_back(chan);
+// }
+
+void	Server::createChannel(Channel &chan, unsigned int fd, User &user, Oper &oper){
+	chan.addUser(fd, user);
+	chan.addOperator(fd, oper);
 	this->_arrayChannel.push_back(chan);
 }
 

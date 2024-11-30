@@ -23,3 +23,4 @@
 	void	Channel::mode(){}
 	void	Channel::addUser(unsigned int fd, User &user){_users.insert(std::make_pair(fd, &user));}
 	void	Channel::removeUser(unsigned int fd){_users.erase(fd);}
+	void	Channel::addOperator(unsigned int fd, Oper &oper){_operators.insert(std::make_pair(fd, &oper));}
