@@ -119,7 +119,7 @@ void	Server::initEpoll(){
 	server._event.data.fd = server._serverSocket;
 	server._event.events = EPOLLIN | EPOLLOUT;
 
-	if(epoll_ctl(server._epollFd, EPOLL_CTL_ADD, server._serverSocket, &server._event) == -1){
+	if (epoll_ctl(server._epollFd, EPOLL_CTL_ADD, server._serverSocket, &server._event) == -1){
 		std::cerr << "ERROR EPOLL : epoll_ctl_add failed." << std::endl;
 		close(server._serverSocket);
 		close(server._epollFd);
@@ -132,8 +132,8 @@ void	Server::initEpoll(){
 // 	this->_arrayChannel.push_back(chan);
 // }
 
-void	Server::createChannel(Channel &chan, unsigned int fd, User &user, Oper &oper){
-	chan.addUser(fd, user);
+void	Server::createChannel(Channel &chan, unsigned int fd, Oper &oper){
+	chan.addUser(fd, oper);
 	chan.addOperator(fd, oper);
 	this->_arrayChannel.push_back(chan);
 }

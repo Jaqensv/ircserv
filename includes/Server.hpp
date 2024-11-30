@@ -50,7 +50,7 @@ class Server{
 		void	run();
 
 		//void	createChannel(Channel &chan);
-		void	createChannel(Channel &chan, unsigned int fd, User &user, Oper &oper);
+		void	createChannel(Channel &chan, unsigned int fd, Oper &oper);
 		void	deleteChannel(std::string &channelName);
 
 		void	createUser(int fd, User &user);
