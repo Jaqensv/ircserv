@@ -22,11 +22,12 @@ class Channel{
 		std::string	getName();
 
 	//Setter
-		void		setTopic(std::string topic);
+		void	setTopic(std::string topic);
 
 	//Member function
 		void	mode();
-		void	Channel::addUser(unsigned int fd, User &user);
+		void	addUser(unsigned int fd, User &user);
+		void	removeUser(unsigned int fd);
 
 	private :
 	//Member variable

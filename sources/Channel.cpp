@@ -19,8 +19,7 @@
 	void		Channel::setTopic(std::string topic){this->_topic = topic;}
 	std::string	Channel::getName(){return this->_name;}
 
-
-
 //Member function
 	void	Channel::mode(){}
 	void	Channel::addUser(unsigned int fd, User &user){_users.insert(std::make_pair(fd, &user));}
+	void	Channel::removeUser(unsigned int fd){_users.erase(fd);}
