@@ -44,6 +44,10 @@
 		return NULL;
 	}
 
+	std::map<int, User*>	Server::getUsers() const {
+		return _arrayUser;
+	}
+
 	unsigned short		Server::getBackLogSize(){
 		return this->_backLogSize;
 	}
@@ -158,23 +162,9 @@ void	Server::deleteUser(int fd){
 	this->_arrayUser.erase(fd);
 }
 
-//Operator
-void	Server::createOperator(Oper &op){
-	this->_arrayOperator.push_back(op);
-}
 
-void	Server::deleteOperator(int fd){
-	for (std::vector<Oper>::iterator it = _arrayOperator.begin(); it != _arrayOperator.end(); ) {
-		if (it->getFd() == fd) {
-			it = _arrayOperator.erase(it); // Remove and iterator go forward
-		} else {
-			++it; // Only go forward iterator
-		}
-	}
-}
-
-std::vector<Oper>&	Server::getOperators() {
-	return this->_arrayOperator;
+std::vector<Channel> Server::getChannels() const {
+	return _arrayChannel;
 }
 
 void	Server::broadcast(int senderFd, std::string &message){
@@ -257,26 +247,29 @@ void	Server::run(){
 					epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 					deleteUser(clientFd);
 					exit(1);
-				}
-				else{
+				} else {
 					std::stringstream ss(buffer);
-					std::string message;
-					ss >> message;
-					command(message);
 					std::cout << "Message from client " << clientFd << ": " << buffer;
-					broadcast(clientFd, message);
+					std::string command, channel, arg1, arg2, arg3;
+					ss >> command >> channel >> arg1 >> arg2 >> arg3;
+					if (command == "KICK") {
+					
+						KICK / channel user
+						MODE / channel option (facultatif)
+
+					}
+					// else if (message == "INVITE")
+					// else if (message == "TOPIC")
+					else if (command == "MODE")
+						mode(channel, arg1, arg2);
+					// else
+					// 	std::cerr << "Error: invalid command" << std::endl;
+					broadcast(clientFd, command);
 				}
 			}
 		}
 	}
 }
 
-void Server::command(std::string message) {
-	if (message == "KICK")
-		
-	else if (message == "INVITE")
-	else if (message == "TOPIC")
-	else if (message == "MODE")
-	else
-		std::cerr << "Error: invalid command" << std::endl;
+void Server::execCommand() {
 }

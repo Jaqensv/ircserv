@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <sstream> // stringstream
+#include <algorithm> // std::find
 #include "Channel.hpp"
 #include "User.hpp"
 #include "Operator.hpp"
@@ -33,12 +34,13 @@ class Server{
 		void				setNeedPasswFalse();
 		void				setNeedPasswTrue();
 
-		unsigned short		getPort();
-		std::string			getPassw();
-		User*				getUser(int fd);
-		std::vector<Oper>&	getOperators();
-		bool				getNeedPassw();
-		unsigned short		getBackLogSize();
+		unsigned short			getPort();
+		std::string				getPassw();
+		User*					getUser(int fd);
+		std::map<int, User*>	getUsers() const;
+		std::vector<Channel> 	getChannels() const;
+		bool					getNeedPassw();
+		unsigned short			getBackLogSize();
 
 
 	//Surcharge operator
@@ -49,7 +51,7 @@ class Server{
 		int		socketNonBlocking(int fd);
 		void	initEpoll();
 		void	run();
-		void 	command(std::string message);
+		void 	execCommand();
 
 		//void	createChannel(Channel &chan);
 		void	createChannel(Channel &chan, unsigned int fd, Oper &oper);
@@ -57,9 +59,6 @@ class Server{
 
 		void	createUser(int fd, User &user);
 		void	deleteUser(int fd);
-
-		void	createOperator(Oper &op);
-		void	deleteOperator(int fd);
 
 		void	broadcast(int senderFd, std::string &message);
 
@@ -80,6 +79,5 @@ class Server{
 	//Array of : Channel, User and Operator
 		std::vector<Channel>	_arrayChannel;
 		std::map<int, User*>	_arrayUser;
-		std::vector<Oper>		_arrayOperator;
 
 };

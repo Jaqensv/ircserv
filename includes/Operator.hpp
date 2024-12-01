@@ -18,7 +18,6 @@ class Oper : public User{
 		void 	topic(Channel &channel, std::string topic);
 		void	changePassw(std::string passw);
 		void	deletePassw();
-		void	useTopic();
 
 	private :
 	//Member variable
