@@ -5,6 +5,7 @@
 #include <sys/epoll.h>
 #include <vector>
 #include <map>
+#include <sstream> // stringstream
 #include "Channel.hpp"
 #include "User.hpp"
 #include "Operator.hpp"
@@ -48,6 +49,7 @@ class Server{
 		int		socketNonBlocking(int fd);
 		void	initEpoll();
 		void	run();
+		void 	command(std::string message);
 
 		//void	createChannel(Channel &chan);
 		void	createChannel(Channel &chan, unsigned int fd, Oper &oper);

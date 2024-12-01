@@ -8,12 +8,19 @@ void	Oper::kick(unsigned int	fd, Channel &channel){channel.removeUser(fd);}
 void	Oper::invite(unsigned int fd, User &user, Channel &channel){channel.addUser(fd, user);}
 
 void	Oper::topic(Channel &channel){
-	std::cout << channel.getName() << " : " << channel.getTopic() << std::endl;
+	if (_canTopic == true)
+		std::cout << channel.getName() << " : " << channel.getTopic() << std::endl;
+	else
+		std::cerr << "Error: needs rights to topic" << std::endl;
 }
 
 void	Oper::topic(Channel &channel, std::string topic){
-	channel.setTopic(topic);
-	std::cout << channel.getName() << " topic modified : " << channel.getTopic() << std::endl;
+	if (_canTopic == true) {
+		channel.setTopic(topic);
+		std::cout << channel.getName() << " topic modified : " << channel.getTopic() << std::endl;
+	}
+	else
+		std::cerr << "Error: needs rights to topic" << std::endl;
 }
 
 void	Oper::changePassw(std::string passw){

@@ -259,12 +259,24 @@ void	Server::run(){
 					exit(1);
 				}
 				else{
-					std::string message = buffer;
+					std::stringstream ss(buffer);
+					std::string message;
+					ss >> message;
+					command(message);
 					std::cout << "Message from client " << clientFd << ": " << buffer;
-					// implementer commande ici
 					broadcast(clientFd, message);
 				}
 			}
 		}
 	}
+}
+
+void Server::command(std::string message) {
+	if (message == "KICK")
+		
+	else if (message == "INVITE")
+	else if (message == "TOPIC")
+	else if (message == "MODE")
+	else
+		std::cerr << "Error: invalid command" << std::endl;
 }
