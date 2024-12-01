@@ -13,7 +13,7 @@ class Server{
 
 	public :
 
-	//Instance unique
+	//Instance unique, singleton
 	static Server &getInstance() {
 		static Server instance;
 		return instance;
@@ -59,6 +59,8 @@ class Server{
 		void	createOperator(Oper &op);
 		void	deleteOperator(int fd);
 
+		void	broadcast(int senderFd, std::string &message);
+
 
 	private :
 	//Variable member
@@ -75,7 +77,7 @@ class Server{
 
 	//Array of : Channel, User and Operator
 		std::vector<Channel>	_arrayChannel;
-		std::map<int, User*>		_arrayUser;
+		std::map<int, User*>	_arrayUser;
 		std::vector<Oper>		_arrayOperator;
 
 };

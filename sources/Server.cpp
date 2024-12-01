@@ -177,9 +177,23 @@ std::vector<Oper>&	Server::getOperators() {
 	return this->_arrayOperator;
 }
 
+void	Server::broadcast(int senderFd, std::string &message){
+	for(std::map<int, User*>::iterator it =this->_arrayUser.begin(); it != _arrayUser.end(); it++){
+		int clientFd = it->first;
+		if(clientFd != senderFd){
+			ssize_t bytesSent = send(clientFd, message.c_str(), message.size(), 0);
+			if (bytesSent == -1) {
+				std::cerr << "ERROR BROADCAST : Failed to send message to client " << clientFd << std::endl;
+				exit(1);
+			}
+		}
+	}
+}
+
 void	Server::run(){
 
 	Server	&server = Server::getInstance();
+	server.initEpoll();
 
 	struct epoll_event	events[this->_backLogSize];
 	int					eventCount, clientFd;
@@ -227,6 +241,29 @@ void	Server::run(){
 				createUser(clientFd, newUser);
 
 				std::cout << "New client connected : " << clientFd << std::endl;
+			}
+			else{
+			//handle client message
+				clientFd = events[n].data.fd;
+				char	buffer[1024];
+
+				memset(buffer, 0, sizeof(buffer));
+				ssize_t	bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
+				if(bytesRead <= 0){
+					std::cout << "Client disconnected: " << clientFd << std::endl;
+					close(clientFd);
+					close(server._serverSocket);
+					close(server._epollFd);
+					epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+					deleteUser(clientFd);
+					exit(1);
+				}
+				else{
+					std::string message = buffer;
+					std::cout << "Message from client " << clientFd << ": " << buffer;
+					// implementer commande ici
+					broadcast(clientFd, message);
+				}
 			}
 		}
 	}
