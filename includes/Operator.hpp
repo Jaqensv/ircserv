@@ -19,6 +19,7 @@ class Oper : public User{
 		void	changePassw(std::string passw);
 		void	deletePassw();
 		void	useTopic();
+		void	Mode(std::string *arg);
 
 	private :
 	//Member variable

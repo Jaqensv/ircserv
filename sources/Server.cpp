@@ -149,6 +149,10 @@ void	Server::deleteChannel(std::string &channelName){
 	}
 }
 
+std::map<int, User*>	Server::getArrayUser() {
+	return this->_arrayUser;
+}
+
 //User
 void	Server::createUser(int fd, User &user){
 		this->_arrayUser.insert(std::make_pair(fd, &user));

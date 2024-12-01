@@ -32,5 +32,28 @@ void	Oper::useTopic(){
 		std::cerr << this->getNickname() << " doesn't have permission to change topic." << std::endl;
 		return ;
 	}
-	
+}
+
+void	Oper::Mode(std::string *arg) {
+	Server &server = Server::getInstance();
+	if (!arg) {
+		std::cerr << "ERROR: No argument given for MODE command." << std::endl;
+		return ;
+	}
+	if (arg[0] == "-t") {
+		for (int i = 0; i < server.getArrayUser().size(); i++) {
+			if (server.getArrayUser()[i].getNickname() == arg[1]) {
+				server.getArrayUser()[i].set;
+			}
+				std::cerr << "ERROR: " << this->getNickname() << " is already an operator." << std::endl;
+				return ;
+		}
+	}
+	else if (arg[0] == "-k") {
+		this->_canTopic = false;
+		std::cout << this->getNickname() << " can't change topic anymore." << std::endl;
+	}
+	else {
+		std::cerr << "ERROR: Invalid argument for MODE command." << std::endl;
+	}
 }

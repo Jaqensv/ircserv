@@ -32,13 +32,13 @@ class Server{
 		void				setNeedPasswFalse();
 		void				setNeedPasswTrue();
 
-		unsigned short		getPort();
-		std::string			getPassw();
-		User*				getUser(int fd);
-		std::vector<Oper>&	getOperators();
-		bool				getNeedPassw();
-		unsigned short		getBackLogSize();
-
+		unsigned short			getPort();
+		std::string				getPassw();
+		User*					getUser(int fd);
+		std::vector<Oper>&		getOperators();
+		bool					getNeedPassw();
+		unsigned short			getBackLogSize();
+		std::map<int, User*>	getArrayUser();
 
 	//Surcharge operator
 		Server	&operator=(Server const &other);
