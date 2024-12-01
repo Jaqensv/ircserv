@@ -255,7 +255,7 @@ void	Server::run(){
 				else{
 					std::string message = buffer;
 					std::cout << "Message from client " << clientFd << ": " << buffer;
-					//implementer ICI les commandes !
+					// implementer commande ici
 					broadcast(clientFd, message);
 				}
 			}
