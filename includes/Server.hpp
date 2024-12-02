@@ -36,7 +36,7 @@ class Server{
 
 		unsigned short			getPort();
 		std::string				getPassw();
-		User*					getUser(int fd);
+		// User					&getUser(int fd);
 		std::map<int, User*>	getUsers() const;
 		std::vector<Channel> 	getChannels() const;
 		bool					getNeedPassw();
@@ -54,7 +54,7 @@ class Server{
 		void 	execCommand();
 
 		//void	createChannel(Channel &chan);
-		void	createChannel(Channel &chan, unsigned int fd, Oper &oper);
+		void	createChannel(unsigned int fd, std::string channel_name);
 		void	deleteChannel(std::string &channelName);
 
 		void	createUser(int fd, User &user);

@@ -18,6 +18,14 @@
 	std::string	Channel::getTopic(){return this->_topic;}
 	void		Channel::setTopic(std::string topic){this->_topic = topic;}
 	std::string	Channel::getName(){return this->_name;}
+	Oper*		Channel::getOper(unsigned int fd) {
+		std::map<int, Oper*>::iterator it = _operators.begin();
+		for (; it != _operators.end(); ++it) {
+			if (fd == static_cast<unsigned int>(it->first))
+				return it->second;
+		}
+		return it->second;
+	}
 
 //Member function
 	void	Channel::mode(){}

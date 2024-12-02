@@ -3,18 +3,6 @@
 #include "../includes/Operator.hpp"
 #include "../includes/Server.hpp"
 
-void	Oper::kick(std::string channel, std::string user, Server &server){
-	std::vector<Channel> chan;
-		if (channel.empty() || user.empty())
-			std::cerr << "Error: invalid command" << std::endl;
-		else {
-			if (std::find(server.getChannels().begin(), server.getChannels().end(), channel) == server.getChannels().end())
-				std::cerr << channel << " doesn't exist" << std::endl;
-			if (std::find(server.getUsers().begin(), server.getUsers().end(), user) == server.getUsers().end())
-				std::cerr << user << " doesn't exist" << std::endl;
-		}
-			channel.removeUser(fd);}
-
 void	Oper::invite(unsigned int fd, User &user, Channel &channel){channel.addUser(fd, user);}
 
 void	Oper::topic(Channel &channel){

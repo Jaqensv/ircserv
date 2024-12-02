@@ -20,6 +20,7 @@ class Channel{
 	//Getter
 		std::string	getTopic();
 		std::string	getName();
+		Oper*		getOper(unsigned int fd);
 
 	//Setter
 		void	setTopic(std::string topic);

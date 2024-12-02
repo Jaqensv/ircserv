@@ -12,7 +12,6 @@ class Oper : public User{
 		Oper(int fd) : User(fd){}
 
 	//Member method Operator
-		void	kick(unsigned int fd, Channel &channel);
 		void	invite(unsigned int fd, User &user, Channel &channel);
 		void	topic(Channel &channel);
 		void 	topic(Channel &channel, std::string topic);

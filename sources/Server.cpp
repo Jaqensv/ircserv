@@ -37,12 +37,13 @@
 	void			Server::setNeedPasswTrue(){this->_needPassw = true;}
 	bool			Server::getNeedPassw(){return this->_needPassw;}
 
-	User*			Server::getUser(int fd){
-		if (this->_arrayUser.find(fd) != _arrayUser.end()) {
-			return _arrayUser[fd];
-		}
-		return NULL;
-	}
+	// User			&Server::getUser(int fd){
+	// 	for (std::map<int, User*>::iterator it = _arrayUser.begin(); it != _arrayUser.end(); ++it){
+	// 		if (fd == it->first)
+	// 			return *it->second;
+	// 	}
+		
+	// }
 
 	std::map<int, User*>	Server::getUsers() const {
 		return _arrayUser;
@@ -136,10 +137,17 @@ void	Server::initEpoll(){
 // 	this->_arrayChannel.push_back(chan);
 // }
 
-void	Server::createChannel(Channel &chan, unsigned int fd, Oper &oper){
-	chan.addUser(fd, oper);
-	chan.addOperator(fd, oper);
-	this->_arrayChannel.push_back(chan);
+void	Server::createChannel(unsigned int fd, std::string channel_name){
+	Channel channel(channel_name);
+	Oper oper(fd);
+
+	channel.addUser(fd, oper);
+	oper.setNickname("test0");
+	std::cout << oper.getNickname() << std::endl;
+	channel.addOperator(fd, oper);
+	oper.setNickname("test1");
+	std::cout << channel.getOper(fd)->getNickname() << std::endl;
+	this->_arrayChannel.push_back(channel);
 }
 
 void	Server::deleteChannel(std::string &channelName){
@@ -248,28 +256,30 @@ void	Server::run(){
 					deleteUser(clientFd);
 					exit(1);
 				} else {
-					std::stringstream ss(buffer);
-					std::cout << "Message from client " << clientFd << ": " << buffer;
-					std::string command, channel, arg1, arg2, arg3;
-					ss >> command >> channel >> arg1 >> arg2 >> arg3;
-					if (command == "KICK") {
-					
-						KICK / channel user
-						MODE / channel option (facultatif)
+					// std::stringstream ss(buffer);
+					// std::cout << "Message from client " << clientFd << ": " << buffer;
+					// std::string command, channel, arg1, arg2, arg3;
+					server.createChannel(clientFd, "new");
 
-					}
-					// else if (message == "INVITE")
-					// else if (message == "TOPIC")
-					else if (command == "MODE")
-						mode(channel, arg1, arg2);
-					// else
+					// ss >> command >> channel >> arg1 >> arg2 >> arg3;
+					// if (command == "KICK") {
+					
+					// 	KICK / channel user
+					// 	MODE / channel option (facultatif)
+
+					// }
+					// // else if (message == "INVITE")
+					// // else if (message == "TOPIC")
+					// else if (command == "MODE")
+					// 	mode(channel, arg1, arg2);
+					// // else
 					// 	std::cerr << "Error: invalid command" << std::endl;
-					broadcast(clientFd, command);
+					//broadcast(clientFd, command);
 				}
 			}
 		}
 	}
 }
 
-void Server::execCommand() {
-}
+// void Server::execCommand() {
+// }
