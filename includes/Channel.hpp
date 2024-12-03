@@ -20,7 +20,9 @@ class Channel{
 	//Getter
 		std::string	getTopic();
 		std::string	getName();
+		//ahans
 		Oper*		getOper(unsigned int fd);
+		//ahans
 		User*		getUser(unsigned int fd);
 
 	//Setter
@@ -31,6 +33,7 @@ class Channel{
 		void	addUser(unsigned int fd, User &user);
 		void	removeUser(unsigned int fd);
 		void	addOperator(unsigned int fd, Oper &oper);
+		//ahans
 		bool	isOperator(unsigned int fd);
 
 	private :
