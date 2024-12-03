@@ -40,8 +40,13 @@ class Server{
 		bool					getNeedPassw();
 		unsigned short			getBackLogSize();
 		//ahans
-		Channel*				getChannel(const std::string &channelName);
-
+		Channel					&getChannel(const std::string &channelName);
+		//ahans
+		bool					isChannel(const std::string &channelName);
+		//ahans
+		User					&getUser(int fd);
+		//ahans
+		bool					isUser(int fd);
 
 	//Surcharge operator
 		Server	&operator=(Server const &other);
@@ -55,7 +60,6 @@ class Server{
 		//void	createChannel(Channel &chan);
 		//ahans
 		void	createChannel(unsigned int fd, std::string channel_name);
-
 		void	createUser(int fd, User &user);
 		void	deleteUser(int fd);
 

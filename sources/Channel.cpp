@@ -40,10 +40,9 @@
 	}
 
 //Member function
-	void	Channel::mode(){}
-	void	Channel::addUser(unsigned int fd, User &user){_users.insert(std::make_pair(fd, &user));}
+	void	Channel::addUser(User &user){_users.insert(std::make_pair(user.getFd(), &user));}
 	void	Channel::removeUser(unsigned int fd){_users.erase(fd);}
-	void	Channel::addOperator(unsigned int fd, Oper &oper){_operators.insert(std::make_pair(fd, &oper));}
+	void	Channel::addOperator(Oper &oper){_operators.insert(std::make_pair(oper.getUser().getFd(), &oper));}
 
 	//ahans
 	bool	Channel::isOperator(unsigned int fd){

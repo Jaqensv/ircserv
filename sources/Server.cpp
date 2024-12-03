@@ -41,24 +41,50 @@
 		return _arrayUser;
 	}
 
-	//ahans
-	Channel*	Server::getChannel(const std::string &channelName){
-		std::cout << "search channel : " << channelName << std::endl;
-		std::vector<Channel*>::iterator it = _arrayChannel.begin();
-		for (; it != _arrayChannel.end(); ++it) {
-			if (channelName == (*it)->getName()) {
-				std::cout << "channel found " << (*it)->getName() << std::endl;
-				return *it;
-			}
+//ahans
+Channel	&Server::getChannel(const std::string &channelName){
+	std::vector<Channel*>::iterator it = _arrayChannel.begin();
+	for (; it != _arrayChannel.end(); ++it) {
+		if (channelName == (*it)->getName()) {
+			return **it;
 		}
-		std::cout << "channel not found" << std::endl;
-		return NULL;
 	}
+	return **it;
+}
 
-	unsigned short		Server::getBackLogSize(){
-		return this->_backLogSize;
+//ahans
+User	&Server::getUser(int fd) {
+	std::map<int, User*>::iterator it = _arrayUser.begin();
+	for (; it != _arrayUser.end(); ++it) {
+		if (fd == it->first)
+			return *it->second;
 	}
+	return *it->second;
+}
 
+//ahans
+bool	Server::isUser(int fd) {
+	std::map<int, User*>::iterator it = _arrayUser.begin();
+	for (; it != _arrayUser.end(); ++it) {
+		if (fd == it->first)
+			return true;
+	}
+	return false;
+}
+
+unsigned short		Server::getBackLogSize(){
+	return this->_backLogSize;
+}
+
+//ahans
+bool	Server::isChannel(const std::string &channelName) {
+	std::vector<Channel*>::iterator it = _arrayChannel.begin();
+	for (; it != _arrayChannel.end(); ++it) {
+		if (channelName == (*it)->getName())
+			return true;
+	}
+	return false;
+}
 
 //Member functions
 int	Server::socketNonBlocking(int fd){
@@ -140,11 +166,16 @@ void	Server::initEpoll(){
 
 //ahans
 void	Server::createChannel(unsigned int fd, std::string channel_name){
+	if (isChannel(channel_name) == true) {
+		std::cerr << "ERROR: Channel already exists" << std::endl;
+		return;
+	}
+	Server	&server = Server::getInstance();
 	Channel *newChannel = new Channel(channel_name);
-	Oper oper(fd);
+	Oper *oper = new Oper(server.getUser(fd));
 
-	(*newChannel).addUser(fd, oper);
-	(*newChannel).addOperator(fd, oper);
+	(*newChannel).addUser(server.getUser(fd));
+	(*newChannel).addOperator(*oper);
 	this->_arrayChannel.push_back(newChannel);
 }
 
@@ -238,13 +269,7 @@ void	Server::run(){
 					deleteUser(clientFd);
 					exit(1);
 				} else {
-					server.createChannel(clientFd, "new");
-					server.createChannel(clientFd, "new1");
-					server.createChannel(clientFd, "new2");
-					std::cout << "false :" << std::endl;
-					std::cout << server.getChannel("test") << std::endl;
-					std::cout << "true :" << std::endl;
-					std::cout << server.getChannel("new2") << std::endl;
+
 				}
 			}
 		}

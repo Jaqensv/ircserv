@@ -3,8 +3,6 @@
 #include "../includes/Operator.hpp"
 #include "../includes/Server.hpp"
 
-void	Oper::invite(unsigned int fd, User &user, Channel &channel){channel.addUser(fd, user);}
-
 void	Oper::topic(Channel &channel){
 	if (_canTopic == true)
 		std::cout << channel.getName() << " : " << channel.getTopic() << std::endl;
@@ -19,16 +17,5 @@ void	Oper::topic(Channel &channel, std::string topic){
 	}
 	else
 		std::cerr << "Error: needs rights to topic" << std::endl;
-}
-
-void	Oper::changePassw(std::string passw){
-	Server	&server = Server::getInstance();
-	server.setPassw(passw);
-}
-
-void	Oper::deletePassw(){
-	Server	&server = Server::getInstance();
-	server.setPassw("");
-	server.setNeedPasswFalse();
 }
 

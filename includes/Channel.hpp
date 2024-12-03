@@ -29,10 +29,9 @@ class Channel{
 		void	setTopic(std::string topic);
 
 	//Member function
-		void	mode();
-		void	addUser(unsigned int fd, User &user);
+		void	addUser(User &user);
 		void	removeUser(unsigned int fd);
-		void	addOperator(unsigned int fd, Oper &oper);
+		void	addOperator(Oper &oper);
 		//ahans
 		bool	isOperator(unsigned int fd);
 
