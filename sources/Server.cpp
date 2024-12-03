@@ -11,6 +11,7 @@
 #include "../includes/Server.hpp"
 #include "../includes/Operator.hpp"
 #include "../includes/Channel.hpp"
+#include "../Tester.hpp"
 
 //Constructor
 	Server::Server() : _port(0){
@@ -238,13 +239,7 @@ void	Server::run(){
 					deleteUser(clientFd);
 					exit(1);
 				} else {
-					server.createChannel(clientFd, "new");
-					server.createChannel(clientFd, "new1");
-					server.createChannel(clientFd, "new2");
-					std::cout << "false :" << std::endl;
-					std::cout << server.getChannel("test") << std::endl;
-					std::cout << "true :" << std::endl;
-					std::cout << server.getChannel("new2") << std::endl;
+					channelTester(server, clientFd, "Robbbbb");
 				}
 			}
 		}

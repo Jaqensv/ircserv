@@ -9,6 +9,7 @@ class Oper : public User{
 
 	public :
 	//Constructor
+		Oper(){};
 		Oper(int fd) : User(fd){}
 
 	//Member method Operator
