@@ -37,16 +37,22 @@
 	void			Server::setNeedPasswTrue(){this->_needPassw = true;}
 	bool			Server::getNeedPassw(){return this->_needPassw;}
 
-	// User			&Server::getUser(int fd){
-	// 	for (std::map<int, User*>::iterator it = _arrayUser.begin(); it != _arrayUser.end(); ++it){
-	// 		if (fd == it->first)
-	// 			return *it->second;
-	// 	}
-		
-	// }
-
 	std::map<int, User*>	Server::getUsers() const {
 		return _arrayUser;
+	}
+
+	//ahans
+	Channel*	Server::getChannel(const std::string &channelName){
+		std::cout << "search channel : " << channelName << std::endl;
+		std::vector<Channel*>::iterator it = _arrayChannel.begin();
+		for (; it != _arrayChannel.end(); ++it) {
+			if (channelName == (*it)->getName()) {
+				std::cout << "channel found " << (*it)->getName() << std::endl;
+				return *it;
+			}
+		}
+		std::cout << "channel not found" << std::endl;
+		return NULL;
 	}
 
 	unsigned short		Server::getBackLogSize(){
@@ -132,33 +138,14 @@ void	Server::initEpoll(){
 	}
 }
 
-//Channel
-// void	Server::createChannel(Channel &chan){
-// 	this->_arrayChannel.push_back(chan);
-// }
-
+//ahans
 void	Server::createChannel(unsigned int fd, std::string channel_name){
-	Channel channel(channel_name);
+	Channel *newChannel = new Channel(channel_name);
 	Oper oper(fd);
 
-	channel.addUser(fd, oper);
-	oper.setNickname("test0");
-	std::cout << oper.getNickname() << std::endl;
-	channel.addOperator(fd, oper);
-	oper.setNickname("test1");
-	std::cout << channel.getOper(fd)->getNickname() << std::endl;
-	this->_arrayChannel.push_back(channel);
-}
-
-void	Server::deleteChannel(std::string &channelName){
-
-	for (std::vector<Channel>::iterator it = _arrayChannel.begin(); it != _arrayChannel.end(); ) {
-		if (it->getName() == channelName) {
-			it = _arrayChannel.erase(it); // Remove and iterator go forward
-		} else {
-			++it; // Only go forward iterator
-		}
-	}
+	(*newChannel).addUser(fd, oper);
+	(*newChannel).addOperator(fd, oper);
+	this->_arrayChannel.push_back(newChannel);
 }
 
 //User
@@ -168,11 +155,6 @@ void	Server::createUser(int fd, User &user){
 
 void	Server::deleteUser(int fd){
 	this->_arrayUser.erase(fd);
-}
-
-
-std::vector<Channel> Server::getChannels() const {
-	return _arrayChannel;
 }
 
 void	Server::broadcast(int senderFd, std::string &message){
@@ -256,30 +238,15 @@ void	Server::run(){
 					deleteUser(clientFd);
 					exit(1);
 				} else {
-					// std::stringstream ss(buffer);
-					// std::cout << "Message from client " << clientFd << ": " << buffer;
-					// std::string command, channel, arg1, arg2, arg3;
 					server.createChannel(clientFd, "new");
-
-					// ss >> command >> channel >> arg1 >> arg2 >> arg3;
-					// if (command == "KICK") {
-					
-					// 	KICK / channel user
-					// 	MODE / channel option (facultatif)
-
-					// }
-					// // else if (message == "INVITE")
-					// // else if (message == "TOPIC")
-					// else if (command == "MODE")
-					// 	mode(channel, arg1, arg2);
-					// // else
-					// 	std::cerr << "Error: invalid command" << std::endl;
-					//broadcast(clientFd, command);
+					server.createChannel(clientFd, "new1");
+					server.createChannel(clientFd, "new2");
+					std::cout << "false :" << std::endl;
+					std::cout << server.getChannel("test") << std::endl;
+					std::cout << "true :" << std::endl;
+					std::cout << server.getChannel("new2") << std::endl;
 				}
 			}
 		}
 	}
 }
-
-// void Server::execCommand() {
-// }

@@ -36,11 +36,11 @@ class Server{
 
 		unsigned short			getPort();
 		std::string				getPassw();
-		// User					&getUser(int fd);
 		std::map<int, User*>	getUsers() const;
-		std::vector<Channel> 	getChannels() const;
 		bool					getNeedPassw();
 		unsigned short			getBackLogSize();
+		//ahans
+		Channel*				getChannel(const std::string &channelName);
 
 
 	//Surcharge operator
@@ -51,11 +51,10 @@ class Server{
 		int		socketNonBlocking(int fd);
 		void	initEpoll();
 		void	run();
-		void 	execCommand();
 
 		//void	createChannel(Channel &chan);
+		//ahans
 		void	createChannel(unsigned int fd, std::string channel_name);
-		void	deleteChannel(std::string &channelName);
 
 		void	createUser(int fd, User &user);
 		void	deleteUser(int fd);
@@ -77,7 +76,7 @@ class Server{
 		bool				_needPassw;
 
 	//Array of : Channel, User and Operator
-		std::vector<Channel>	_arrayChannel;
+		std::vector<Channel*>	_arrayChannel;
 		std::map<int, User*>	_arrayUser;
 
 };

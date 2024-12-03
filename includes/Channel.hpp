@@ -21,6 +21,7 @@ class Channel{
 		std::string	getTopic();
 		std::string	getName();
 		Oper*		getOper(unsigned int fd);
+		User*		getUser(unsigned int fd);
 
 	//Setter
 		void	setTopic(std::string topic);
@@ -30,6 +31,7 @@ class Channel{
 		void	addUser(unsigned int fd, User &user);
 		void	removeUser(unsigned int fd);
 		void	addOperator(unsigned int fd, Oper &oper);
+		bool	isOperator(unsigned int fd);
 
 	private :
 	//Member variable
