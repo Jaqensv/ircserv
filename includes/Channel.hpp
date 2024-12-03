@@ -18,8 +18,10 @@ class Channel{
 		Channel	&operator=(Channel const &other);
 
 	//Getter
-		std::string	getTopic();
-		std::string	getName();
+		std::string				getTopic();
+		std::string				getName();
+		// matt
+		std::map<int, User*>&	getUsers();
 		//ahans
 		Oper*		getOper(unsigned int fd);
 		//ahans
@@ -29,10 +31,9 @@ class Channel{
 		void	setTopic(std::string topic);
 
 	//Member function
-		void	mode();
-		void	addUser(unsigned int fd, User &user);
+		void	addUser(User &user);
 		void	removeUser(unsigned int fd);
-		void	addOperator(unsigned int fd, Oper &oper);
+		void	addOperator(Oper &oper);
 		//ahans
 		bool	isOperator(unsigned int fd);
 

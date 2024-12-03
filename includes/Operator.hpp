@@ -5,22 +5,18 @@
 
 class Channel;
 
-class Oper : public User{
-
+class Oper {
 	public :
 	//Constructor
-		Oper(){};
-		Oper(int fd) : User(fd){}
+		Oper(User &user) : _user(user){}
 
 	//Member method Operator
-		void	invite(unsigned int fd, User &user, Channel &channel);
 		void	topic(Channel &channel);
 		void 	topic(Channel &channel, std::string topic);
-		void	changePassw(std::string passw);
-		void	deletePassw();
+		User	&getUser() const {return _user;}
 
 	private :
 	//Member variable
-		bool					_canTopic;
-
+		User	&_user;
+		bool	_canTopic;
 };
