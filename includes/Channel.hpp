@@ -35,6 +35,8 @@ class Channel{
 		void	removeUser(unsigned int fd);
 		void	addOperator(Oper &oper);
 		//ahans
+		void	revokeOperator(unsigned int clientFd, unsigned int userFd);
+		//ahans
 		bool	isOperator(unsigned int fd);
 
 	private :

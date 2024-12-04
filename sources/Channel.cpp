@@ -43,6 +43,15 @@
 //Member function
 	void	Channel::addUser(User &user){_users.insert(std::make_pair(user.getFd(), &user));}
 	void	Channel::removeUser(unsigned int fd){_users.erase(fd);}
+	//ahans
+	void	Channel::revokeOperator(unsigned int clientFd, unsigned int userFd){
+		if (isOperator(clientFd)) {
+			_operators.erase(userFd);
+			delete getOper(userFd);
+		} else {
+			std::cout << "User " << clientFd << " is not operator can't revoke user " << userFd << std::endl;
+		}
+	}
 	void	Channel::addOperator(Oper &oper){_operators.insert(std::make_pair(oper.getUser().getFd(), &oper));}
 
 	//ahans
