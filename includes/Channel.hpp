@@ -22,6 +22,7 @@ class Channel{
 		std::string				getName();
 		// matt
 		std::map<int, User*>&	getUsers();
+		std::map<int, Oper*>&	getOpers();
 		//ahans
 		Oper*		getOper(unsigned int fd);
 		//ahans
@@ -31,9 +32,9 @@ class Channel{
 		void	setTopic(std::string topic);
 
 	//Member function
-		void	addUser(User &user);
+		void	addUser(unsigned int fd);
 		void	removeUser(unsigned int fd);
-		void	addOperator(Oper &oper);
+		void	addOperator(unsigned int fd);
 		//ahans
 		void	revokeOperator(unsigned int clientFd, unsigned int userFd);
 		//ahans

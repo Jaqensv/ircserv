@@ -19,6 +19,7 @@
 	void					Channel::setTopic(std::string topic){this->_topic = topic;}
 	std::string				Channel::getName(){return this->_name;}
 	std::map<int, User*>&	Channel::getUsers(){return _users;}
+	std::map<int, Oper*>&	Channel::getOpers(){return _operators;}
 
 	//ahans
 	Oper*		Channel::getOper(unsigned int fd) {
@@ -41,7 +42,15 @@
 	}
 
 //Member function
-	void	Channel::addUser(User &user){_users.insert(std::make_pair(user.getFd(), &user));}
+	void	Channel::addUser(unsigned int fd){
+		User *new_user = new User(fd);
+		_users.insert(std::make_pair(fd, new_user));
+	}
+	// void	Channel::addOperator(unsigned int fd){
+	// 	Oper *new_oper = new Oper();
+	// 	_operators.insert(std::make_pair(fd, new_oper));
+	// }
+
 	void	Channel::removeUser(unsigned int fd){_users.erase(fd);}
 	//ahans
 	void	Channel::revokeOperator(unsigned int clientFd, unsigned int userFd){
@@ -52,7 +61,6 @@
 			std::cout << "User " << clientFd << " is not operator can't revoke user " << userFd << std::endl;
 		}
 	}
-	void	Channel::addOperator(Oper &oper){_operators.insert(std::make_pair(oper.getUser().getFd(), &oper));}
 
 	//ahans
 	bool	Channel::isOperator(unsigned int fd){

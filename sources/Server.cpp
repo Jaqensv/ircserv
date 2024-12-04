@@ -176,8 +176,8 @@ void	Server::createChannel(unsigned int fd, std::string channel_name){
 	Channel *newChannel = new Channel(channel_name);
 	Oper *oper = new Oper(server.getUser(fd));
 
-	(*newChannel).addUser(server.getUser(fd));
-	(*newChannel).addOperator(*oper);
+	(*newChannel).addUser(fd);
+	(*newChannel).addOperator(fd);
 	this->_arrayChannel.push_back(newChannel);
 }
 
