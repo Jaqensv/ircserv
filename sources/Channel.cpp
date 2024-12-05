@@ -3,12 +3,11 @@
 #include "../includes/Server.hpp"
 #include "../includes/Channel.hpp"
 #include "../includes/User.hpp"
-#include "../includes/Operator.hpp"
 
 //Constructor & Destructor
 	Channel::Channel(){}
 	Channel::Channel(Channel const &copy){(void)copy;}
-	Channel::Channel(std::string name) : _name(name){}
+	Channel::Channel(std::string name) : _name(name) {}
 	Channel::~Channel(){}
 
 //Surcharge operator
@@ -19,11 +18,11 @@
 	void					Channel::setTopic(std::string topic){this->_topic = topic;}
 	std::string				Channel::getName(){return this->_name;}
 	std::map<int, User*>&	Channel::getUsers(){return _users;}
-	std::map<int, Oper*>&	Channel::getOpers(){return _operators;}
+	std::map<int, User*>&	Channel::getOpers(){return _operators;}
 
 	//ahans
-	Oper*		Channel::getOper(unsigned int fd) {
-		std::map<int, Oper*>::iterator it = _operators.begin();
+	User*		Channel::getOper(unsigned int fd) {
+		std::map<int, User*>::iterator it = _operators.begin();
 		for (; it != _operators.end(); ++it) {
 			if (fd == static_cast<unsigned int>(it->first))
 				return it->second;
@@ -43,28 +42,26 @@
 
 //Member function
 	void	Channel::addUser(unsigned int fd){
-		User *new_user = new User(fd);
-		_users.insert(std::make_pair(fd, new_user));
+		Server	&server = Server::getInstance();
+		_users.insert(std::make_pair(fd, &server.getUser(fd)));
 	}
-	// void	Channel::addOperator(unsigned int fd){
-	// 	Oper *new_oper = new Oper();
-	// 	_operators.insert(std::make_pair(fd, new_oper));
-	// }
+
+	void	Channel::addOperator(unsigned int fd) {
+		_operators.insert(std::make_pair(fd, getUser(fd)));
+	}
 
 	void	Channel::removeUser(unsigned int fd){_users.erase(fd);}
 	//ahans
 	void	Channel::revokeOperator(unsigned int clientFd, unsigned int userFd){
-		if (isOperator(clientFd)) {
+		if (isOperator(clientFd))
 			_operators.erase(userFd);
-			delete getOper(userFd);
-		} else {
+		else
 			std::cout << "User " << clientFd << " is not operator can't revoke user " << userFd << std::endl;
-		}
 	}
 
 	//ahans
 	bool	Channel::isOperator(unsigned int fd){
-		std::map<int, Oper*>::iterator it = _operators.begin();
+		std::map<int, User*>::iterator it = _operators.begin();
 		for (; it != _operators.end(); ++it) {
 			if (fd == static_cast<unsigned int>(it->first))
 				return true;

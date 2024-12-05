@@ -18,25 +18,36 @@ void channelTester(Server &server, unsigned int clientFd, std::string channel_na
 		std::cout << (*it)->getName() << std::endl;
 	BACKLINE;
 	std::cout << "In " << server.getChannel(channel_name).getName() << ", we have these users : " << std::endl;
-	std::map<int, User*>::iterator user_it = server.getChannel(channel_name).getUsers().begin();
-	for (; user_it != server.getChannel(channel_name).getUsers().end(); ++user_it)
+
+	for (std::map<int, User*>::iterator user_it = server.getChannel(channel_name).getUsers().begin(); user_it != server.getChannel(channel_name).getUsers().end(); ++user_it)
 		std::cout << "User name : " << user_it->second->getUsername() << " | " << "fd : " << user_it->first << std::endl;
 	BACKLINE;
 	std::cout << "In " << server.getChannel(channel_name).getName() << ", we have these operators : " << std::endl;
-	std::map<int, Oper*>::iterator oper_it = server.getChannel(channel_name).getOpers().begin();
-	for (; oper_it != server.getChannel(channel_name).getOpers().end(); ++oper_it) {
-		unsigned fd = oper_it->first;
-		std::string user_name = NULL;
-		for (std::map<int, User*>::iterator user_it = server.getChannel(channel_name).getUsers().begin(); user_it != server.getChannel(channel_name).getUsers().end(); ++user_it) {
-			if (fd == user_it->first)
-				std::cout << "User name : " << user_it->second->getUsername() << " | " << "fd : " << oper_it->first << std::endl;
-		}
+	for (std::map<int, User*>::iterator oper_it = server.getChannel(channel_name).getOpers().begin(); oper_it != server.getChannel(channel_name).getOpers().end(); ++oper_it)
+		std::cout << "User name : " << oper_it->second->getUsername() << " | " << "fd : " << oper_it->first << std::endl;
+
+	BACKLINE;
+	std::cout << "We add one user who becomes an operator" << std::endl;
+	server.getChannel(channel_name).addUser(clientFd);
+	server.getChannel(channel_name).addOperator(clientFd);
+	BACKLINE;
+	std::cout << "In " << server.getChannel(channel_name).getName() << ", we have these users : " << std::endl;
+
+	for (std::map<int, User*>::iterator user_it = server.getChannel(channel_name).getUsers().begin(); user_it != server.getChannel(channel_name).getUsers().end(); ++user_it)
+		std::cout << "User name : " << user_it->second->getUsername() << " | " << "fd : " << user_it->first << std::endl;
+	BACKLINE;
+	std::cout << "In " << server.getChannel(channel_name).getName() << ", we have these operators : " << std::endl;
+	for (std::map<int, User*>::iterator oper_it = server.getChannel(channel_name).getOpers().begin(); oper_it != server.getChannel(channel_name).getOpers().end(); ++oper_it)
+		std::cout << "User name : " << oper_it->second->getUsername() << " | " << "fd : " << oper_it->first << std::endl;
+	BACKLINE;
+	if (server.getChannel(channel_name).getOpers().size() > 1) {
+		std::cout << "We revoke the rights of the first operator" << std::endl;
+		server.getChannel(channel_name).revokeOperator(clientFd, 5);
+		std::cout << "In " << server.getChannel(channel_name).getName() << ", we have these operators : " << std::endl;
+		for (std::map<int, User*>::iterator oper_it = server.getChannel(channel_name).getOpers().begin(); oper_it != server.getChannel(channel_name).getOpers().end(); ++oper_it)
+			std::cout << "User name : " << oper_it->second->getUsername() << " | " << "fd : " << oper_it->first << std::endl;
 	}
 	BACKLINE;
-	unsigned int new_fd = clientFd++;
-	std::cout << "We add one user who becomes an operator" << std::endl;
-	server.getChannel(channel_name).addUser(new_fd);
-	server.getChannel(channel_name).addOperator(new_fd);
 	std::cout << "##################### TESTER #####################" << std::endl;
 	BACKLINE;
 }

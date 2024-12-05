@@ -9,7 +9,6 @@
 #include <fcntl.h>
 #include <algorithm>
 #include "../includes/Server.hpp"
-#include "../includes/Operator.hpp"
 #include "../includes/Channel.hpp"
 #include "../includes/Tester.hpp"
 
@@ -172,9 +171,7 @@ void	Server::createChannel(unsigned int fd, std::string channel_name){
 		std::cerr << "ERROR: Channel already exists" << std::endl;
 		return;
 	}
-	Server	&server = Server::getInstance();
 	Channel *newChannel = new Channel(channel_name);
-	Oper *oper = new Oper(server.getUser(fd));
 
 	(*newChannel).addUser(fd);
 	(*newChannel).addOperator(fd);

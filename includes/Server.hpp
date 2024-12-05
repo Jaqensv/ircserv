@@ -9,7 +9,8 @@
 #include <algorithm> // std::find
 #include "Channel.hpp"
 #include "User.hpp"
-#include "Operator.hpp"
+
+class Channel;
 
 class Server{
 
