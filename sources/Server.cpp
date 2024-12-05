@@ -269,6 +269,7 @@ void	Server::run(){
 					exit(1);
 				} 
 				else {
+					
 					channelTester(server, clientFd, "Robbbbb");
 				}
 			}
