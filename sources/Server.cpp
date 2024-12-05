@@ -178,10 +178,6 @@ void	Server::createChannel(unsigned int fd, std::string channel_name){
 	this->_arrayChannel.push_back(newChannel);
 }
 
-std::map<int, User*>	Server::getArrayUser() {
-	return this->_arrayUser;
-}
-
 //User
 void	Server::createUser(int fd, User &user){
 		this->_arrayUser.insert(std::make_pair(fd, &user));
@@ -271,7 +267,7 @@ void	Server::run(){
 					epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 					deleteUser(clientFd);
 					exit(1);
-				} 
+				}
 				else {
 					channelTester(server, clientFd, "Robbbbb");
 				}
