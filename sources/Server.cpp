@@ -9,8 +9,8 @@
 #include <fcntl.h>
 #include <algorithm>
 #include "../includes/Server.hpp"
-#include "../includes/Operator.hpp"
 #include "../includes/Channel.hpp"
+#include "../includes/Tester.hpp"
 
 //Constructor
 	Server::Server() : _port(0){
@@ -37,17 +37,55 @@
 	void			Server::setNeedPasswTrue(){this->_needPassw = true;}
 	bool			Server::getNeedPassw(){return this->_needPassw;}
 
-	User*			Server::getUser(int fd){
-		if (this->_arrayUser.find(fd) != _arrayUser.end()) {
-			return _arrayUser[fd];
+	const std::vector<Channel*>& Server::getChannels(){
+		return _arrayChannel;
+	}
+
+//ahans
+Channel	&Server::getChannel(const std::string &channelName){
+	std::vector<Channel*>::iterator it = _arrayChannel.begin();
+	for (; it != _arrayChannel.end(); ++it) {
+		if (channelName == (*it)->getName()) {
+			return **it;
 		}
-		return NULL;
 	}
+	return **it;
+}
 
-	unsigned short		Server::getBackLogSize(){
-		return this->_backLogSize;
+
+//ahans
+User	&Server::getUser(int fd) {
+	std::map<int, User*>::iterator it = _arrayUser.begin();
+	for (; it != _arrayUser.end(); ++it) {
+		if (fd == it->first)
+			return *it->second;
 	}
+	return *it->second;
+}
 
+//ahans
+bool	Server::isUser(int fd) {
+	std::map<int, User*>::iterator it = _arrayUser.begin();
+	for (; it != _arrayUser.end(); ++it) {
+		if (fd == it->first)
+			return true;
+	}
+	return false;
+}
+
+unsigned short		Server::getBackLogSize(){
+	return this->_backLogSize;
+}
+
+//ahans
+bool	Server::isChannel(const std::string &channelName) {
+	std::vector<Channel*>::iterator it = _arrayChannel.begin();
+	for (; it != _arrayChannel.end(); ++it) {
+		if (channelName == (*it)->getName())
+			return true;
+	}
+	return false;
+}
 
 //Member functions
 int	Server::socketNonBlocking(int fd){
@@ -127,26 +165,17 @@ void	Server::initEpoll(){
 	}
 }
 
-//Channel
-// void	Server::createChannel(Channel &chan){
-// 	this->_arrayChannel.push_back(chan);
-// }
-
-void	Server::createChannel(Channel &chan, unsigned int fd, Oper &oper){
-	chan.addUser(fd, oper);
-	chan.addOperator(fd, oper);
-	this->_arrayChannel.push_back(chan);
-}
-
-void	Server::deleteChannel(std::string &channelName){
-
-	for (std::vector<Channel>::iterator it = _arrayChannel.begin(); it != _arrayChannel.end(); ) {
-		if (it->getName() == channelName) {
-			it = _arrayChannel.erase(it); // Remove and iterator go forward
-		} else {
-			++it; // Only go forward iterator
-		}
+//ahans
+void	Server::createChannel(unsigned int fd, std::string channel_name){
+	if (isChannel(channel_name) == true) {
+		std::cerr << "ERROR: Channel already exists" << std::endl;
+		return;
 	}
+	Channel *newChannel = new Channel(channel_name);
+
+	(*newChannel).addUser(fd);
+	(*newChannel).addOperator(fd);
+	this->_arrayChannel.push_back(newChannel);
 }
 
 std::map<int, User*>	Server::getArrayUser() {
@@ -160,25 +189,6 @@ void	Server::createUser(int fd, User &user){
 
 void	Server::deleteUser(int fd){
 	this->_arrayUser.erase(fd);
-}
-
-//Operator
-void	Server::createOperator(Oper &op){
-	this->_arrayOperator.push_back(op);
-}
-
-void	Server::deleteOperator(int fd){
-	for (std::vector<Oper>::iterator it = _arrayOperator.begin(); it != _arrayOperator.end(); ) {
-		if (it->getFd() == fd) {
-			it = _arrayOperator.erase(it); // Remove and iterator go forward
-		} else {
-			++it; // Only go forward iterator
-		}
-	}
-}
-
-std::vector<Oper>&	Server::getOperators() {
-	return this->_arrayOperator;
 }
 
 void	Server::broadcast(int senderFd, std::string &message){
@@ -261,12 +271,9 @@ void	Server::run(){
 					epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 					deleteUser(clientFd);
 					exit(1);
-				}
-				else{
-					std::string message = buffer;
-					std::cout << "Message from client " << clientFd << ": " << buffer;
-					// implementer commande ici
-					broadcast(clientFd, message);
+				} 
+				else {
+					channelTester(server, clientFd, "Robbbbb");
 				}
 			}
 		}
