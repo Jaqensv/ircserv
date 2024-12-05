@@ -46,4 +46,7 @@ class Channel{
 		std::string				_topic;
 		std::map<int, User*> 	_users;
 		std::map<int, Oper*>	_operators;
+
+		//std::map<int, bool>		_canTopic;
+
 };

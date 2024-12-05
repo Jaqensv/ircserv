@@ -33,10 +33,10 @@ void channelTester(Server &server, unsigned int clientFd, std::string channel_na
 		}
 	}
 	BACKLINE;
-	unsigned int new_fd = clientFd++;
-	std::cout << "We add one user who becomes an operator" << std::endl;
-	server.getChannel(channel_name).addUser(new_fd);
-	server.getChannel(channel_name).addOperator(new_fd);
+	// unsigned int new_fd = clientFd++;
+	// std::cout << "We add one user who becomes an operator" << std::endl;
+	// server.getChannel(channel_name).addUser(new_fd);
+	// server.getChannel(channel_name).addOperator(new_fd);
 	std::cout << "##################### TESTER #####################" << std::endl;
 	BACKLINE;
 }
