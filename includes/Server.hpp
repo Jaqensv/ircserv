@@ -5,9 +5,12 @@
 #include <sys/epoll.h>
 #include <vector>
 #include <map>
+#include <sstream> // stringstream
+#include <algorithm> // std::find
 #include "Channel.hpp"
 #include "User.hpp"
-#include "Operator.hpp"
+
+class Channel;
 
 class Server{
 
@@ -32,13 +35,21 @@ class Server{
 		void				setNeedPasswFalse();
 		void				setNeedPasswTrue();
 
-		unsigned short		getPort();
-		std::string			getPassw();
-		User*				getUser(int fd);
-		std::vector<Oper>&	getOperators();
-		bool				getNeedPassw();
-		unsigned short		getBackLogSize();
+		unsigned short			getPort();
+		std::string				getPassw();
+		// matt
+		const std::vector<Channel*>&	getChannels();
 
+		bool					getNeedPassw();
+		unsigned short			getBackLogSize();
+		//ahans
+		Channel					&getChannel(const std::string &channelName);
+		//ahans
+		bool					isChannel(const std::string &channelName);
+		//ahans
+		User					&getUser(int fd);
+		//ahans
+		bool					isUser(int fd);
 
 	//Surcharge operator
 		Server	&operator=(Server const &other);
@@ -48,16 +59,13 @@ class Server{
 		void	initEpoll();
 		void	run();
 
-		void	createChannel(Channel &chan);
-		void	deleteChannel(std::string &channelName);
-
+		//void	createChannel(Channel &chan);
+		//ahans
+		void	createChannel(unsigned int fd, std::string channel_name);
 		void	createUser(int fd, User &user);
 		void	deleteUser(int fd);
 
-		void	createOperator(Oper &op);
-		void	deleteOperator(int fd);
-
-		void		broadcastAll(int senderFd, std::string &message);
+		void	broadcast(int senderFd, std::string &message);
 
 
 	private :
@@ -74,8 +82,7 @@ class Server{
 		bool				_needPassw;
 
 	//Array of : Channel, User and Operator
-		std::vector<Channel>	_arrayChannel;
+		std::vector<Channel*>	_arrayChannel;
 		std::map<int, User*>	_arrayUser;
-		std::vector<Oper>		_arrayOperator;
 
 };

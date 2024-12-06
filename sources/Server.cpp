@@ -11,8 +11,8 @@
 #include <termios.h>
 #include "../includes/IrcMessage.hpp"
 #include "../includes/Server.hpp"
-#include "../includes/Operator.hpp"
 #include "../includes/Channel.hpp"
+#include "../includes/Tester.hpp"
 
 
 //Constructor
@@ -40,17 +40,55 @@
 	void			Server::setNeedPasswTrue(){this->_needPassw = true;}
 	bool			Server::getNeedPassw(){return this->_needPassw;}
 
-	User*			Server::getUser(int fd){
-		if (this->_arrayUser.find(fd) != _arrayUser.end()) {
-			return _arrayUser[fd];
+	const std::vector<Channel*>& Server::getChannels(){
+		return _arrayChannel;
+	}
+
+//ahans
+Channel	&Server::getChannel(const std::string &channelName){
+	std::vector<Channel*>::iterator it = _arrayChannel.begin();
+	for (; it != _arrayChannel.end(); ++it) {
+		if (channelName == (*it)->getName()) {
+			return **it;
 		}
-		return NULL;
 	}
+	return **it;
+}
 
-	unsigned short		Server::getBackLogSize(){
-		return this->_backLogSize;
+
+//ahans
+User	&Server::getUser(int fd) {
+	std::map<int, User*>::iterator it = _arrayUser.begin();
+	for (; it != _arrayUser.end(); ++it) {
+		if (fd == it->first)
+			return *it->second;
 	}
+	return *it->second;
+}
 
+//ahans
+bool	Server::isUser(int fd) {
+	std::map<int, User*>::iterator it = _arrayUser.begin();
+	for (; it != _arrayUser.end(); ++it) {
+		if (fd == it->first)
+			return true;
+	}
+	return false;
+}
+
+unsigned short		Server::getBackLogSize(){
+	return this->_backLogSize;
+}
+
+//ahans
+bool	Server::isChannel(const std::string &channelName) {
+	std::vector<Channel*>::iterator it = _arrayChannel.begin();
+	for (; it != _arrayChannel.end(); ++it) {
+		if (channelName == (*it)->getName())
+			return true;
+	}
+	return false;
+}
 
 //Member functions
 void	Server::initServer(){
@@ -104,7 +142,7 @@ void	Server::initEpoll(){
 	server._event.data.fd = server._serverSocket;
 	server._event.events = EPOLLIN | EPOLLOUT;
 
-	if(epoll_ctl(server._epollFd, EPOLL_CTL_ADD, server._serverSocket, &server._event) == -1){
+	if (epoll_ctl(server._epollFd, EPOLL_CTL_ADD, server._serverSocket, &server._event) == -1){
 		std::cerr << "ERROR EPOLL : epoll_ctl_add failed." << std::endl;
 		close(server._serverSocket);
 		close(server._epollFd);
@@ -112,20 +150,17 @@ void	Server::initEpoll(){
 	}
 }
 
-//Channel
-void	Server::createChannel(Channel &chan){
-	this->_arrayChannel.push_back(chan);
-}
-
-void	Server::deleteChannel(std::string &channelName){
-
-	for (std::vector<Channel>::iterator it = _arrayChannel.begin(); it != _arrayChannel.end(); ) {
-		if (it->getName() == channelName) {
-			it = _arrayChannel.erase(it); // Remove and iterator go forward
-		} else {
-			++it; // Only go forward iterator
-		}
+//ahans
+void	Server::createChannel(unsigned int fd, std::string channel_name){
+	if (isChannel(channel_name) == true) {
+		std::cerr << "ERROR: Channel already exists" << std::endl;
+		return;
 	}
+	Channel *newChannel = new Channel(channel_name);
+
+	(*newChannel).addUser(fd);
+	(*newChannel).addOperator(fd);
+	this->_arrayChannel.push_back(newChannel);
 }
 
 //User
@@ -137,27 +172,7 @@ void	Server::deleteUser(int fd){
 	this->_arrayUser.erase(fd);
 }
 
-//Operator
-void	Server::createOperator(Oper &op){
-	this->_arrayOperator.push_back(op);
-}
-
-void	Server::deleteOperator(int fd){
-	for (std::vector<Oper>::iterator it = _arrayOperator.begin(); it != _arrayOperator.end(); ) {
-		if (it->getFd() == fd) {
-			it = _arrayOperator.erase(it); // Remove and iterator go forward
-		} else {
-			++it; // Only go forward iterator
-		}
-	}
-}
-
-std::vector<Oper>&	Server::getOperators() {
-	return this->_arrayOperator;
-}
-
-
-void	Server::broadcastAll(int senderFd, std::string &message){
+void	Server::broadcast(int senderFd, std::string &message){
 	for(std::map<int, User*>::iterator it =this->_arrayUser.begin(); it != _arrayUser.end(); it++){
 		int clientFd = it->first;
 		if(clientFd != senderFd){
@@ -223,12 +238,23 @@ void	Server::run(){
 					epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 					deleteUser(clientFd);
 				}
-				else{
+				else {
+					std::stringstream ss(buffer);
+					std::string command, channel, arg3, arg4;
+					ss >> command >> channel >> arg3 >> arg4;
 					std::string input = buffer;
 					// parseIrcMessage(input);
 					std::cout << "Message from client " << clientFd << ": " << buffer;
-					// implementer commande ici
+					if (command == "KICK")
+						std::cout << "Enter KICK methode" << std::endl;
+					else if (command == "INVITE")
+						std::cout << "Enter INVITE methode" << std::endl;
+					else if (command == "TOPIC")
+						std::cout << "Enter TOPIC methode" << std::endl;
+					else if (command == "MODE")
+						std::cout << "Enter MODE methode" << std::endl;
 					broadcastAll(clientFd, input);
+					//channelTester(server, clientFd, "Robbbbb");
 				}
 			}
 		}
