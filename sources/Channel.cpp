@@ -19,16 +19,17 @@
 	std::map<int, User*>&	Channel::getUsers(){return _users;}
 	std::map<int, User*>&	Channel::getOpers(){return _operators;}
 	//matt
-	void					Channel::setTopic(unsigned int fd, std::string topic) {
-		std::map<int, User*>::iterator user_it = _users.find(fd);
-		if (_canTopic == true) {
-			_topic = topic;
+	void					Channel::setTopic(unsigned int fd, std::string channel_name, std::string topic) {
+		Server &server = server.getInstance();
+
+		std::map<int, User*>::iterator user_it = server.getChannel(channel_name)._users.find(fd);
+		if (server.getChannel(channel_name)._canTopic == true) {
+			server.getChannel(channel_name)._topic = topic;
 			std::cout << user_it->second->getUsername() << " has changed the topic: " << _topic << std::endl;
 		}
 		else {
-			std::map<int, User*>::iterator oper_it = _operators.find(fd);
-			if (oper_it != _operators.end()) {
-				_topic = topic;
+			if (server.getChannel(channel_name).isOperator(fd)) {
+				server.getChannel(channel_name)._topic = topic;
 				std::cout << user_it->second->getUsername() << " has changed the topic: " << _topic << std::endl;
 			}
 			else

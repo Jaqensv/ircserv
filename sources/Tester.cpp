@@ -38,7 +38,7 @@ void channelTester(Server &server, unsigned int clientFd, std::string channel_na
 	server.getChannel(channel_name).addUser(clientFd);
 	server.getChannel(channel_name).addOperator(clientFd);
 	std::cout << "He tries to change the topic into " << channel_name << std::endl;
-	server.getChannel(channel_name).setTopic(clientFd, "NOUVEAU TOPIC WESH");
+	server.getChannel(channel_name).setTopic(clientFd, server.getChannel(channel_name).getName(), "NOUVEAU TOPIC WESH");
 	BACKLINE;
 	std::cout << "In " << server.getChannel(channel_name).getName() << ", we have these users : " << std::endl;
 

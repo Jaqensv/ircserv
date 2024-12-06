@@ -28,7 +28,7 @@ class Channel{
 
 	//Setter
 		//matt
-		void	setTopic(unsigned int fd, std::string topic);
+		void	setTopic(unsigned int fd, std::string channel_name, std::string topic);
 
 	//Member function
 		void	addUser(unsigned int fd);
