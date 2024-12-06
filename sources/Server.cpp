@@ -9,7 +9,6 @@
 #include <fcntl.h>
 #include <algorithm>
 #include "../includes/Server.hpp"
-#include "../includes/Operator.hpp"
 #include "../includes/Channel.hpp"
 #include "../includes/Tester.hpp"
 
@@ -172,9 +171,7 @@ void	Server::createChannel(unsigned int fd, std::string channel_name){
 		std::cerr << "ERROR: Channel already exists" << std::endl;
 		return;
 	}
-	Server	&server = Server::getInstance();
 	Channel *newChannel = new Channel(channel_name);
-	Oper *oper = new Oper(server.getUser(fd));
 
 	(*newChannel).addUser(fd);
 	(*newChannel).addOperator(fd);
@@ -272,6 +269,18 @@ void	Server::run(){
 					exit(1);
 				} 
 				else {
+					// std::stringstream ss(buffer);
+					// std::string command, channel, arg3, arg4;
+					// ss >> command >> channel >> arg3 >> arg4;
+					// if (command == "KICK")
+					// 	std::cout << "Enter KICK methode" << std::endl;
+					// else if (command == "INVITE")
+					// 	std::cout << "Enter INVITE methode" << std::endl;
+					// else if (command == "TOPIC")
+					// 	std::cout << "Enter TOPIC methode" << std::endl;
+					// else if (command == "MODE")
+					// 	std::cout << "Enter MODE methode" << std::endl;
+
 					channelTester(server, clientFd, "Robbbbb");
 				}
 			}

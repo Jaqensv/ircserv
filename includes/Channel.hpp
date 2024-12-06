@@ -3,13 +3,11 @@
 #include <string>
 #include "Server.hpp"
 #include "User.hpp"
-#include "Operator.hpp"
 
 class Channel{
 
 	public :
 	//Constructor & Destructor
-		Channel();
 		Channel(Channel const &copy);
 		Channel(std::string name);
 		~Channel();
@@ -22,14 +20,15 @@ class Channel{
 		std::string				getName();
 		// matt
 		std::map<int, User*>&	getUsers();
-		std::map<int, Oper*>&	getOpers();
+		std::map<int, User*>&	getOpers();
 		//ahans
-		Oper*		getOper(unsigned int fd);
+		User*		getOper(unsigned int fd);
 		//ahans
 		User*		getUser(unsigned int fd);
 
 	//Setter
-		void	setTopic(std::string topic);
+		//matt
+		void	setTopic(unsigned int fd, std::string channel_name, std::string topic);
 
 	//Member function
 		void	addUser(unsigned int fd);
@@ -42,11 +41,12 @@ class Channel{
 
 	private :
 	//Member variable
+		Channel();
 		std::string				_name;
 		std::string				_topic;
-		std::map<int, User*> 	_users;
-		std::map<int, Oper*>	_operators;
+		bool					_canTopic; // false pour que les OP, true pour tout le monde
 
-		//std::map<int, bool>		_canTopic;
+		std::map<int, User*> 	_users;
+		std::map<int, User*>	_operators;
 
 };
