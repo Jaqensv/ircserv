@@ -45,7 +45,6 @@ class Server{
 
 	//Member functions
 		void	initServer();
-		int		socketNonBlocking(int fd);
 		void	initEpoll();
 		void	run();
 
@@ -58,7 +57,7 @@ class Server{
 		void	createOperator(Oper &op);
 		void	deleteOperator(int fd);
 
-		void	broadcast(int senderFd, std::string &message);
+		void		broadcastAll(int senderFd, std::string &message);
 
 
 	private :

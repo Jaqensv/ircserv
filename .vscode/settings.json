@@ -50,6 +50,7 @@
 		"typeinfo": "cpp",
 		"cstring": "cpp",
 		"cinttypes": "cpp",
-		"map": "cpp"
+		"map": "cpp",
+		"sstream": "cpp"
 	}
 }
