@@ -269,19 +269,19 @@ void	Server::run(){
 					exit(1);
 				} 
 				else {
-					std::stringstream ss(buffer);
-					std::string command, channel, arg3, arg4;
-					ss >> command >> channel >> arg3 >> arg4;
-					if (command == "KICK")
-						std::cout << "Enter KICK methode" << std::endl;
-					else if (command == "INVITE")
-						std::cout << "Enter INVITE methode" << std::endl;
-					else if (command == "TOPIC")
-						std::cout << "Enter TOPIC methode" << std::endl;
-					else if (command == "MODE")
-						std::cout << "Enter MODE methode" << std::endl;
+					// std::stringstream ss(buffer);
+					// std::string command, channel, arg3, arg4;
+					// ss >> command >> channel >> arg3 >> arg4;
+					// if (command == "KICK")
+					// 	std::cout << "Enter KICK methode" << std::endl;
+					// else if (command == "INVITE")
+					// 	std::cout << "Enter INVITE methode" << std::endl;
+					// else if (command == "TOPIC")
+					// 	std::cout << "Enter TOPIC methode" << std::endl;
+					// else if (command == "MODE")
+					// 	std::cout << "Enter MODE methode" << std::endl;
 
-					//channelTester(server, clientFd, "Robbbbb");
+					channelTester(server, clientFd, "Robbbbb");
 				}
 			}
 		}

@@ -5,13 +5,20 @@ void channelTester(Server &server, unsigned int clientFd, std::string channel_na
 	BACKLINE;
 	std::cout << "##################### TESTER #####################" << std::endl;
 	BACKLINE;
+
 	std::cout << "Channels created : " << std::endl;
-	server.createChannel(clientFd, channel_name);
-	std::cout << "'" << server.getChannel(channel_name).getName() << "'" << " channel created by user " << clientFd << std::endl;
-	server.createChannel(clientFd, "new1");
-	std::cout << "'" << server.getChannel("new1").getName() << "'" << " channel created by user " << clientFd << std::endl;
-	server.createChannel(clientFd, "new2");
-	std::cout << "'" << server.getChannel("new2").getName() << "'" << " channel created by user " << clientFd << std::endl;
+	if (server.isChannel(channel_name) == false) {
+		server.createChannel(clientFd, channel_name);
+		std::cout << "'" << server.getChannel(channel_name).getName() << "'" << " channel created by user " << clientFd << std::endl;
+	}
+	if (server.isChannel("new1") == false) {
+		server.createChannel(clientFd, "new1");
+		std::cout << "'" << server.getChannel("new1").getName() << "'" << " channel created by user " << clientFd << std::endl;
+	}
+	if (server.isChannel("new2") == false) {
+		server.createChannel(clientFd, "new2");
+		std::cout << "'" << server.getChannel("new2").getName() << "'" << " channel created by user " << clientFd << std::endl;
+	}
 	BACKLINE;
 	std::cout << "This server contains these channels : " << std::endl;
 	for (std::vector<Channel*>::const_iterator it = server.getChannels().begin(); it != server.getChannels().end(); ++it)
@@ -30,6 +37,8 @@ void channelTester(Server &server, unsigned int clientFd, std::string channel_na
 	std::cout << "We add one user who becomes an operator" << std::endl;
 	server.getChannel(channel_name).addUser(clientFd);
 	server.getChannel(channel_name).addOperator(clientFd);
+	std::cout << "He tries to change the topic into " << channel_name << std::endl;
+	server.getChannel(channel_name).setTopic(clientFd, "NOUVEAU TOPIC WESH");
 	BACKLINE;
 	std::cout << "In " << server.getChannel(channel_name).getName() << ", we have these users : " << std::endl;
 
