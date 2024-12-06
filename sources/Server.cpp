@@ -172,7 +172,7 @@ void	Server::deleteUser(int fd){
 	this->_arrayUser.erase(fd);
 }
 
-void	Server::broadcast(int senderFd, std::string &message){
+void	Server::broadcastAll(int senderFd, std::string &message){
 	for(std::map<int, User*>::iterator it =this->_arrayUser.begin(); it != _arrayUser.end(); it++){
 		int clientFd = it->first;
 		if(clientFd != senderFd){
@@ -239,22 +239,21 @@ void	Server::run(){
 					deleteUser(clientFd);
 				}
 				else {
-					std::stringstream ss(buffer);
-					std::string command, channel, arg3, arg4;
-					ss >> command >> channel >> arg3 >> arg4;
 					std::string input = buffer;
-					// parseIrcMessage(input);
+					server._arrayParams = parseIrcMessage(input);
 					std::cout << "Message from client " << clientFd << ": " << buffer;
-					if (command == "KICK")
+					if(server._arrayParams.isCommand == false){
+						broadcastAll(clientFd, server._arrayParams.params[0]);
+					}
+					else if (server._arrayParams.command == "/KICK")
 						std::cout << "Enter KICK methode" << std::endl;
-					else if (command == "INVITE")
+					else if (server._arrayParams.command == "/INVITE")
 						std::cout << "Enter INVITE methode" << std::endl;
-					else if (command == "TOPIC")
+					else if (server._arrayParams.command == "/TOPIC")
 						std::cout << "Enter TOPIC methode" << std::endl;
-					else if (command == "MODE")
+					else if (server._arrayParams.command == "/MODE")
 						std::cout << "Enter MODE methode" << std::endl;
-					broadcastAll(clientFd, input);
-					//channelTester(server, clientFd, "Robbbbb");
+					// channelTester(server, clientFd, "Robbbbb");
 				}
 			}
 		}

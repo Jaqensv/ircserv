@@ -9,6 +9,7 @@
 #include <algorithm> // std::find
 #include "Channel.hpp"
 #include "User.hpp"
+#include "IrcMessage.hpp"
 
 class Channel;
 
@@ -65,7 +66,7 @@ class Server{
 		void	createUser(int fd, User &user);
 		void	deleteUser(int fd);
 
-		void	broadcast(int senderFd, std::string &message);
+		void	broadcastAll(int senderFd, std::string &message);
 
 
 	private :
@@ -82,7 +83,8 @@ class Server{
 		bool				_needPassw;
 
 	//Array of : Channel, User and Operator
-		std::vector<Channel*>	_arrayChannel;
-		std::map<int, User*>	_arrayUser;
+		std::vector<Channel*>		_arrayChannel;
+		std::map<int, User*>		_arrayUser;
+		IrcMessage					_arrayParams;
 
 };
