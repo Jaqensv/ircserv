@@ -13,8 +13,8 @@
 
 // Getter
 	int				User::getFd(){return this->_fd;}
-	std::string	User::getNickname(){return this->_nickname;}
-	std::string	User::getUsername(){return this->_username;}
+	std::string		User::getNickname(){return this->_nickname;}
+	std::string		User::getUsername(){return this->_username;}
 
 //Setter
 	void	User::setFd(unsigned int fd){this->_fd = fd;}

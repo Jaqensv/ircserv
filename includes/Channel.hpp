@@ -40,7 +40,6 @@ class Channel{
 		bool	isOperator(unsigned int fd);
 		//matt
 		void	kick(Server &server, unsigned int fd, std::string channel_name, std::string nickname);
-		//void	kick(unsigned int fd, std::string channel_name, std::string nickname, std::string comment);
 
 	private :
 	//Member variable

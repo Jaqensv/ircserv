@@ -55,7 +55,6 @@ Channel	&Server::getChannel(const std::string &channelName){
 	return **it;
 }
 
-
 //ahans
 User	&Server::getUser(int fd) {
 	std::map<int, User*>::iterator it = _arrayUser.begin();
@@ -67,7 +66,7 @@ User	&Server::getUser(int fd) {
 }
 
 //matt
-unsigned int	Server::getUserFd(std::string nickname) {
+unsigned int	Server::getTargetUserFd(std::string nickname) {
 	for (std::map<int, User*>::iterator user_it = _arrayUser.begin(); user_it != _arrayUser.end(); ++user_it) {
 		if (user_it->second->getNickname() == nickname)
 			return user_it->first;

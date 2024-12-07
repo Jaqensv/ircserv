@@ -68,7 +68,7 @@
 	}
 
 	void	Channel::removeUser(Server &server, std::string nickname){
-		_users.erase(server.getUserFd(nickname));
+		_users.erase(server.getTargetUserFd(nickname));
 	}
 
 	//ahans

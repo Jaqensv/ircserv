@@ -50,7 +50,7 @@ class Server{
 		//ahans
 		User					&getUser(int fd);
 		//matt
-		unsigned int			getUserFd(std::string nickname);
+		unsigned int			getTargetUserFd(std::string nickname);
 		//ahans
 		bool					isUser(int fd);
 
