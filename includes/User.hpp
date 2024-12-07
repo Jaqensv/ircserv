@@ -7,7 +7,6 @@ class User{
 	public :
 
 	//Constructor & Destructor
-		User();
 		User(User const &copy);
 		User(unsigned int fd);
 		~User();
@@ -27,6 +26,7 @@ class User{
 
 
 	private :
+		User();
 	//Variable member
 		unsigned int	_fd;
 		std::string		_nickname;

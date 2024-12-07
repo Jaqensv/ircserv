@@ -6,9 +6,12 @@
 #include <vector>
 #include <map>
 #include <sstream> // stringstream
+#include <algorithm> // std::find
 #include "Channel.hpp"
 #include "User.hpp"
-#include "Operator.hpp"
+#include "IrcMessage.hpp"
+
+class Channel;
 
 class Server{
 
@@ -33,35 +36,37 @@ class Server{
 		void				setNeedPasswFalse();
 		void				setNeedPasswTrue();
 
-		unsigned short		getPort();
-		std::string			getPassw();
-		User*				getUser(int fd);
-		std::vector<Oper>&	getOperators();
-		bool				getNeedPassw();
-		unsigned short		getBackLogSize();
+		unsigned short			getPort();
+		std::string				getPassw();
+		// matt
+		const std::vector<Channel*>&	getChannels();
 
+		bool					getNeedPassw();
+		unsigned short			getBackLogSize();
+		//ahans
+		Channel					&getChannel(const std::string &channelName);
+		//ahans
+		bool					isChannel(const std::string &channelName);
+		//ahans
+		User					&getUser(int fd);
+		//ahans
+		bool					isUser(int fd);
 
 	//Surcharge operator
 		Server	&operator=(Server const &other);
 
 	//Member functions
 		void	initServer();
-		int		socketNonBlocking(int fd);
 		void	initEpoll();
 		void	run();
-		void 	command(std::string message);
 
 		//void	createChannel(Channel &chan);
-		void	createChannel(Channel &chan, unsigned int fd, Oper &oper);
-		void	deleteChannel(std::string &channelName);
-
+		//ahans
+		void	createChannel(unsigned int fd, std::string channel_name);
 		void	createUser(int fd, User &user);
 		void	deleteUser(int fd);
 
-		void	createOperator(Oper &op);
-		void	deleteOperator(int fd);
-
-		void	broadcast(int senderFd, std::string &message);
+		void	broadcastAll(int senderFd, std::string &message);
 
 
 	private :
@@ -78,8 +83,8 @@ class Server{
 		bool				_needPassw;
 
 	//Array of : Channel, User and Operator
-		std::vector<Channel>	_arrayChannel;
-		std::map<int, User*>	_arrayUser;
-		std::vector<Oper>		_arrayOperator;
+		std::vector<Channel*>		_arrayChannel;
+		std::map<int, User*>		_arrayUser;
+		IrcMessage					_arrayParams;
 
 };
