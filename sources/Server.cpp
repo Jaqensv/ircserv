@@ -239,6 +239,7 @@ void	Server::run(){
 					deleteUser(clientFd);
 				}
 				else {
+
 					std::string input = buffer;
 					server._arrayParams = parseIrcMessage(input);
 					std::cout << "Message from client " << clientFd << ": " << buffer;

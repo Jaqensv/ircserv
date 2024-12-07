@@ -27,7 +27,8 @@ class Channel{
 		User*		getUser(unsigned int fd);
 
 	//Setter
-		void	setTopic(std::string topic);
+		//matt
+		void	setTopic(unsigned int fd, std::string channel_name, std::string topic);
 
 	//Member function
 		void	addUser(unsigned int fd);
@@ -43,7 +44,7 @@ class Channel{
 		Channel();
 		std::string				_name;
 		std::string				_topic;
-		//bool					_canTopic; // false pour que les OP, true pour tout le monde
+		bool					_canTopic; // false pour que les OP, true pour tout le monde
 
 		std::map<int, User*> 	_users;
 		std::map<int, User*>	_operators;
