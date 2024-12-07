@@ -51,7 +51,8 @@ void channelTester(Server &server, unsigned int clientFd, std::string channel_na
 	BACKLINE;
 	if (server.getChannel(channel_name).getOpers().size() > 1) {
 		std::cout << "We revoke the rights of the first operator" << std::endl;
-		server.getChannel(channel_name).revokeOperator(clientFd, 5);
+		std::map<int, User*>::iterator user_it = server.getChannel(channel_name).getOpers().begin();
+		server.getChannel(channel_name).revokeOperator(clientFd, user_it->first);
 		std::cout << "In " << server.getChannel(channel_name).getName() << ", we have these operators : " << std::endl;
 		for (std::map<int, User*>::iterator oper_it = server.getChannel(channel_name).getOpers().begin(); oper_it != server.getChannel(channel_name).getOpers().end(); ++oper_it)
 			std::cout << "User name : " << oper_it->second->getUsername() << " | " << "fd : " << oper_it->first << std::endl;
@@ -60,4 +61,3 @@ void channelTester(Server &server, unsigned int clientFd, std::string channel_na
 	std::cout << "##################### TESTER #####################" << std::endl;
 	BACKLINE;
 }
- 
