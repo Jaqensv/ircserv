@@ -32,12 +32,15 @@ class Channel{
 
 	//Member function
 		void	addUser(unsigned int fd);
-		void	removeUser(unsigned int fd);
+		void	removeUser(Server &server, std::string nickname);
 		void	addOperator(unsigned int fd);
 		//ahans
 		void	revokeOperator(unsigned int clientFd, unsigned int userFd);
 		//ahans
 		bool	isOperator(unsigned int fd);
+		//matt
+		void	kick(Server &server, unsigned int fd, std::string channel_name, std::string nickname);
+		//void	kick(unsigned int fd, std::string channel_name, std::string nickname, std::string comment);
 
 	private :
 	//Member variable

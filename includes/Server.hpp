@@ -49,6 +49,8 @@ class Server{
 		bool					isChannel(const std::string &channelName);
 		//ahans
 		User					&getUser(int fd);
+		//matt
+		unsigned int			getUserFd(std::string nickname);
 		//ahans
 		bool					isUser(int fd);
 

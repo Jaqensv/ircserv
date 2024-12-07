@@ -66,6 +66,16 @@ User	&Server::getUser(int fd) {
 	return *it->second;
 }
 
+//matt
+unsigned int	Server::getUserFd(std::string nickname) {
+	for (std::map<int, User*>::iterator user_it = _arrayUser.begin(); user_it != _arrayUser.end(); ++user_it) {
+		if (user_it->second->getNickname() == nickname)
+			return user_it->first;
+	}
+	std::cerr << "Nickname not found" << std::endl;
+	return 0;
+}
+
 //ahans
 bool	Server::isUser(int fd) {
 	std::map<int, User*>::iterator it = _arrayUser.begin();
@@ -247,7 +257,7 @@ void	Server::run(){
 						broadcastAll(clientFd, server._arrayParams.params[0]);
 					}
 					else if (server._arrayParams.command == "/KICK")
-						std::cout << "Enter KICK methode" << std::endl;
+						getChannel(_arrayParams.params[0]).kick(server, clientFd, _arrayParams.params[0], _arrayParams.params[1]);
 					else if (server._arrayParams.command == "/INVITE")
 						std::cout << "Enter INVITE methode" << std::endl;
 					else if (server._arrayParams.command == "/TOPIC")

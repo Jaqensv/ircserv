@@ -67,8 +67,9 @@
 		_operators.insert(std::make_pair(fd, getUser(fd)));
 	}
 
-	void	Channel::removeUser(unsigned int fd){_users.erase(fd);}
-
+	void	Channel::removeUser(Server &server, std::string nickname){
+		_users.erase(server.getUserFd(nickname));
+	}
 
 	//ahans
 	void	Channel::revokeOperator(unsigned int clientFd, unsigned int userFd){
@@ -86,4 +87,17 @@
 				return true;
 		}
 		return false;
+	}
+
+	//matt
+	void	Channel::kick(Server &server, unsigned int fd, std::string channel_name, std::string nickname) {
+		Channel &channel = server.getChannel(channel_name);
+		User* user = server.getChannel(channel_name).getUser(fd);
+
+		if (!server.getChannel(channel_name).isOperator(fd))
+			std::cout << user->getNickname() << " doesn't have the rights to kick" << std::endl;
+		else {
+			channel.removeUser(server, nickname);
+		}
+	//Parameters: <channel> <user> *( "," <user> ) [<comment>]
 	}

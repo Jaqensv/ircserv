@@ -15,9 +15,10 @@ class User{
 		User	&operator=(User const &other);
 
 	// Getter
-		int			getFd();
-		std::string	getNickname();
-		std::string	getUsername();
+		int				getFd();
+		unsigned int	findFd(std::string nickname);
+		std::string		getNickname();
+		std::string		getUsername();
 
 	//Setter
 		void	setFd(unsigned int fd);

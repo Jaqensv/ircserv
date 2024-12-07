@@ -12,7 +12,7 @@
 	User	&User::operator=(User const &other){(void)other; return (*this);}
 
 // Getter
-	int			User::getFd(){return this->_fd;}
+	int				User::getFd(){return this->_fd;}
 	std::string	User::getNickname(){return this->_nickname;}
 	std::string	User::getUsername(){return this->_username;}
 
