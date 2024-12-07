@@ -8,9 +8,12 @@
 #include <poll.h>
 #include <fcntl.h>
 #include <algorithm>
+#include <termios.h>
+#include "../includes/IrcMessage.hpp"
 #include "../includes/Server.hpp"
 #include "../includes/Channel.hpp"
 #include "../includes/Tester.hpp"
+
 
 //Constructor
 	Server::Server() : _port(0){
@@ -88,25 +91,6 @@ bool	Server::isChannel(const std::string &channelName) {
 }
 
 //Member functions
-int	Server::socketNonBlocking(int fd){
-
-	Server	&server = Server::getInstance(); //Call of server instance
-
-//Check if socket creation work
-	if(server._serverSocket == -1){
-		close(server._serverSocket);
-		std::cerr << "ERROR SOCKET : Socket can't be created." << std::endl;
-		exit(1);
-	}
-
-//Non-blocking mode socket
-	int flags = fcntl(fd, F_GETFL, 0); //-1 si bloquant
-	if (flags == -1) {
-		return -1;
-	}
-	return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
-}
-
 void	Server::initServer(){
 
 //Call of server instance
@@ -115,10 +99,11 @@ void	Server::initServer(){
 
 //Socket creation : for creating communication point, like a FD
 
-	server._serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-	if (socketNonBlocking(server._serverSocket) < 0){
-	std::cerr << "ERROR: Unable to set server socket to non-blocking mode." << std::endl;
-	exit(1);
+	server._serverSocket = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+	if(server._serverSocket == -1){
+		close(server._serverSocket);
+		std::cerr << "ERROR SOCKET : Socket can't be created." << std::endl;
+		exit(1);
 	}
 
 //Address socket creation with sockaddr_in structure
@@ -187,14 +172,14 @@ void	Server::deleteUser(int fd){
 	this->_arrayUser.erase(fd);
 }
 
-void	Server::broadcast(int senderFd, std::string &message){
+void	Server::broadcastAll(int senderFd, std::string &message){
 	for(std::map<int, User*>::iterator it =this->_arrayUser.begin(); it != _arrayUser.end(); it++){
 		int clientFd = it->first;
 		if(clientFd != senderFd){
 			ssize_t bytesSent = send(clientFd, message.c_str(), message.size(), 0);
 			if (bytesSent == -1) {
 				std::cerr << "ERROR BROADCAST : Failed to send message to client " << clientFd << std::endl;
-				exit(1);
+				continue;
 			}
 		}
 	}
@@ -209,13 +194,12 @@ void	Server::run(){
 	int					eventCount, clientFd;
 
 	server._addrlen = sizeof(server._serverAddres);
+
 	while(true){
 		eventCount = epoll_wait(server._epollFd, events, this->_backLogSize, -1);
 		if(eventCount == -1){
 			std::cerr << "ERROR EPOLL_WAIT : epoll_wait doesn't work." << std::endl;
-			close(server._serverSocket);
-			close(server._epollFd);
-			exit(1);
+			continue;
 		}
 
 		for(int n = 0; n < eventCount; n++){
@@ -224,15 +208,6 @@ void	Server::run(){
 				clientFd = accept(server._serverSocket, (struct sockaddr *)&server._serverAddres, &server._addrlen);
 				if(clientFd == -1){
 					std::cerr << "ERROR ACCEPT : can't connect to socket." << std::endl;
-					close(server._serverSocket);
-					close(server._epollFd);
-					exit(1);
-				}
-				if (socketNonBlocking(clientFd) < 0){
-					std::cerr << "ERROR: Unable to set server socket to non-blocking mode." << std::endl;
-					close(server._serverSocket);
-					close(server._epollFd);
-					exit(1);
 				}
 
 			//add client to epoll
@@ -241,9 +216,7 @@ void	Server::run(){
 				clientEvent.events = EPOLLIN;
 				if(epoll_ctl(server._epollFd, EPOLL_CTL_ADD, clientFd, &clientEvent) == -1){
 					std::cerr << "ERROR EPOLL : epoll_ctl_add failed." << std::endl;
-					close(server._serverSocket);
-					close(server._epollFd);
-					exit(1);
+					continue;
 				}
 
 			//add client to client array
@@ -262,14 +235,27 @@ void	Server::run(){
 				if(bytesRead <= 0){
 					std::cout << "Client disconnected: " << clientFd << std::endl;
 					close(clientFd);
-					close(server._serverSocket);
-					close(server._epollFd);
 					epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 					deleteUser(clientFd);
 					exit(1);
 				}
 				else {
-					channelTester(server, clientFd, "Robbbbb");
+
+					std::string input = buffer;
+					server._arrayParams = parseIrcMessage(input);
+					std::cout << "Message from client " << clientFd << ": " << buffer;
+					if(server._arrayParams.isCommand == false){
+						broadcastAll(clientFd, server._arrayParams.params[0]);
+					}
+					else if (server._arrayParams.command == "/KICK")
+						std::cout << "Enter KICK methode" << std::endl;
+					else if (server._arrayParams.command == "/INVITE")
+						std::cout << "Enter INVITE methode" << std::endl;
+					else if (server._arrayParams.command == "/TOPIC")
+						std::cout << "Enter TOPIC methode" << std::endl;
+					else if (server._arrayParams.command == "/MODE")
+						std::cout << "Enter MODE methode" << std::endl;
+					// channelTester(server, clientFd, "Robbbbb");
 				}
 			}
 		}

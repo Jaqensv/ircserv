@@ -7,7 +7,7 @@
 //Constructor & Destructor
 	Channel::Channel(){}
 	Channel::Channel(Channel const &copy){(void)copy;}
-	Channel::Channel(std::string name) : _name(name) {}
+	Channel::Channel(std::string name) : _name(name), _canTopic(true) {}
 	Channel::~Channel(){}
 
 //Surcharge operator
@@ -15,10 +15,27 @@
 
 //Getter & Setter
 	std::string				Channel::getTopic(){return this->_topic;}
-	void					Channel::setTopic(std::string topic){this->_topic = topic;}
 	std::string				Channel::getName(){return this->_name;}
 	std::map<int, User*>&	Channel::getUsers(){return _users;}
 	std::map<int, User*>&	Channel::getOpers(){return _operators;}
+	//matt
+	void					Channel::setTopic(unsigned int fd, std::string channel_name, std::string topic) {
+		Server &server = server.getInstance();
+
+		std::map<int, User*>::iterator user_it = server.getChannel(channel_name)._users.find(fd);
+		if (server.getChannel(channel_name)._canTopic == true) {
+			server.getChannel(channel_name)._topic = topic;
+			std::cout << user_it->second->getUsername() << " has changed the topic: " << _topic << std::endl;
+		}
+		else {
+			if (server.getChannel(channel_name).isOperator(fd)) {
+				server.getChannel(channel_name)._topic = topic;
+				std::cout << user_it->second->getUsername() << " has changed the topic: " << _topic << std::endl;
+			}
+			else
+				std::cout << user_it->second->getUsername() <<  " doesn't have the rights to change the topic" << std::endl;
+		}
+	}
 
 	//ahans
 	User*		Channel::getOper(unsigned int fd) {
@@ -51,6 +68,8 @@
 	}
 
 	void	Channel::removeUser(unsigned int fd){_users.erase(fd);}
+
+
 	//ahans
 	void	Channel::revokeOperator(unsigned int clientFd, unsigned int userFd){
 		if (isOperator(clientFd))
