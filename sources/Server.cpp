@@ -237,6 +237,7 @@ void	Server::run(){
 					close(clientFd);
 					epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 					deleteUser(clientFd);
+					exit(1);
 				}
 				else {
 
