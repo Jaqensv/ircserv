@@ -26,10 +26,8 @@ void	parseArgs(IrcMessage &mess, std::string &input){
 			mess.params[i].erase(0, 1);
 			mess.params[i] += mess.crlf;
 		}
-		else{
-			tmp += mess.crlf;
+		else
 			mess.params.push_back(tmp);
-		}
 	}
 }
 

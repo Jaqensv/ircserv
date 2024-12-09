@@ -66,6 +66,16 @@ User	&Server::getUser(int fd) {
 }
 
 //matt
+std::string		Server::getUsername() {
+	struct passwd *un;
+	uid_t uid = getuid();
+	un = getpwuid(uid);
+
+	if (un)
+		return std::string(un->pw_name);
+	return NULL;
+}
+
 unsigned int	Server::getTargetUserFd(std::string nickname) {
 	for (std::map<int, User*>::iterator user_it = _arrayUser.begin(); user_it != _arrayUser.end(); ++user_it) {
 		if (user_it->second->getNickname() == nickname)
@@ -173,7 +183,9 @@ void	Server::createChannel(unsigned int fd, std::string channel_name){
 }
 
 //User
-void	Server::createUser(int fd, User &user){
+void	Server::createUser(int fd, std::string username, User &user){
+		user.setUsername(username);
+		user.setNickname(username);
 		this->_arrayUser.insert(std::make_pair(fd, &user));
 }
 
@@ -230,7 +242,8 @@ void	Server::run(){
 
 			//add client to client array
 				User	newUser(clientFd);
-				createUser(clientFd, newUser);
+				std::cout << "USERNAME:" << getUsername() << std::endl;
+				createUser(clientFd, getUsername(), newUser);
 
 				std::cout << "New client connected : " << clientFd << std::endl;
 			}
@@ -252,6 +265,8 @@ void	Server::run(){
 					std::string input = buffer;
 					server._arrayParams = parseIrcMessage(input);
 					std::cout << "Message from client " << clientFd << ": " << buffer;
+					createChannel(clientFd, _arrayParams.params[0]);
+					channelTesterLite(_arrayParams.params[0]);
 					if(server._arrayParams.isCommand == false){
 						broadcastAll(clientFd, server._arrayParams.params[0]);
 					}
@@ -263,7 +278,8 @@ void	Server::run(){
 						std::cout << "Enter TOPIC methode" << std::endl;
 					else if (server._arrayParams.command == "/MODE")
 						std::cout << "Enter MODE methode" << std::endl;
-					// channelTester(server, clientFd, "Robbbbb");
+					channelTesterLite(_arrayParams.params[0]);
+					//channelTester(server, clientFd, "Robbbbb");
 				}
 			}
 		}

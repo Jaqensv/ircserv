@@ -7,6 +7,7 @@
 #include <map>
 #include <sstream> // stringstream
 #include <algorithm> // std::find
+#include <pwd.h> // getuid, getpwuid
 #include "Channel.hpp"
 #include "User.hpp"
 #include "IrcMessage.hpp"
@@ -50,6 +51,7 @@ class Server{
 		//ahans
 		User					&getUser(int fd);
 		//matt
+		std::string				getUsername();
 		unsigned int			getTargetUserFd(std::string nickname);
 		//ahans
 		bool					isUser(int fd);
@@ -65,7 +67,7 @@ class Server{
 		//void	createChannel(Channel &chan);
 		//ahans
 		void	createChannel(unsigned int fd, std::string channel_name);
-		void	createUser(int fd, User &user);
+		void	createUser(int fd, std::string username, User &user);
 		void	deleteUser(int fd);
 
 		void	broadcastAll(int senderFd, std::string &message);

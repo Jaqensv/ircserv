@@ -61,3 +61,18 @@ void channelTester(Server &server, unsigned int clientFd, std::string channel_na
 	std::cout << "##################### TESTER #####################" << std::endl;
 	BACKLINE;
 }
+
+
+void channelTesterLite(std::string channel_name) {
+
+	Server &server = server.getInstance();
+	BACKLINE;
+	std::cout << "##################### LITE TESTER #####################" << std::endl;
+	BACKLINE;
+	std::cout << "In " << server.getChannel(channel_name).getName() << ", we have these users : " << std::endl;
+	for (std::map<int, User*>::iterator user_it = server.getChannel(channel_name).getUsers().begin(); user_it != server.getChannel(channel_name).getUsers().end(); ++user_it)
+		std::cout << "User name : " << user_it->second->getUsername() << " | " << "fd : " << user_it->first << std::endl;
+	BACKLINE;
+	std::cout << "##################### LITE TESTER #####################" << std::endl;
+	
+}

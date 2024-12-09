@@ -4,6 +4,8 @@
 #include "Server.hpp"
 #include "User.hpp"
 
+class Server;
+
 class Channel{
 
 	public :
