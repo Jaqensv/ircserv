@@ -51,24 +51,25 @@
 	User*		Channel::getUser(unsigned int fd) {
 		std::map<int, User*>::iterator it = _users.begin();
 		for (; it != _users.end(); ++it) {
-			if (fd == static_cast<unsigned int>(it->first))
+			if (fd == static_cast<unsigned int>(it->first)) {
 				return it->second;
+			}
 		}
 		return NULL;
 	}
 
 //Member function
 	void	Channel::addUser(unsigned int fd){
-		Server	&server = Server::getInstance();
-		_users.insert(std::make_pair(fd, &server.getUser(fd)));
+		User *user = new User(fd);
+		_users.insert(std::make_pair(fd, user));
 	}
 
 	void	Channel::addOperator(unsigned int fd) {
 		_operators.insert(std::make_pair(fd, getUser(fd)));
 	}
 
-	void	Channel::removeUser(Server &server, std::string nickname){
-		_users.erase(server.getTargetUserFd(nickname));
+	void	Channel::removeUser(Server &server, std::string channel_name, std::string nickname){
+		server.getChannel(channel_name).getUsers().erase(server.getTargetUserFd(nickname));
 	}
 
 	//ahans
@@ -97,7 +98,7 @@
 		if (!server.getChannel(channel_name).isOperator(fd))
 			std::cout << user->getNickname() << " doesn't have the rights to kick" << std::endl;
 		else {
-			channel.removeUser(server, nickname);
+			channel.removeUser(server, channel_name, nickname);
 		}
 	//Parameters: <channel> <user> *( "," <user> ) [<comment>]
 	}

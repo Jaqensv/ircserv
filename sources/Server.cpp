@@ -266,7 +266,6 @@ void	Server::run(){
 					server._arrayParams = parseIrcMessage(input);
 					std::cout << "Message from client " << clientFd << ": " << buffer;
 					createChannel(clientFd, _arrayParams.params[0]);
-					channelTesterLite(_arrayParams.params[0]);
 					if(server._arrayParams.isCommand == false){
 						broadcastAll(clientFd, server._arrayParams.params[0]);
 					}

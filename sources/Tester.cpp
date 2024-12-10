@@ -69,6 +69,11 @@ void channelTesterLite(std::string channel_name) {
 	BACKLINE;
 	std::cout << "##################### LITE TESTER #####################" << std::endl;
 	BACKLINE;
+	if (server.getChannel(channel_name).getUser(6) == NULL) {
+		std::cout << "We add an user and name him 'Jean'" << std::endl;
+		server.getChannel(channel_name).addUser(6);
+		server.getChannel(channel_name).getUser(6)->setNickname("Jean");
+	}
 	std::cout << "In " << server.getChannel(channel_name).getName() << ", we have these users : " << std::endl;
 	for (std::map<int, User*>::iterator user_it = server.getChannel(channel_name).getUsers().begin(); user_it != server.getChannel(channel_name).getUsers().end(); ++user_it)
 		std::cout << "User name : " << user_it->second->getUsername() << " | " << "fd : " << user_it->first << std::endl;

@@ -5,7 +5,7 @@
 //Constructor & Destructor
 	User::User(){}
 	User::User(User const &copy){(void)copy;}
-	User::User(unsigned int fd) : _fd(fd){}
+	User::User(unsigned int fd) : _fd(fd) {}
 	User::~User(){}
 
 //Surcharge operator
