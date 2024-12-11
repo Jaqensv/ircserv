@@ -18,5 +18,5 @@
 
 //Setter
 	void	User::setFd(unsigned int fd){this->_fd = fd;}
-	void	User::setNickname(std::string nickname){this->_nickname = nickname;}
+	void	User::setNickname(std::string nickname){std::cout << _nickname << std::endl; this->_nickname = nickname;std::cout << "ttest2" << std::endl;}
 	void	User::setUsername(std::string username){this->_username = username;}

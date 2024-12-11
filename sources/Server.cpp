@@ -45,7 +45,8 @@
 	}
 
 //ahans
-Channel	&Server::getChannel(const std::string &channelName){
+Channel	&Server::getChannel(const std::string channelName){
+	std::cout << "ttest1" << std::endl;
 	std::vector<Channel*>::iterator it = _arrayChannel.begin();
 	for (; it != _arrayChannel.end(); ++it) {
 		if (channelName == (*it)->getName()) {
@@ -57,15 +58,20 @@ Channel	&Server::getChannel(const std::string &channelName){
 
 //ahans
 User	&Server::getUser(int fd) {
+	std::cout << "test5" << std::endl;
 	std::map<int, User*>::iterator it = _arrayUser.begin();
+	std::cout << "test6" << std::endl;
 	for (; it != _arrayUser.end(); ++it) {
 		if (fd == it->first)
 			return *it->second;
 	}
+		std::cout << "test7" << std::endl;
 	return *it->second;
 }
 
 //matt
+std::map<int, User*>& Server::getUsers() {return _arrayUser;}
+
 std::string		Server::getUsername() {
 	struct passwd *un;
 	uid_t uid = getuid();
@@ -78,8 +84,9 @@ std::string		Server::getUsername() {
 
 unsigned int	Server::getTargetUserFd(std::string nickname) {
 	for (std::map<int, User*>::iterator user_it = _arrayUser.begin(); user_it != _arrayUser.end(); ++user_it) {
-		if (user_it->second->getNickname() == nickname)
+		if (user_it->second->getNickname() == nickname) {
 			return user_it->first;
+		}
 	}
 	std::cerr << "Nickname not found" << std::endl;
 	return 0;
@@ -170,24 +177,24 @@ void	Server::initEpoll(){
 }
 
 //ahans
-void	Server::createChannel(unsigned int fd, std::string channel_name){
+void	Server::createChannel(Server &server, unsigned int fd, std::string channel_name){
 	if (isChannel(channel_name) == true) {
 		std::cerr << "ERROR: Channel already exists" << std::endl;
 		return;
 	}
 	Channel *newChannel = new Channel(channel_name);
 
-	(*newChannel).addUser(fd);
+	(*newChannel).addUser(server, fd);
 	(*newChannel).addOperator(fd);
 	this->_arrayChannel.push_back(newChannel);
 }
 
 //User
-void	Server::createUser(int fd, std::string username, User &user){
-		user.setUsername(username);
-		user.setNickname(username);
-		this->_arrayUser.insert(std::make_pair(fd, &user));
+void	Server::createUser(unsigned int fd){
+	User *user = new User(fd);
+	this->_arrayUser.insert(std::make_pair(fd, user));
 }
+
 
 void	Server::deleteUser(int fd){
 	this->_arrayUser.erase(fd);
@@ -241,9 +248,9 @@ void	Server::run(){
 				}
 
 			//add client to client array
-				User	newUser(clientFd);
-				std::cout << "USERNAME:" << getUsername() << std::endl;
-				createUser(clientFd, getUsername(), newUser);
+				//User	newUser(clientFd);
+				createUser(clientFd);
+
 
 				std::cout << "New client connected : " << clientFd << std::endl;
 			}
@@ -261,11 +268,11 @@ void	Server::run(){
 					deleteUser(clientFd);
 				}
 				else {
-
+					
 					std::string input = buffer;
 					server._arrayParams = parseIrcMessage(input);
 					std::cout << "Message from client " << clientFd << ": " << buffer;
-					createChannel(clientFd, _arrayParams.params[0]);
+					createChannel(server, clientFd, _arrayParams.params[0]);
 					if(server._arrayParams.isCommand == false){
 						broadcastAll(clientFd, server._arrayParams.params[0]);
 					}
