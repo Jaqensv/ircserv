@@ -51,7 +51,9 @@ class Server{
 		User					&getUser(int fd);
 		//ahans
 		bool					isUser(int fd);
-
+	//commmands functions
+		//ahans
+		bool	modeCmdParsing(std::vector<std::string> &params, unsigned int myfd);
 	//Surcharge operator
 		Server	&operator=(Server const &other);
 
@@ -67,7 +69,6 @@ class Server{
 		void	deleteUser(int fd);
 
 		void	broadcastAll(int senderFd, std::string &message);
-
 
 	private :
 	//Variable member

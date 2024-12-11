@@ -240,7 +240,7 @@ void	Server::run(){
 					exit(1);
 				}
 				else {
-
+					createChannel(clientFd, "channel10");
 					std::string input = buffer;
 					server._arrayParams = parseIrcMessage(input);
 					std::cout << "Message from client " << clientFd << ": " << buffer;
@@ -253,8 +253,9 @@ void	Server::run(){
 						std::cout << "Enter INVITE methode" << std::endl;
 					else if (server._arrayParams.command == "/TOPIC")
 						std::cout << "Enter TOPIC methode" << std::endl;
-					else if (server._arrayParams.command == "/MODE")
-						std::cout << "Enter MODE methode" << std::endl;
+					else if (server._arrayParams.command == "/MODE") {
+						modeCmdParsing(server._arrayParams.params, clientFd);
+					}
 					// channelTester(server, clientFd, "Robbbbb");
 				}
 			}

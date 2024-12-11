@@ -38,6 +38,18 @@ class Channel{
 		void	revokeOperator(unsigned int clientFd, unsigned int userFd);
 		//ahans
 		bool	isOperator(unsigned int fd);
+		//ahans
+		void	switchCanTopic(bool val);
+		//ahans
+		void	switchInvOnly(bool val);
+		//ahans
+		void	switchKeyMode();
+		//ahans
+		void	switchKeyMode(std::string key);
+		//ahans
+		void	switchLimitMode();
+		//ahans
+		void	switchLimitMode(int limit);
 
 	private :
 	//Member variable
@@ -45,7 +57,11 @@ class Channel{
 		std::string				_name;
 		std::string				_topic;
 		bool					_canTopic; // false pour que les OP, true pour tout le monde
-
+		bool					_invOnly;
+		bool					_keyMode;
+		bool					_limitMode;
+		int						_limit;
+		std::string				_key;
 		std::map<int, User*> 	_users;
 		std::map<int, User*>	_operators;
 
