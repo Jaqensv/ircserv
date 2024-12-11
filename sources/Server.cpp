@@ -6,9 +6,9 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <poll.h>
-#include <fcntl.h>
 #include <algorithm>
 #include <termios.h>
+#include <csignal>
 #include "../includes/IrcMessage.hpp"
 #include "../includes/Server.hpp"
 #include "../includes/Channel.hpp"
@@ -172,8 +172,9 @@ void	Server::deleteUser(int fd){
 	this->_arrayUser.erase(fd);
 }
 
+
 void	Server::broadcastAll(int senderFd, std::string &message){
-	for(std::map<int, User*>::iterator it =this->_arrayUser.begin(); it != _arrayUser.end(); it++){
+	for(std::map<int, User*>::iterator it = this->_arrayUser.begin(); it != _arrayUser.end(); it++){
 		int clientFd = it->first;
 		if(clientFd != senderFd){
 			ssize_t bytesSent = send(clientFd, message.c_str(), message.size(), 0);
@@ -184,6 +185,12 @@ void	Server::broadcastAll(int senderFd, std::string &message){
 		}
 	}
 }
+
+// void	signalHandler(int signum){
+
+// 	(void)signum;
+// 	std::cout << "test" << std::endl;
+// }
 
 void	Server::run(){
 
@@ -201,60 +208,53 @@ void	Server::run(){
 			std::cerr << "ERROR EPOLL_WAIT : epoll_wait doesn't work." << std::endl;
 			continue;
 		}
-
-		for(int n = 0; n < eventCount; n++){
-			if (events[n].data.fd == server._serverSocket){ //if connection is about main socket, a new client connection is pending
-			//accept client connection
-				clientFd = accept(server._serverSocket, (struct sockaddr *)&server._serverAddres, &server._addrlen);
-				if(clientFd == -1){
-					std::cerr << "ERROR ACCEPT : can't connect to socket." << std::endl;
-				}
-
-			//add client to epoll
-				struct epoll_event	clientEvent;
-				clientEvent.data.fd = clientFd;
-				clientEvent.events = EPOLLIN;
-				if(epoll_ctl(server._epollFd, EPOLL_CTL_ADD, clientFd, &clientEvent) == -1){
-					std::cerr << "ERROR EPOLL : epoll_ctl_add failed." << std::endl;
-					continue;
-				}
-
-			//add client to client array
-				User	newUser(clientFd);
-				createUser(clientFd, newUser);
-
-				std::cout << "New client connected : " << clientFd << std::endl;
+		if (events[0].data.fd == server._serverSocket){ //if connection is about main socket, a new client connection is pending
+		//accept client connection
+			clientFd = accept(server._serverSocket, (struct sockaddr *)&server._serverAddres, &server._addrlen);
+			if(clientFd == -1){
+				std::cerr << "ERROR ACCEPT : can't connect to socket." << std::endl;
 			}
-			else{
-			//handle client message
-				clientFd = events[n].data.fd;
-				char	buffer[1024];
 
-				memset(buffer, 0, sizeof(buffer));
-				ssize_t	bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
-				if(bytesRead <= 0){
-					std::cout << "Client disconnected: " << clientFd << std::endl;
-					close(clientFd);
-					epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-					deleteUser(clientFd);
+		//add client to epoll
+			struct epoll_event	clientEvent;
+			clientEvent.data.fd = clientFd;
+			clientEvent.events = EPOLLIN;
+			if(epoll_ctl(server._epollFd, EPOLL_CTL_ADD, clientFd, &clientEvent) == -1){
+				std::cerr << "ERROR EPOLL : epoll_ctl_add failed." << std::endl;
+				continue;
+			}
+
+		//add client to client array
+			User	newUser(clientFd);
+			createUser(clientFd, newUser);
+
+			std::cout << "New client connected : " << clientFd << std::endl;
+		}
+		else{
+		//handle client message
+			clientFd = events[0].data.fd;
+			char	buffer[1024];
+
+			memset(buffer, 0, sizeof(buffer));
+			ssize_t	bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
+			if(bytesRead <= 0)
+				std::cerr << "ERROR RECV : message can't be receive." << std::endl;
+			else {
+				std::string input = buffer;
+				server._arrayParams = parseIrcMessage(input);
+				std::cout << "Message from client " << clientFd << ": " << server._arrayParams.params[0];
+				if(server._arrayParams.isCommand == false){
+					broadcastAll(clientFd, server._arrayParams.params[0]);
 				}
-				else {
-					std::string input = buffer;
-					server._arrayParams = parseIrcMessage(input);
-					std::cout << "Message from client " << clientFd << ": " << buffer;
-					if(server._arrayParams.isCommand == false){
-						broadcastAll(clientFd, server._arrayParams.params[0]);
-					}
-					else if (server._arrayParams.command == "/KICK")
-						std::cout << "Enter KICK methode" << std::endl;
-					else if (server._arrayParams.command == "/INVITE")
-						std::cout << "Enter INVITE methode" << std::endl;
-					else if (server._arrayParams.command == "/TOPIC")
-						std::cout << "Enter TOPIC methode" << std::endl;
-					else if (server._arrayParams.command == "/MODE")
-						std::cout << "Enter MODE methode" << std::endl;
-					// channelTester(server, clientFd, "Robbbbb");
-				}
+				else if (server._arrayParams.command == "/KICK")
+					std::cout << "Enter KICK methode" << std::endl;
+				else if (server._arrayParams.command == "/INVITE")
+					std::cout << "Enter INVITE methode" << std::endl;
+				else if (server._arrayParams.command == "/TOPIC")
+					std::cout << "Enter TOPIC methode" << std::endl;
+				else if (server._arrayParams.command == "/MODE")
+					std::cout << "Enter MODE methode" << std::endl;
+				// channelTester(server, clientFd, "Robbbbb");
 			}
 		}
 	}

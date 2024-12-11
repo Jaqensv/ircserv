@@ -88,3 +88,5 @@ class Server{
 		IrcMessage					_arrayParams;
 
 };
+
+// void	signalHandler(int signum);
