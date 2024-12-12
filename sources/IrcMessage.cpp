@@ -54,7 +54,7 @@ IrcMessage	parseIrcMessage(std::string &input){
 		mess.params[i].erase(0, 1);
 		int	end = mess.params[i].size();
 		mess.params[i].erase(end, 1);
-		mess.params[i] += mess.crlf;
+		// mess.params[i] += mess.crlf;
 	}
 	else{
 		iss >> mess.command;

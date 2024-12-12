@@ -169,6 +169,7 @@ void	Server::createUser(int fd, User &user){
 }
 
 void	Server::deleteUser(int fd){
+	std::cout << "Client " << fd << " deconnected." << std::endl;
 	this->_arrayUser.erase(fd);
 }
 
@@ -186,11 +187,6 @@ void	Server::broadcastAll(int senderFd, std::string &message){
 	}
 }
 
-// void	signalHandler(int signum){
-
-// 	(void)signum;
-// 	std::cout << "test" << std::endl;
-// }
 
 void	Server::run(){
 
@@ -206,14 +202,13 @@ void	Server::run(){
 		eventCount = epoll_wait(server._epollFd, events, this->_backLogSize, -1);
 		if(eventCount == -1){
 			std::cerr << "ERROR EPOLL_WAIT : epoll_wait doesn't work." << std::endl;
-			continue;
+
 		}
 		if (events[0].data.fd == server._serverSocket){ //if connection is about main socket, a new client connection is pending
 		//accept client connection
 			clientFd = accept(server._serverSocket, (struct sockaddr *)&server._serverAddres, &server._addrlen);
-			if(clientFd == -1){
+			if(clientFd == -1)
 				std::cerr << "ERROR ACCEPT : can't connect to socket." << std::endl;
-			}
 
 		//add client to epoll
 			struct epoll_event	clientEvent;
@@ -233,16 +228,31 @@ void	Server::run(){
 		else{
 		//handle client message
 			clientFd = events[0].data.fd;
-			char	buffer[1024];
+			char	buffer[512];
 
 			memset(buffer, 0, sizeof(buffer));
 			ssize_t	bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
-			if(bytesRead <= 0)
+			std::string	mss = buffer;
+			std::cout << bytesRead << std::endl;
+
+			if (bytesRead <= 0){
 				std::cerr << "ERROR RECV : message can't be receive." << std::endl;
-			else {
-				std::string input = buffer;
+				close(clientFd);
+				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+				deleteUser(clientFd);
+			}
+			else if(mss[mss.size() - 1] != '\n'){
+				server.getUser(clientFd).setBuffer(server.getUser(clientFd).getBuffer() + mss);
+				std::cout << server.getUser(clientFd).getBuffer() << std::endl;
+			}
+			else{
+
+				std::string	input = buffer;
 				server._arrayParams = parseIrcMessage(input);
 				std::cout << "Message from client " << clientFd << ": " << server._arrayParams.params[0];
+				// for(size_t j = 0; j < server._arrayParams.params[0].size(); j++)
+				// 	std::cout << (int)server._arrayParams.params[0][j] << " ";
+				// std::cout << std::endl;
 				if(server._arrayParams.isCommand == false){
 					broadcastAll(clientFd, server._arrayParams.params[0]);
 				}
@@ -255,6 +265,7 @@ void	Server::run(){
 				else if (server._arrayParams.command == "/MODE")
 					std::cout << "Enter MODE methode" << std::endl;
 				// channelTester(server, clientFd, "Robbbbb");
+				server.getUser(clientFd).setBuffer(NULL);
 			}
 		}
 	}
