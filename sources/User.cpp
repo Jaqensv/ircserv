@@ -21,4 +21,9 @@
 	void	User::setFd(unsigned int fd){this->_fd = fd;}
 	void	User::setNickname(std::string nickname){this->_nickname = nickname;}
 	void	User::setUsername(std::string username){this->_username = username;}
-	void	User::setBuffer(std::string buffer){this->_buffer = buffer;};
+	void	User::setBuffer(std::string buffer){
+		if (buffer == "")
+			this->_buffer = buffer;
+		else
+			this->_buffer += buffer;
+	};

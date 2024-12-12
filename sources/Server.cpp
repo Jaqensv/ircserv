@@ -233,8 +233,6 @@ void	Server::run(){
 			memset(buffer, 0, sizeof(buffer));
 			ssize_t	bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 			std::string	mss = buffer;
-			std::cout << bytesRead << std::endl;
-
 			if (bytesRead <= 0){
 				std::cerr << "ERROR RECV : message can't be receive." << std::endl;
 				close(clientFd);
@@ -242,14 +240,12 @@ void	Server::run(){
 				deleteUser(clientFd);
 			}
 			else if(mss[mss.size() - 1] != '\n'){
-				server.getUser(clientFd).setBuffer(server.getUser(clientFd).getBuffer() + mss);
-				std::cout << server.getUser(clientFd).getBuffer() << std::endl;
+				server.getUser(clientFd).setBuffer(mss);
 			}
 			else{
-
-				std::string	input = buffer;
+				std::string	input = server.getUser(clientFd).getBuffer() + mss;
 				server._arrayParams = parseIrcMessage(input);
-				std::cout << "Message from client " << clientFd << ": " << server._arrayParams.params[0];
+				std::cout << "Message from client " << clientFd << ": " << server._arrayParams.params[0] << std::endl;
 				// for(size_t j = 0; j < server._arrayParams.params[0].size(); j++)
 				// 	std::cout << (int)server._arrayParams.params[0][j] << " ";
 				// std::cout << std::endl;
@@ -265,7 +261,7 @@ void	Server::run(){
 				else if (server._arrayParams.command == "/MODE")
 					std::cout << "Enter MODE methode" << std::endl;
 				// channelTester(server, clientFd, "Robbbbb");
-				server.getUser(clientFd).setBuffer(NULL);
+				server.getUser(clientFd).setBuffer("");
 			}
 		}
 	}
