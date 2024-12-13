@@ -182,6 +182,7 @@ void	Server::createUser(int fd, User &user){
 
 void	Server::deleteUser(int fd){
 	std::cout << "Client " << fd << " deconnected." << std::endl;
+	delete &getUser(fd);
 	this->_arrayUser.erase(fd);
 }
 
