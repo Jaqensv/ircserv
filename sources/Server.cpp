@@ -58,19 +58,18 @@ Channel	&Server::getChannel(const std::string &channelName){
 
 //ahans
 User	&Server::getUser(int fd) {
-	std::map<int, User*>::iterator it = _arrayUser.begin();
-	for (; it != _arrayUser.end(); ++it) {
-		if (fd == it->first)
+	for (std::map<int, User*>::iterator it = this->_arrayUser.begin(); it != _arrayUser.end(); it++) {
+		if (it->first == fd)
 			return *it->second;
 	}
-	return *it->second;
+	return *_arrayUser.end()->second;
 }
 
 //ahans
 bool	Server::isUser(int fd) {
 	std::map<int, User*>::iterator it = _arrayUser.begin();
-	for (; it != _arrayUser.end(); ++it) {
-		if (fd == it->first)
+	for (; it != _arrayUser.end(); it++) {
+		if (it->first == fd)
 			return true;
 	}
 	return false;
@@ -165,7 +164,20 @@ void	Server::createChannel(unsigned int fd, std::string channel_name){
 
 //User
 void	Server::createUser(int fd, User &user){
-		this->_arrayUser.insert(std::make_pair(fd, &user));
+	// this->_arrayUser.insert(std::make_pair(fd, &user));
+	if (_arrayUser.find(fd) != _arrayUser.end()) {
+	std::cerr << "ERROR FD " << fd << ": already exists in _arrayUser." << std::endl;
+	return;
+	}
+	this->_arrayUser.insert(std::make_pair(fd, &user));
+
+
+
+	std::cout << "[DEBUG] Current _arrayUser contents:" << std::endl;
+	for (std::map<int, User*>::iterator it = _arrayUser.begin(); it != _arrayUser.end(); ++it) {
+		std::cout << "FD: " << it->first << ", User pointer: " << it->second << std::endl;}
+
+
 }
 
 void	Server::deleteUser(int fd){
@@ -187,7 +199,6 @@ void	Server::broadcastAll(int senderFd, std::string &message){
 	}
 }
 
-
 void	Server::run(){
 
 	Server	&server = Server::getInstance();
@@ -200,10 +211,9 @@ void	Server::run(){
 
 	while(true){
 		eventCount = epoll_wait(server._epollFd, events, this->_backLogSize, -1);
-		if(eventCount == -1){
+		if(eventCount == -1)
 			std::cerr << "ERROR EPOLL_WAIT : epoll_wait doesn't work." << std::endl;
 
-		}
 		if (events[0].data.fd == server._serverSocket){ //if connection is about main socket, a new client connection is pending
 		//accept client connection
 			clientFd = accept(server._serverSocket, (struct sockaddr *)&server._serverAddres, &server._addrlen);
@@ -220,8 +230,8 @@ void	Server::run(){
 			}
 
 		//add client to client array
-			User	newUser(clientFd);
-			createUser(clientFd, newUser);
+			User* newUser = new User(clientFd);
+			createUser(clientFd, *newUser);
 
 			std::cout << "New client connected : " << clientFd << std::endl;
 		}
@@ -233,22 +243,28 @@ void	Server::run(){
 			memset(buffer, 0, sizeof(buffer));
 			ssize_t	bytesRead = recv(clientFd, buffer, sizeof(buffer) - 1, 0);
 			std::string	mss = buffer;
-			if (bytesRead <= 0){
+			if (bytesRead < 0){
 				std::cerr << "ERROR RECV : message can't be receive." << std::endl;
 				close(clientFd);
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 				deleteUser(clientFd);
 			}
+			else if (bytesRead == 0){
+				close(clientFd);
+				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+				deleteUser(clientFd);
+			}
+			else if(mss.empty()){
+				std::cout << "control D" << std::endl;
+			}
 			else if(mss[mss.size() - 1] != '\n'){
 				server.getUser(clientFd).setBuffer(mss);
+				send(clientFd, "^D", 2, 0);
 			}
 			else{
 				std::string	input = server.getUser(clientFd).getBuffer() + mss;
 				server._arrayParams = parseIrcMessage(input);
 				std::cout << "Message from client " << clientFd << ": " << server._arrayParams.params[0] << std::endl;
-				// for(size_t j = 0; j < server._arrayParams.params[0].size(); j++)
-				// 	std::cout << (int)server._arrayParams.params[0][j] << " ";
-				// std::cout << std::endl;
 				if(server._arrayParams.isCommand == false){
 					broadcastAll(clientFd, server._arrayParams.params[0]);
 				}

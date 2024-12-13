@@ -5,11 +5,21 @@
 //Constructor & Destructor
 	User::User(){}
 	User::User(User const &copy){(void)copy;}
-	User::User(unsigned int fd) : _fd(fd), _buffer(""){}
+	User::User(unsigned int fd) : _fd(fd), _buffer(""){
+
+		std::cout << fd << std::endl;
+	}
 	User::~User(){}
 
 //Surcharge operator
-	User	&User::operator=(User const &other){(void)other; return (*this);}
+	User	&User::operator=(User const &other){
+		this->setFd(other._fd);
+		this->setNickname(other._nickname);
+		this->setUsername(other._username);
+		this->setNickname(other._nickname);
+		this->setBuffer(other._buffer);
+		return *this;
+	}
 
 // Getter
 	int			User::getFd(){return this->_fd;}
