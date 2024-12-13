@@ -18,11 +18,13 @@ class User{
 		int			getFd();
 		std::string	getNickname();
 		std::string	getUsername();
+		std::string	getBuffer();
 
 	//Setter
 		void	setFd(unsigned int fd);
 		void	setNickname(std::string nickname);
 		void	setUsername(std::string username);
+		void	setBuffer(std::string buffer);
 
 
 	private :
@@ -31,5 +33,6 @@ class User{
 		unsigned int	_fd;
 		std::string		_nickname;
 		std::string		_username;
+		std::string		_buffer;
 
 };
