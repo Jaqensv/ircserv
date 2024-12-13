@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <termios.h>
 #include <csignal>
+#include <netdb.h>
 #include "../includes/IrcMessage.hpp"
 #include "../includes/Server.hpp"
 #include "../includes/Channel.hpp"
@@ -164,20 +165,11 @@ void	Server::createChannel(unsigned int fd, std::string channel_name){
 
 //User
 void	Server::createUser(int fd, User &user){
-	// this->_arrayUser.insert(std::make_pair(fd, &user));
 	if (_arrayUser.find(fd) != _arrayUser.end()) {
 	std::cerr << "ERROR FD " << fd << ": already exists in _arrayUser." << std::endl;
 	return;
 	}
 	this->_arrayUser.insert(std::make_pair(fd, &user));
-
-
-
-	std::cout << "[DEBUG] Current _arrayUser contents:" << std::endl;
-	for (std::map<int, User*>::iterator it = _arrayUser.begin(); it != _arrayUser.end(); ++it) {
-		std::cout << "FD: " << it->first << ", User pointer: " << it->second << std::endl;}
-
-
 }
 
 void	Server::deleteUser(int fd){
@@ -220,6 +212,28 @@ void	Server::run(){
 			clientFd = accept(server._serverSocket, (struct sockaddr *)&server._serverAddres, &server._addrlen);
 			if(clientFd == -1)
 				std::cerr << "ERROR ACCEPT : can't connect to socket." << std::endl;
+
+
+
+
+
+
+	// char host[NI_MAXHOST];
+	// char service[NI_MAXSERV];
+
+	// int result = getnameinfo((struct sockaddr*)&server._serverAddres, server._addrlen,
+	// 							host, sizeof(host),
+	// 							service, sizeof(service),
+	// 							0);
+
+	// (void)result;
+	// std::cout << host << std::endl;
+
+
+
+
+
+
 
 		//add client to epoll
 			struct epoll_event	clientEvent;

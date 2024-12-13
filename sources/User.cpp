@@ -1,14 +1,12 @@
 #include <iostream>
 #include <string>
+#include <unistd.h>
 #include "../includes/User.hpp"
 
 //Constructor & Destructor
 	User::User(){}
 	User::User(User const &copy){(void)copy;}
-	User::User(unsigned int fd) : _fd(fd), _buffer(""){
-
-		std::cout << fd << std::endl;
-	}
+	User::User(unsigned int fd) : _fd(fd), _buffer(""){}
 	User::~User(){}
 
 //Surcharge operator
