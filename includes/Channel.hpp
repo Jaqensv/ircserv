@@ -4,6 +4,8 @@
 #include "Server.hpp"
 #include "User.hpp"
 
+class Server;
+
 class Channel{
 
 	public :
@@ -31,13 +33,15 @@ class Channel{
 		void	setTopic(unsigned int fd, std::string channel_name, std::string topic);
 
 	//Member function
-		void	addUser(unsigned int fd);
-		void	removeUser(unsigned int fd);
+		void	addUser(Server &server, unsigned int fd);
+		void	removeUser(Server &server, std::string channel_name, std::string nickname);
 		void	addOperator(unsigned int fd);
 		//ahans
 		void	revokeOperator(unsigned int clientFd, unsigned int userFd);
 		//ahans
 		bool	isOperator(unsigned int fd);
+		//matt
+		void	kick(Server &server, unsigned int fd, std::string channel_name, std::string nickname);
 
 	private :
 	//Member variable

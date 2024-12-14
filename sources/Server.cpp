@@ -46,7 +46,8 @@
 	}
 
 //ahans
-Channel	&Server::getChannel(const std::string &channelName){
+Channel	&Server::getChannel(const std::string channelName){
+	std::cout << "ttest1" << std::endl;
 	std::vector<Channel*>::iterator it = _arrayChannel.begin();
 	for (; it != _arrayChannel.end(); ++it) {
 		if (channelName == (*it)->getName()) {
@@ -56,7 +57,6 @@ Channel	&Server::getChannel(const std::string &channelName){
 	return **it;
 }
 
-
 //ahans
 User	&Server::getUser(int fd) {
 	for (std::map<int, User*>::iterator it = this->_arrayUser.begin(); it != _arrayUser.end(); it++) {
@@ -64,6 +64,29 @@ User	&Server::getUser(int fd) {
 			return *it->second;
 	}
 	return *_arrayUser.end()->second;
+}
+
+//matt
+std::map<int, User*>& Server::getUsers() {return _arrayUser;}
+
+std::string		Server::getUsername() {
+	struct passwd *un;
+	uid_t uid = getuid();
+	un = getpwuid(uid);
+
+	if (un)
+		return std::string(un->pw_name);
+	return NULL;
+}
+
+unsigned int	Server::getTargetUserFd(std::string nickname) {
+	for (std::map<int, User*>::iterator user_it = _arrayUser.begin(); user_it != _arrayUser.end(); ++user_it) {
+		if (user_it->second->getNickname() == nickname) {
+			return user_it->first;
+		}
+	}
+	std::cerr << "Nickname not found" << std::endl;
+	return 0;
 }
 
 //ahans
@@ -151,14 +174,14 @@ void	Server::initEpoll(){
 }
 
 //ahans
-void	Server::createChannel(unsigned int fd, std::string channel_name){
+void	Server::createChannel(Server &server, unsigned int fd, std::string channel_name){
 	if (isChannel(channel_name) == true) {
 		std::cerr << "ERROR: Channel already exists" << std::endl;
 		return;
 	}
 	Channel *newChannel = new Channel(channel_name);
 
-	(*newChannel).addUser(fd);
+	(*newChannel).addUser(server, fd);
 	(*newChannel).addOperator(fd);
 	this->_arrayChannel.push_back(newChannel);
 }
@@ -171,6 +194,7 @@ void	Server::createUser(int fd, User &user){
 	}
 	this->_arrayUser.insert(std::make_pair(fd, &user));
 }
+
 
 void	Server::deleteUser(int fd){
 	std::cout << "Client " << fd << " deconnected." << std::endl;

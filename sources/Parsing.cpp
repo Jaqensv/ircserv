@@ -68,9 +68,7 @@ static void	checkParam(int argc, char **argv){
 		std::cerr << "Bad password, try again." << std::endl;
 		exit(1);
 	}
+	
 }
 
-void	parsing(int argc, char **argv){
-
-	checkParam(argc, argv);
-}
+void	parsing(int argc, char **argv){checkParam(argc, argv);}

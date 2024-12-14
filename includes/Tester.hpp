@@ -5,3 +5,4 @@
 #define BACKLINE std::cout << '\n'
 
 void channelTester(Server &server, unsigned int clientFd, std::string channel_name);
+void channelTesterLite(std::string channel_name);
