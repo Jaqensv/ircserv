@@ -11,6 +11,7 @@ void	parseArgs(IrcMessage &mess, std::string &input){
 	std::string			command;
 	std::string			message;
 	std::string			tmp;
+	bool				isCrlf = false;
 
 	iss.str(input);
 	iss >> mess.command;
@@ -31,6 +32,9 @@ void	parseArgs(IrcMessage &mess, std::string &input){
 		else
 			mess.params.push_back(tmp);
 	}
+	if (isCrlf == false)
+		return;
+		// mess.params.back() += mess.crlf;
 }
 
 IrcMessage	parseIrcMessage(std::string &input){

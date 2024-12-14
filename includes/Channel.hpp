@@ -36,12 +36,17 @@ class Channel{
 		void	addUser(Server &server, unsigned int fd);
 		void	removeUser(Server &server, std::string channel_name, std::string nickname);
 		void	addOperator(unsigned int fd);
-		//ahans
-		void	revokeOperator(unsigned int clientFd, unsigned int userFd);
-		//ahans
-		bool	isOperator(unsigned int fd);
 		//matt
 		void	kick(Server &server, unsigned int fd, std::string channel_name, std::string nickname);
+		//ahans
+		void	revokeOperator(unsigned int clientFd, unsigned int userFd);
+		bool	isOperator(unsigned int fd);
+		void	switchCanTopic(bool val);
+		void	switchInvOnly(bool val);
+		void	switchKeyMode();
+		void	switchKeyMode(std::string key);
+		void	switchLimitMode();
+		void	switchLimitMode(int limit);
 
 	private :
 	//Member variable
@@ -49,7 +54,11 @@ class Channel{
 		std::string				_name;
 		std::string				_topic;
 		bool					_canTopic; // false pour que les OP, true pour tout le monde
-
+		bool					_invOnly;
+		bool					_keyMode;
+		bool					_limitMode;
+		int						_limit;
+		std::string				_key;
 		std::map<int, User*> 	_users;
 		std::map<int, User*>	_operators;
 

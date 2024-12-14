@@ -4,10 +4,7 @@
 #include "../includes/Server.hpp"
 #include "../includes/handleInclude.hpp"
 
-
-
-
-int	main(int argc, char **argv){
+int	main(int argc, char ** argv) {
 
 	parsing(argc, argv);
 
