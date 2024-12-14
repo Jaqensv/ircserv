@@ -14,6 +14,7 @@
 #include "../includes/Server.hpp"
 #include "../includes/Channel.hpp"
 #include "../includes/Tester.hpp"
+#include "../includes/handleInclude.hpp"
 
 
 //Constructor
@@ -279,6 +280,10 @@ void	Server::run(){
 				std::cout << server._arrayUser[clientFd]->getNickname() << ": " << server._arrayParams.params[0] << std::endl;
 				if(server._arrayParams.isCommand == false){
 					broadcastAll(clientFd, server._arrayParams.params[0]);
+				}
+				else if(server._arrayParams.command == "/JOIN"){
+					std::cout << "Enter JOIN command" << std::endl;
+					commandJoin(clientFd);
 				}
 				else if (server._arrayParams.command == "/KICK")
 					std::cout << "Enter KICK methode" << std::endl;
