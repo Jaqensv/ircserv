@@ -46,9 +46,7 @@ class Server{
 		unsigned short			getBackLogSize();
 		//ahans
 		Channel					&getChannel(const std::string channelName);
-		//ahans
 		bool					isChannel(const std::string &channelName);
-		//ahans
 		User					&getUser(int fd);
 		//matt
 		//void					addServerUser(unsigned int fd);
@@ -58,7 +56,6 @@ class Server{
 		//ahans
 		bool					isUser(int fd);
 	//commmands functions
-		//ahans
 		bool	modeCmdParsing(std::vector<std::string> &params, unsigned int myfd);
 	//Surcharge operator
 		Server	&operator=(Server const &other);
@@ -67,6 +64,8 @@ class Server{
 		void	initServer();
 		void	initEpoll();
 		void	run();
+		void	join(int clientFd);
+
 
 		//void	createChannel(Channel &chan);
 		//ahans

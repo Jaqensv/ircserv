@@ -47,26 +47,41 @@
 		return NULL;
 	}
 
+	bool Channel::isKeyMode() {
+		return _keyMode;
+	}
+
+	std::string Channel::getKey() {
+		return _key;
+	}
+
+	bool Channel::isLimitMode() {
+		return _limitMode;
+	}
+
+	size_t Channel::getLimit() {
+		return _limit;
+	}
+
+	bool Channel::isInvOnly() {
+		return _invOnly;
+	}
+
+
+
 	User*		Channel::getUser(unsigned int fd) {
-		std::cout << "test8" << std::endl;
 		std::map<int, User*>::iterator it = _users.begin();
-		std::cout << "test9" << std::endl;
 		for (; it != _users.end(); ++it) {
-					std::cout << "test10" << std::endl;
 			if (fd == static_cast<unsigned int>(it->first)) {
-						std::cout << "test11" << std::endl;
 				return it->second;
 			}
 		}
-				std::cout << "test12" << std::endl;
 		return NULL;
 	}
 
 //Member function
 	void	Channel::addUser(Server &server, unsigned int fd){
-		std::cout << "test3" << std::endl;
 		_users.insert(std::make_pair(fd, &server.getUser(fd)));
-		std::cout << "test4" << std::endl;
 	}
 
 	void	Channel::addOperator(unsigned int fd) {

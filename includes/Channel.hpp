@@ -27,6 +27,11 @@ class Channel{
 		User*		getOper(unsigned int fd);
 		//ahans
 		User*		getUser(unsigned int fd);
+		bool		isKeyMode();
+		std::string	getKey();
+		bool		isLimitMode();
+		bool		isInvOnly();
+		size_t		getLimit();
 
 	//Setter
 		//matt
@@ -57,7 +62,7 @@ class Channel{
 		bool					_invOnly;
 		bool					_keyMode;
 		bool					_limitMode;
-		int						_limit;
+		size_t					_limit;
 		std::string				_key;
 		std::map<int, User*> 	_users;
 		std::map<int, User*>	_operators;

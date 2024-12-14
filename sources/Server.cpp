@@ -48,7 +48,6 @@
 
 //ahans
 Channel	&Server::getChannel(const std::string channelName){
-	std::cout << "ttest1" << std::endl;
 	std::vector<Channel*>::iterator it = _arrayChannel.begin();
 	for (; it != _arrayChannel.end(); ++it) {
 		if (channelName == (*it)->getName()) {
@@ -307,7 +306,7 @@ void	Server::run(){
 				}
 				else if(server._arrayParams.command == "/JOIN"){
 					std::cout << "Enter JOIN command" << std::endl;
-					commandJoin(clientFd);
+					join(clientFd);
 				}
 				else if (server._arrayParams.command == "/KICK")
 					std::cout << "Enter KICK methode" << std::endl;

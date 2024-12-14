@@ -73,9 +73,7 @@ void channelTesterLite(std::string channel_name) {
 	if (server.getChannel(channel_name).getUser(6) == NULL) {
 		std::cout << "We add an user and name him 'Jean'" << std::endl;
 		server.getChannel(channel_name).addUser(server, 6);
-		std::cout << "test" << std::endl;
 		server.getChannel(channel_name).getUser(6)->setNickname("Jean");
-		std::cout << "test1" << std::endl;
 	}
 	for (std::map<int, User*>::iterator it = server.getUsers().begin(); it != server.getUsers().end(); ++it)
 		std::cout << "Array User name : " << it->second->getNickname() << " | " << "fd : " << it->first << std::endl;
