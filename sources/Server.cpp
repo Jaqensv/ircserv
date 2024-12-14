@@ -214,27 +214,6 @@ void	Server::run(){
 				std::cerr << "ERROR ACCEPT : can't connect to socket." << std::endl;
 
 
-
-
-
-
-	// char host[NI_MAXHOST];
-	// char service[NI_MAXSERV];
-
-	// int result = getnameinfo((struct sockaddr*)&server._serverAddres, server._addrlen,
-	// 							host, sizeof(host),
-	// 							service, sizeof(service),
-	// 							0);
-
-	// (void)result;
-	// std::cout << host << std::endl;
-
-
-
-
-
-
-
 		//add client to epoll
 			struct epoll_event	clientEvent;
 			clientEvent.data.fd = clientFd;
@@ -249,6 +228,24 @@ void	Server::run(){
 			createUser(clientFd, *newUser);
 
 			std::cout << "New client connected : " << clientFd << std::endl;
+
+		//find postname and fill in nickname
+			char host[NI_MAXHOST];
+			char service[NI_MAXSERV];
+			int result = getnameinfo((struct sockaddr*)&server._serverAddres, server._addrlen,host, sizeof(host),service, sizeof(service),0);
+			if(result != 0){
+				std::cerr << "ERROR GETNAMEINFO : can't receive nickname." << std::endl;
+				close(clientFd);
+				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+				deleteUser(clientFd);
+			}
+			std::string	nick;
+			nick = host;
+			size_t	pos;
+			pos = nick.find('.');
+			if(pos != std::string::npos)
+				nick = nick.substr(0, pos);
+			server._arrayUser[clientFd]->setNickname(nick);
 		}
 		else{
 		//handle client message
@@ -279,7 +276,7 @@ void	Server::run(){
 			else{
 				std::string	input = server.getUser(clientFd).getBuffer() + mss;
 				server._arrayParams = parseIrcMessage(input);
-				std::cout << "Message from client " << clientFd << ": " << server._arrayParams.params[0] << std::endl;
+				std::cout << server._arrayUser[clientFd]->getNickname() << ": " << server._arrayParams.params[0] << std::endl;
 				if(server._arrayParams.isCommand == false){
 					broadcastAll(clientFd, server._arrayParams.params[0]);
 				}
