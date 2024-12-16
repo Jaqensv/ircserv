@@ -12,9 +12,11 @@ void	parseArgs(IrcMessage &mess, std::string &input){
 	std::string			message;
 	std::string			tmp;
 	bool				isCrlf = false;
+	int					j = 0;
 
 	iss.str(input);
 	iss >> mess.command;
+
 	for(int i = 0; iss >> tmp; i++){
 
 		if(tmp[0] == ':'){
@@ -27,14 +29,16 @@ void	parseArgs(IrcMessage &mess, std::string &input){
 			mess.params[i].erase(0, 1);
 			int	end = mess.params[i].size();
 			mess.params[i].erase(end, 1);
+			isCrlf = true;
 			mess.params[i] += mess.crlf;
 		}
-		else
+		else{
 			mess.params.push_back(tmp);
+		}
+		j = i;
 	}
-	if (isCrlf == false)
-		return;
-		// mess.params.back() += mess.crlf;
+	if(isCrlf == false)
+			mess.params[j] += mess.crlf;
 }
 
 IrcMessage	parseIrcMessage(std::string &input){
@@ -58,7 +62,7 @@ IrcMessage	parseIrcMessage(std::string &input){
 		mess.params[i].erase(0, 1);
 		int	end = mess.params[i].size();
 		mess.params[i].erase(end, 1);
-		// mess.params[i] += mess.crlf;
+		mess.params[i] += mess.crlf;
 	}
 	else{
 		iss >> mess.command;

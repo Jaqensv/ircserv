@@ -300,7 +300,7 @@ void	Server::run(){
 			else{
 				std::string	input = server.getUser(clientFd).getBuffer() + mss;
 				server._arrayParams = parseIrcMessage(input);
-				std::cout << server._arrayUser[clientFd]->getNickname() << ": " << server._arrayParams.params[0] << std::endl;
+				std::cout << server._arrayUser[clientFd]->getNickname() << ": " << server._arrayParams.params[0] << std::flush;
 				if(server._arrayParams.isCommand == false){
 					broadcastAll(clientFd, server._arrayParams.params[0]);
 				}
