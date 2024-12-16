@@ -1,12 +1,14 @@
 #include <iostream>
 #include <string>
 #include <unistd.h>
+#include <cstring>
 #include "../includes/User.hpp"
+#include "../includes/Channel.hpp"
 
 //Constructor & Destructor
 	User::User(){}
 	User::User(User const &copy){(void)copy;}
-	User::User(unsigned int fd) : _fd(fd), _buffer(""){}
+	User::User(unsigned int fd) : _fd(fd), _buffer(""), _myChannel(""){}
 	User::~User(){}
 
 //Surcharge operator
@@ -24,6 +26,8 @@
 	std::string	User::getNickname(){return this->_nickname;}
 	std::string	User::getUsername(){return this->_username;}
 	std::string	User::getBuffer(){return this->_buffer;}
+	std::string	User::getMyChannel(){return this->_myChannel;}
+
 
 //Setter
 	void	User::setFd(unsigned int fd){this->_fd = fd;}
@@ -35,3 +39,4 @@
 		else
 			this->_buffer += buffer;
 	};
+	void	User::setMyChannel(std::string myChannel){this->_myChannel = myChannel;}

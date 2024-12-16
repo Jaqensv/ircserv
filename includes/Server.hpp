@@ -13,6 +13,7 @@
 #include "IrcMessage.hpp"
 
 class Channel;
+class User;
 
 class Server{
 

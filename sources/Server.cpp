@@ -197,7 +197,9 @@ void	Server::createUser(int fd, User &user){
 
 
 void	Server::deleteUser(int fd){
+	Server	&server = Server::getInstance();
 	std::cout << "Client " << fd << " deconnected." << std::endl;
+	server.getChannel(getUser(fd).getMyChannel()).removeUser(fd);
 	delete &getUser(fd);
 	this->_arrayUser.erase(fd);
 }
@@ -301,11 +303,16 @@ void	Server::run(){
 				std::string	input = server.getUser(clientFd).getBuffer() + mss;
 				server._arrayParams = parseIrcMessage(input);
 				std::cout << server._arrayUser[clientFd]->getNickname() << ": " << server._arrayParams.params[0] << std::flush;
+
+				// if(server._arrayParams.isCommand == false){
+				// 	broadcastAll(clientFd, server._arrayParams.params[0]);
+				// }
 				if(server._arrayParams.isCommand == false){
-					broadcastAll(clientFd, server._arrayParams.params[0]);
+					if(server.isChannel(server.getUser(clientFd).getMyChannel())){
+						server.getChannel(server.getUser(clientFd).getMyChannel()).broadcastChannel(clientFd, server._arrayParams.params[0]);
+					}
 				}
 				else if(server._arrayParams.command == "/JOIN"){
-					std::cout << "Enter JOIN command" << std::endl;
 					join(clientFd);
 				}
 				else if (server._arrayParams.command == "/KICK")

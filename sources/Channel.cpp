@@ -81,6 +81,7 @@
 
 //Member function
 	void	Channel::addUser(Server &server, unsigned int fd){
+		std::cout << "fd : " << fd << std::endl;
 		_users.insert(std::make_pair(fd, &server.getUser(fd)));
 	}
 
@@ -88,8 +89,8 @@
 		_operators.insert(std::make_pair(fd, getUser(fd)));
 	}
 
-	void	Channel::removeUser(Server &server, std::string channel_name, std::string nickname){
-		server.getChannel(channel_name).getUsers().erase(server.getTargetUserFd(nickname));
+	void	Channel::removeUser(int clientFd){
+		this->_users.erase(_users.find(clientFd));
 	}
 
 	//ahans
@@ -110,17 +111,17 @@
 	}
 
 	//matt
-	void	Channel::kick(Server &server, unsigned int fd, std::string channel_name, std::string nickname) {
-		Channel &channel = server.getChannel(channel_name);
-		User* user = server.getChannel(channel_name).getUser(fd);
+	// void	Channel::kick(Server &server, unsigned int fd, std::string channel_name, std::string nickname) {
+	// 	Channel &channel = server.getChannel(channel_name);
+	// 	User* user = server.getChannel(channel_name).getUser(fd);
 
-		if (!server.getChannel(channel_name).isOperator(fd))
-			std::cout << user->getNickname() << " doesn't have the rights to kick" << std::endl;
-		else {
-			channel.removeUser(server, channel_name, nickname);
-		}
+	// 	if (!server.getChannel(channel_name).isOperator(fd))
+	// 		std::cout << user->getNickname() << " doesn't have the rights to kick" << std::endl;
+	// 	else {
+	// 		channel.removeUser(server, channel_name, nickname);
+	// 	}
 	//Parameters: <channel> <user> *( "," <user> ) [<comment>]
-	}
+	// }
 	//ahans
 	void	Channel::switchCanTopic(bool val){
 		if (val != _canTopic) {
@@ -178,3 +179,19 @@
 			_limit = limit;
 		}
 	}
+
+
+void	Channel::broadcastChannel(int senderFd, std::string &message){
+
+	for(std::map<int, User*>::iterator it = this->_users.begin(); it != _users.end(); it++){
+		std::cout << "<" << it->second->getFd() << ">" << std::endl;
+		int clientFd = it->first;
+		if(clientFd != senderFd){
+			ssize_t bytesSent = send(clientFd, message.c_str(), message.size(), 0);
+			if (bytesSent == -1) {
+				std::cerr << "ERROR BROADCAST : Failed to send message to client " << clientFd << std::endl;
+				continue;
+			}
+		}
+	}
+}

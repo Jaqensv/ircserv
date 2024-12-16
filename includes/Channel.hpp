@@ -39,7 +39,7 @@ class Channel{
 
 	//Member function
 		void	addUser(Server &server, unsigned int fd);
-		void	removeUser(Server &server, std::string channel_name, std::string nickname);
+		void	removeUser(int clientFd);
 		void	addOperator(unsigned int fd);
 		//matt
 		void	kick(Server &server, unsigned int fd, std::string channel_name, std::string nickname);
@@ -52,6 +52,8 @@ class Channel{
 		void	switchKeyMode(std::string key);
 		void	switchLimitMode();
 		void	switchLimitMode(int limit);
+		void	broadcastChannel(int senderFd, std::string &message);
+
 
 	private :
 	//Member variable

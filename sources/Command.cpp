@@ -17,8 +17,10 @@ void	Server::join(int clientFd){
 		return;
 	}
 	server._arrayParams.params[0].erase(0, 1);
+	if(server._arrayParams.params[0].find("\r\n"))
+			server._arrayParams.params[0] = server._arrayParams.params[0].substr(0, server._arrayParams.params[0].size() - 2);
 	if(isChannel(server._arrayParams.params[0])) {
-		Channel chan = getChannel(server._arrayParams.params[0]);
+		Channel &chan = getChannel(server._arrayParams.params[0]);
 		if (chan.isInvOnly() == true) {
 			std::cout << "ERROR :channel is invite only." << std::endl;
 			return;
@@ -42,9 +44,12 @@ void	Server::join(int clientFd){
 			}
 		}
 		chan.addUser(server, clientFd);
+		server.getUser(clientFd).setMyChannel(chan.getName());
 	}
 	else {
 		createChannel(server, clientFd, server._arrayParams.params[0]);
 		std::cout << "Channel " << server.getChannel(server._arrayParams.params[0]).getName() << " created by " << server.getUser(clientFd).getNickname() << std::endl;
+		std::cout << server.getChannel(server._arrayParams.params[0]).getName() << std::endl;
+		server.getUser(clientFd).setMyChannel(server.getChannel(server._arrayParams.params[0]).getName());
 	}
 }
