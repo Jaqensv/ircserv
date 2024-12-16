@@ -184,7 +184,6 @@
 void	Channel::broadcastChannel(int senderFd, std::string &message){
 
 	for(std::map<int, User*>::iterator it = this->_users.begin(); it != _users.end(); it++){
-		std::cout << "<" << it->second->getFd() << ">" << std::endl;
 		int clientFd = it->first;
 		if(clientFd != senderFd){
 			ssize_t bytesSent = send(clientFd, message.c_str(), message.size(), 0);

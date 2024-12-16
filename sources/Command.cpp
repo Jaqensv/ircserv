@@ -44,12 +44,15 @@ void	Server::join(int clientFd){
 			}
 		}
 		chan.addUser(server, clientFd);
+		if(server.getUser(clientFd).getMyChannel() != "")
+			server.getChannel(server.getUser(clientFd).getMyChannel()).getUsers().erase(server.getChannel(server.getUser(clientFd).getMyChannel()).getUsers().find(clientFd));
 		server.getUser(clientFd).setMyChannel(chan.getName());
 	}
 	else {
 		createChannel(server, clientFd, server._arrayParams.params[0]);
 		std::cout << "Channel " << server.getChannel(server._arrayParams.params[0]).getName() << " created by " << server.getUser(clientFd).getNickname() << std::endl;
-		std::cout << server.getChannel(server._arrayParams.params[0]).getName() << std::endl;
+		if(server.getUser(clientFd).getMyChannel() != "")
+			server.getChannel(server.getUser(clientFd).getMyChannel()).getUsers().erase(server.getChannel(server.getUser(clientFd).getMyChannel()).getUsers().find(clientFd));
 		server.getUser(clientFd).setMyChannel(server.getChannel(server._arrayParams.params[0]).getName());
 	}
 }
