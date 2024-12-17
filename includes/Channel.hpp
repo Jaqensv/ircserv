@@ -32,10 +32,12 @@ class Channel{
 		bool		isLimitMode();
 		bool		isInvOnly();
 		size_t		getLimit();
+		bool		getIsTopic();
 
 	//Setter
 		//matt
-		void	setTopic(unsigned int fd, std::string channel_name, std::string topic);
+		void	setTopic(unsigned int fd, std::vector<std::string> topic);
+		void	setTopic(unsigned int fd);
 
 	//Member function
 		void	addUser(Server &server, unsigned int fd);

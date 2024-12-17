@@ -63,23 +63,31 @@
 // }
 
 
-void channelTesterLite(std::string channel_name) {
+// void channelTesterLite(std::string channel_name) {
 
+// 	Server &server = server.getInstance();
+// 	BACKLINE;
+// 	//std::cout << "CHANNEL NAME " << channel_name << std::endl;
+// 	std::cout << "##################### LITE TESTER #####################" << std::endl;
+// 	BACKLINE;
+// 	if (server.getChannel(channel_name).getUser(6) == NULL) {
+// 		std::cout << "We add an user and name him 'Jean'" << std::endl;
+// 		server.getChannel(channel_name).addUser(server, 6);
+// 		server.getChannel(channel_name).getUser(6)->setNickname("Jean");
+// 	}
+// 	for (std::map<int, User*>::iterator it = server.getUsers().begin(); it != server.getUsers().end(); ++it)
+// 		std::cout << "Array User name : " << it->second->getNickname() << " | " << "fd : " << it->first << std::endl;
+// 	std::cout << "In " << server.getChannel(channel_name).getName() << ", we have these users : " << std::endl;
+// 	for (std::map<int, User*>::iterator user_it = server.getChannel(channel_name).getUsers().begin(); user_it != server.getChannel(channel_name).getUsers().end(); ++user_it)
+// 		std::cout << "User name : " << user_it->second->getNickname() << " | " << "fd : " << user_it->first << std::endl;
+// 	BACKLINE;
+// 	std::cout << "##################### LITE TESTER #####################" << std::endl;
+// }
+
+void channelTopicTester(std::string channel_name) {
 	Server &server = server.getInstance();
-	BACKLINE;
-	//std::cout << "CHANNEL NAME " << channel_name << std::endl;
-	std::cout << "##################### LITE TESTER #####################" << std::endl;
-	BACKLINE;
-	if (server.getChannel(channel_name).getUser(6) == NULL) {
-		std::cout << "We add an user and name him 'Jean'" << std::endl;
-		server.getChannel(channel_name).addUser(server, 6);
-		server.getChannel(channel_name).getUser(6)->setNickname("Jean");
-	}
-	for (std::map<int, User*>::iterator it = server.getUsers().begin(); it != server.getUsers().end(); ++it)
-		std::cout << "Array User name : " << it->second->getNickname() << " | " << "fd : " << it->first << std::endl;
-	std::cout << "In " << server.getChannel(channel_name).getName() << ", we have these users : " << std::endl;
-	for (std::map<int, User*>::iterator user_it = server.getChannel(channel_name).getUsers().begin(); user_it != server.getChannel(channel_name).getUsers().end(); ++user_it)
-		std::cout << "User name : " << user_it->second->getNickname() << " | " << "fd : " << user_it->first << std::endl;
-	BACKLINE;
-	std::cout << "##################### LITE TESTER #####################" << std::endl;
+	if (channel_name[0] == '#')
+		channel_name.erase(0, 1);
+	Channel &channel = server.getChannel(channel_name);
+	std::cout << "Topic: " << channel.getTopic() << std::endl;
 }

@@ -271,6 +271,10 @@ void	Server::run(){
 			pos = nick.find('.');
 			if(pos != std::string::npos)
 				nick = nick.substr(0, pos);
+			if (clientFd == 5) 									// TMP <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+				nick = "Allan";									// TMP <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+			else if (clientFd == 6)								// TMP <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+				nick = "Matt";									// TMP <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 			server._arrayUser[clientFd]->setNickname(nick);
 		}
 		else{
@@ -312,19 +316,28 @@ void	Server::run(){
 						server.getChannel(server.getUser(clientFd).getMyChannel()).broadcastChannel(clientFd, server._arrayParams.params[0]);
 					}
 				}
-				else if(server._arrayParams.command == "/JOIN"){
+				else if(server._arrayParams.command == "/JOIN")
 					join(clientFd);
-				}
 				else if (server._arrayParams.command == "/KICK") {
 					std::cout << getChannel(getUser(clientFd).getMyChannel()).getName() << std::endl;
 					getChannel(getUser(clientFd).getMyChannel()).kick(server, clientFd, server._arrayParams.params[0]);
 				} else if (server._arrayParams.command == "/INVITE")
 					std::cout << "Enter INVITE methode" << std::endl;
-				else if (server._arrayParams.command == "/TOPIC")
-					std::cout << "Enter TOPIC methode" << std::endl;
+				else if (server._arrayParams.command == "/TOPIC") {
+					if (server._arrayParams.params[0][0] == '#')
+						server._arrayParams.params[0].erase(0, 1);
+					if (server._arrayParams.params.size() == 1 && server._arrayParams.params[0].find("\r\n"))
+						server._arrayParams.params[0] = server._arrayParams.params[0].substr(0, server._arrayParams.params[0].size() - 2);
+					if (isChannel(server._arrayParams.params[0])) {
+						if (server._arrayParams.params.size() >= 1)
+							getChannel(server._arrayParams.params[0]).setTopic(clientFd, server._arrayParams.params);
+						else
+							getChannel(server._arrayParams.params[0]).setTopic(clientFd);
+					}
+					//channelTopicTester(server._arrayParams.params[0]);
+				}
 				else if (server._arrayParams.command == "/MODE")
 					std::cout << "Enter MODE methode" << std::endl;
-				// channelTester(server, clientFd, "Robbbbb");
 				server.getUser(clientFd).setBuffer("");
 			}
 		}
