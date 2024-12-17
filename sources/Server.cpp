@@ -315,9 +315,10 @@ void	Server::run(){
 				else if(server._arrayParams.command == "/JOIN"){
 					join(clientFd);
 				}
-				else if (server._arrayParams.command == "/KICK")
-					std::cout << "Enter KICK methode" << std::endl;
-				else if (server._arrayParams.command == "/INVITE")
+				else if (server._arrayParams.command == "/KICK") {
+					std::cout << getChannel(getUser(clientFd).getMyChannel()).getName() << std::endl;
+					getChannel(getUser(clientFd).getMyChannel()).kick(server, clientFd, server._arrayParams.params[0]);
+				} else if (server._arrayParams.command == "/INVITE")
 					std::cout << "Enter INVITE methode" << std::endl;
 				else if (server._arrayParams.command == "/TOPIC")
 					std::cout << "Enter TOPIC methode" << std::endl;
