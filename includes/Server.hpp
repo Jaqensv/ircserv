@@ -13,6 +13,7 @@
 #include "IrcMessage.hpp"
 
 class Channel;
+class User;
 
 class Server{
 
@@ -46,9 +47,7 @@ class Server{
 		unsigned short			getBackLogSize();
 		//ahans
 		Channel					&getChannel(const std::string channelName);
-		//ahans
 		bool					isChannel(const std::string &channelName);
-		//ahans
 		User					&getUser(int fd);
 		//matt
 		//void					addServerUser(unsigned int fd);
@@ -57,7 +56,8 @@ class Server{
 		unsigned int			getTargetUserFd(std::string nickname);
 		//ahans
 		bool					isUser(int fd);
-
+	//commmands functions
+		bool	modeCmdParsing(std::vector<std::string> &params, unsigned int myfd);
 	//Surcharge operator
 		Server	&operator=(Server const &other);
 
@@ -65,15 +65,16 @@ class Server{
 		void	initServer();
 		void	initEpoll();
 		void	run();
+		void	join(int clientFd);
+
 
 		//void	createChannel(Channel &chan);
 		//ahans
 		void	createChannel(Server &server, unsigned int fd, std::string channel_name);
-		void	createUser(unsigned int fd);
+		void	createUser(int fd, User &user);
 		void	deleteUser(int fd);
 
 		void	broadcastAll(int senderFd, std::string &message);
-
 
 	private :
 	//Variable member
