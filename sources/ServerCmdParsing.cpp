@@ -3,7 +3,7 @@
 
 //if params[1] doesn't exist  RPL_CHANNELMODEIS (324)
 bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd) {
-	// Server	&server = Server::getInstance();
+	Server	&server = Server::getInstance();
 	std::string	&chanName = params[0];
 
 	if (chanName[0] == '#') {
@@ -52,22 +52,22 @@ bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd)
 	}
 	// — o : Donner/retirer le privilège de l’opérateur de canal
 	else if (params[1][1] == 'o') {
-		// User	*userTarget = server.getUserByNN(params[2]);
-		// if (isAdd) {
-		// 	if (chan.isOperator(userTarget->getFd())) {
-		// 		std::cout << params[2] << " is already operator" << std::endl;
-		// 	} else {
-		// 		chan.addOperator(userTarget->getFd());
-		// 		std::cout << params[2] << " has been added to operator" << std::endl;
-		// 	}
-		// } else {
-		// 	if (!chan.isOperator(userTarget->getFd())) {
-		// 		std::cout << params[2] << " is not operator" << std::endl;
-		// 	} else {
-		// 		chan.revokeOperator(myfd, userTarget->getFd());
-		// 		std::cout << params[2] << " has been revoked from operator" << std::endl;
-		// 	}
-		// }
+		User	*userTarget = server.getUser(server.getTargetUserFd(params[2]));
+		if (isAdd) {
+			if (chan.isOperator(userTarget->getFd())) {
+				std::cout << params[2] << " is already operator" << std::endl;
+			} else {
+				chan.addOperator(userTarget->getFd());
+				std::cout << params[2] << " has been added to operator" << std::endl;
+			}
+		} else {
+			if (!chan.isOperator(userTarget->getFd())) {
+				std::cout << params[2] << " is not operator" << std::endl;
+			} else {
+				chan.revokeOperator(myfd, userTarget->getFd());
+				std::cout << params[2] << " has been revoked from operator" << std::endl;
+			}
+		}
 	}
 	// — l : Définir/supprimer la limite d’utilisateurs pour le canal
 	else if (params[1][1] == 'l') {
