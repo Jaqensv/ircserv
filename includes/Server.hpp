@@ -7,8 +7,10 @@
 #include <map>
 #include <sstream> // stringstream
 #include <algorithm> // std::find
+#include <pwd.h> // getuid, getpwuid
 #include "Channel.hpp"
 #include "User.hpp"
+#include "IrcMessage.hpp"
 
 class Channel;
 
@@ -43,11 +45,16 @@ class Server{
 		bool					getNeedPassw();
 		unsigned short			getBackLogSize();
 		//ahans
-		Channel					&getChannel(const std::string &channelName);
+		Channel					&getChannel(const std::string channelName);
 		//ahans
 		bool					isChannel(const std::string &channelName);
 		//ahans
 		User					&getUser(int fd);
+		//matt
+		//void					addServerUser(unsigned int fd);
+		std::map<int, User*>&	getUsers();
+		std::string				getUsername();
+		unsigned int			getTargetUserFd(std::string nickname);
 		//ahans
 		bool					isUser(int fd);
 
@@ -56,17 +63,16 @@ class Server{
 
 	//Member functions
 		void	initServer();
-		int		socketNonBlocking(int fd);
 		void	initEpoll();
 		void	run();
 
 		//void	createChannel(Channel &chan);
 		//ahans
-		void	createChannel(unsigned int fd, std::string channel_name);
-		void	createUser(int fd, User &user);
+		void	createChannel(Server &server, unsigned int fd, std::string channel_name);
+		void	createUser(unsigned int fd);
 		void	deleteUser(int fd);
 
-		void	broadcast(int senderFd, std::string &message);
+		void	broadcastAll(int senderFd, std::string &message);
 
 
 	private :
@@ -83,7 +89,8 @@ class Server{
 		bool				_needPassw;
 
 	//Array of : Channel, User and Operator
-		std::vector<Channel*>	_arrayChannel;
-		std::map<int, User*>	_arrayUser;
+		std::vector<Channel*>		_arrayChannel;
+		std::map<int, User*>		_arrayUser;
+		IrcMessage					_arrayParams;
 
 };

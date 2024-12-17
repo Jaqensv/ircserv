@@ -49,26 +49,34 @@
 
 	//ahans
 	User*		Channel::getUser(unsigned int fd) {
+		std::cout << "test8" << std::endl;
 		std::map<int, User*>::iterator it = _users.begin();
+		std::cout << "test9" << std::endl;
 		for (; it != _users.end(); ++it) {
-			if (fd == static_cast<unsigned int>(it->first))
+					std::cout << "test10" << std::endl;
+			if (fd == static_cast<unsigned int>(it->first)) {
+						std::cout << "test11" << std::endl;
 				return it->second;
+			}
 		}
+				std::cout << "test12" << std::endl;
 		return NULL;
 	}
 
 //Member function
-	void	Channel::addUser(unsigned int fd){
-		Server	&server = Server::getInstance();
+	void	Channel::addUser(Server &server, unsigned int fd){
+		std::cout << "test3" << std::endl;
 		_users.insert(std::make_pair(fd, &server.getUser(fd)));
+		std::cout << "test4" << std::endl;
 	}
 
 	void	Channel::addOperator(unsigned int fd) {
 		_operators.insert(std::make_pair(fd, getUser(fd)));
 	}
 
-	void	Channel::removeUser(unsigned int fd){_users.erase(fd);}
-
+	void	Channel::removeUser(Server &server, std::string channel_name, std::string nickname){
+		server.getChannel(channel_name).getUsers().erase(server.getTargetUserFd(nickname));
+	}
 
 	//ahans
 	void	Channel::revokeOperator(unsigned int clientFd, unsigned int userFd){
@@ -86,4 +94,17 @@
 				return true;
 		}
 		return false;
+	}
+
+	//matt
+	void	Channel::kick(Server &server, unsigned int fd, std::string channel_name, std::string nickname) {
+		Channel &channel = server.getChannel(channel_name);
+		User* user = server.getChannel(channel_name).getUser(fd);
+
+		if (!server.getChannel(channel_name).isOperator(fd))
+			std::cout << user->getNickname() << " doesn't have the rights to kick" << std::endl;
+		else {
+			channel.removeUser(server, channel_name, nickname);
+		}
+	//Parameters: <channel> <user> *( "," <user> ) [<comment>]
 	}
