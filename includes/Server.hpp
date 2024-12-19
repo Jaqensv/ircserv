@@ -68,10 +68,13 @@ class Server{
 		void	join(int clientFd);
 
 
+
 		//void	createChannel(Channel &chan);
 		//ahans
 		void	createChannel(Server &server, unsigned int fd, std::string channel_name);
 		void	createUser(int fd, User &user);
+		void	findNickName(int clientFd);
+
 		void	deleteUser(int fd);
 
 		void	broadcastAll(int senderFd, std::string &message);
