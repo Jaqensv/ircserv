@@ -7,11 +7,13 @@
 #include <map>
 #include <sstream> // stringstream
 #include <algorithm> // std::find
+#include <pwd.h> // getuid, getpwuid
 #include "Channel.hpp"
 #include "User.hpp"
 #include "IrcMessage.hpp"
 
 class Channel;
+class User;
 
 class Server{
 
@@ -44,15 +46,17 @@ class Server{
 		bool					getNeedPassw();
 		unsigned short			getBackLogSize();
 		//ahans
-		Channel					&getChannel(const std::string &channelName);
-		//ahans
+		Channel					&getChannel(const std::string channelName);
 		bool					isChannel(const std::string &channelName);
-		//ahans
 		User					&getUser(int fd);
+		//matt
+		//void					addServerUser(unsigned int fd);
+		std::map<int, User*>&	getUsers();
+		std::string				getUsername();
+		unsigned int			getTargetUserFd(std::string nickname);
 		//ahans
 		bool					isUser(int fd);
 	//commmands functions
-		//ahans
 		bool	modeCmdParsing(std::vector<std::string> &params, unsigned int myfd);
 	//Surcharge operator
 		Server	&operator=(Server const &other);
@@ -61,10 +65,12 @@ class Server{
 		void	initServer();
 		void	initEpoll();
 		void	run();
+		void	join(int clientFd);
+
 
 		//void	createChannel(Channel &chan);
 		//ahans
-		void	createChannel(unsigned int fd, std::string channel_name);
+		void	createChannel(Server &server, unsigned int fd, std::string channel_name);
 		void	createUser(int fd, User &user);
 		void	deleteUser(int fd);
 

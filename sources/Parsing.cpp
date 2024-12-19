@@ -43,34 +43,12 @@ static void	checkParam(int argc, char **argv){
 	std::string	password;
 	password = static_cast<std::string>(argv[2]);
 
-	// if(password.size() < 6){
-	// 	std::cerr << "Password must have at least 6 characters, including at least 1 number and 1 uppercase letter." << std::endl;
-	// 	exit(1);
-	// }
-
-	// bool	oneDigit = false;
-	// bool	oneUpper = false;
-	// for(i = 0; i < password.size(); i++){
-	// 	if(isdigit(password[i]))
-	// 		oneDigit = true;
-	// 	else if(isupper(password[i]))
-	// 		oneUpper = true;
-	// 	if (oneDigit && oneUpper)
-	// 		break;
-	// }
-
-	// if(!oneDigit || !oneUpper){
-	// 	std::cerr << "Password must have at least 6 characters, including at least 1 number and 1 uppercase letter." << std::endl;
-	// 	exit(1);
-	// }
 	Server	&server = Server::getInstance(); //Call of server instance
 	if(password.compare(server.getPassw())){
 		std::cerr << "Bad password, try again." << std::endl;
 		exit(1);
 	}
+	
 }
 
-void	parsing(int argc, char **argv){
-
-	checkParam(argc, argv);
-}
+void	parsing(int argc, char **argv){checkParam(argc, argv);}

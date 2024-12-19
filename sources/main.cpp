@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <csignal>
 #include "../includes/Server.hpp"
 #include "../includes/handleInclude.hpp"
 

@@ -1,6 +1,9 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include "../includes/Channel.hpp"
+
+class Channel;
 
 class User{
 
@@ -15,14 +18,18 @@ class User{
 		User	&operator=(User const &other);
 
 	// Getter
-		int			getFd();
-		std::string	getNickname();
-		std::string	getUsername();
+		int				getFd();
+		std::string		getNickname();
+		std::string		getUsername();
+		std::string		getBuffer();
+		std::string		getMyChannel();
 
 	//Setter
 		void	setFd(unsigned int fd);
 		void	setNickname(std::string nickname);
 		void	setUsername(std::string username);
+		void	setBuffer(std::string buffer);
+		void	setMyChannel(std::string myChannel);
 
 
 	private :
@@ -31,5 +38,7 @@ class User{
 		unsigned int	_fd;
 		std::string		_nickname;
 		std::string		_username;
+		std::string		_buffer;
+		std::string		_myChannel;
 
 };

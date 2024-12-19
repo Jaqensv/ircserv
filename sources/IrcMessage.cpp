@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstring>
 #include <sstream>
+#include <cstdlib>
 #include "../includes/IrcMessage.hpp"
 
 void	parseArgs(IrcMessage &mess, std::string &input){
@@ -12,11 +13,25 @@ void	parseArgs(IrcMessage &mess, std::string &input){
 	std::string			message;
 	std::string			tmp;
 	bool				isCrlf = false;
+	int					j = 0;
+	int					countWord = 0;
+	std::string			garbage;
 
 	iss.str(input);
 	iss >> mess.command;
-	for(int i = 0; iss >> tmp; i++){
 
+	while(iss >> garbage)
+		countWord++;
+	if(countWord < 1){
+		std::cerr << "ERROR CMD : command need almost one parameter." << std::endl;
+		mess.params.push_back("");
+		return;
+	}
+	iss.clear();
+	iss.str(input);
+	iss >> mess.command;
+
+	for(int i = 0; iss >> tmp; i++){
 		if(tmp[0] == ':'){
 			tmp.erase(0,1);
 			mess.params.push_back("");
@@ -25,17 +40,19 @@ void	parseArgs(IrcMessage &mess, std::string &input){
 				mess.params[i] += message;
 			}
 			mess.params[i].erase(0, 1);
+			int	end = mess.params[i].size();
+			mess.params[i].erase(end, 1);
 			isCrlf = true;
 			mess.params[i] += mess.crlf;
 		}
 		else{
-			isCrlf = false;
 			mess.params.push_back(tmp);
 		}
+		j = i;
 	}
-	if (isCrlf == false)
-		return;
-		// mess.params.back() += mess.crlf;
+	if(isCrlf == false)
+			mess.params[j] += mess.crlf;
+
 }
 
 IrcMessage	parseIrcMessage(std::string &input){
@@ -57,13 +74,12 @@ IrcMessage	parseIrcMessage(std::string &input){
 			mess.params[i] += message;
 		}
 		mess.params[i].erase(0, 1);
+		int	end = mess.params[i].size();
+		mess.params[i].erase(end, 1);
 		mess.params[i] += mess.crlf;
-		std::cout << "test" << std::endl;
 	}
-	else{
-		iss >> mess.command;
+	else
 		parseArgs(mess, input);
-	}
 
 	return mess;
 }

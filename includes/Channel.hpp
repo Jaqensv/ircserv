@@ -4,6 +4,8 @@
 #include "Server.hpp"
 #include "User.hpp"
 
+class Server;
+
 class Channel{
 
 	public :
@@ -25,31 +27,34 @@ class Channel{
 		User*		getOper(unsigned int fd);
 		//ahans
 		User*		getUser(unsigned int fd);
+		bool		isKeyMode();
+		std::string	getKey();
+		bool		isLimitMode();
+		bool		isInvOnly();
+		size_t		getLimit();
+		bool		getIsTopic();
 
 	//Setter
 		//matt
-		void	setTopic(unsigned int fd, std::string channel_name, std::string topic);
+		void	setTopic(unsigned int fd, std::vector<std::string> topic);
+		void	setTopic(unsigned int fd);
 
 	//Member function
-		void	addUser(unsigned int fd);
-		void	removeUser(unsigned int fd);
+		void	addUser(Server &server, unsigned int fd);
+		void	removeUser(int clientFd);
 		void	addOperator(unsigned int fd);
+		void	kick(Server &server, unsigned int fd, std::string nickname);
 		//ahans
 		void	revokeOperator(unsigned int clientFd, unsigned int userFd);
-		//ahans
 		bool	isOperator(unsigned int fd);
-		//ahans
 		void	switchCanTopic(bool val);
-		//ahans
 		void	switchInvOnly(bool val);
-		//ahans
 		void	switchKeyMode();
-		//ahans
 		void	switchKeyMode(std::string key);
-		//ahans
 		void	switchLimitMode();
-		//ahans
 		void	switchLimitMode(int limit);
+		void	broadcastChannel(int senderFd, std::string &message);
+
 
 	private :
 	//Member variable
@@ -60,7 +65,7 @@ class Channel{
 		bool					_invOnly;
 		bool					_keyMode;
 		bool					_limitMode;
-		int						_limit;
+		size_t					_limit;
 		std::string				_key;
 		std::map<int, User*> 	_users;
 		std::map<int, User*>	_operators;
