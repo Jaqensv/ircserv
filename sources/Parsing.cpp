@@ -4,6 +4,19 @@
 #include "../includes/Server.hpp"
 
 
+void	Server::parseTopic(Server &server, int clientFd) {
+	if (server._arrayParams.params[0][0] == '#')
+		server._arrayParams.params[0].erase(0, 1);
+	if (server._arrayParams.params.size() == 1 && server._arrayParams.params[0].find("\r\n"))
+		server._arrayParams.params[0] = server._arrayParams.params[0].substr(0, server._arrayParams.params[0].size() - 2);
+	if (isChannel(server._arrayParams.params[0])) {
+		if (server._arrayParams.params.size() >= 1)
+			getChannel(server._arrayParams.params[0]).setTopic(clientFd, server._arrayParams.params);
+		else
+			getChannel(server._arrayParams.params[0]).setTopic(clientFd);
+	}
+}
+
 static void	checkParam(int argc, char **argv){
 
 //Number argc verification
@@ -48,7 +61,7 @@ static void	checkParam(int argc, char **argv){
 		std::cerr << "Bad password, try again." << std::endl;
 		exit(1);
 	}
-	
+
 }
 
 void	parsing(int argc, char **argv){checkParam(argc, argv);}

@@ -66,7 +66,7 @@ class Server{
 		void	initEpoll();
 		void	run();
 		void	join(int clientFd);
-
+		void	parseTopic(Server &server, int clientFd);
 
 		//void	createChannel(Channel &chan);
 		//ahans
