@@ -243,7 +243,6 @@ void	Server::broadcastAll(int senderFd, std::string &message){
 	}
 }
 
-
 void	Server::run(){
 
 	Server	&server = Server::getInstance();
