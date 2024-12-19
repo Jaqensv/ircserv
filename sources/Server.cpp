@@ -264,6 +264,10 @@ void	Server::run(){
 			if(clientFd == -1)
 				std::cerr << "ERROR ACCEPT : can't connect to socket." << std::endl;
 
+
+			sendPing(clientFd);
+
+
 		//add client to epoll
 			struct epoll_event	clientEvent;
 			clientEvent.data.fd = clientFd;

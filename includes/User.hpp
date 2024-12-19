@@ -23,6 +23,7 @@ class User{
 		std::string		getUsername();
 		std::string		getBuffer();
 		std::string		getMyChannel();
+		std::string		getToken();
 
 	//Setter
 		void	setFd(unsigned int fd);
@@ -30,6 +31,7 @@ class User{
 		void	setUsername(std::string username);
 		void	setBuffer(std::string buffer);
 		void	setMyChannel(std::string myChannel);
+		void	setToken(std::string token);
 
 
 	private :
@@ -40,5 +42,6 @@ class User{
 		std::string		_username;
 		std::string		_buffer;
 		std::string		_myChannel;
+		std::string		_token;
 
 };

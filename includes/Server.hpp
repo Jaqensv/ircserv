@@ -32,28 +32,26 @@ class Server{
 	//Destructor
 		~Server();
 
-	//Setter & Getter
+	//Setter
 		void				setPort(unsigned short port);
 		void				setPassw(std::string port);
 		void				setNeedPasswFalse();
 		void				setNeedPasswTrue();
 
+	//Getter
 		unsigned short			getPort();
 		std::string				getPassw();
-		// matt
 		const std::vector<Channel*>&	getChannels();
-
 		bool					getNeedPassw();
 		unsigned short			getBackLogSize();
-		//ahans
 		Channel					&getChannel(const std::string channelName);
 		bool					isChannel(const std::string &channelName);
 		User					&getUser(int fd);
-		//matt
 		//void					addServerUser(unsigned int fd);
 		std::map<int, User*>&	getUsers();
 		std::string				getUsername();
 		unsigned int			getTargetUserFd(std::string nickname);
+
 		//ahans
 		bool					isUser(int fd);
 	//commmands functions
@@ -67,14 +65,14 @@ class Server{
 		void	run();
 		void	join(int clientFd);
 
+	//Ping Pong Functions
+		void	sendPing(int clientFd);
 
 
-		//void	createChannel(Channel &chan);
-		//ahans
+	//void	createChannel(Channel &chan);
 		void	createChannel(Server &server, unsigned int fd, std::string channel_name);
 		void	createUser(int fd, User &user);
 		void	findNickName(int clientFd);
-
 		void	deleteUser(int fd);
 
 		void	broadcastAll(int senderFd, std::string &message);
