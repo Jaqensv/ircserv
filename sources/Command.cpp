@@ -55,4 +55,6 @@ void	Server::join(int clientFd){
 			server.getChannel(server.getUser(clientFd).getMyChannel()).getUsers().erase(server.getChannel(server.getUser(clientFd).getMyChannel()).getUsers().find(clientFd));
 		server.getUser(clientFd).setMyChannel(server.getChannel(server._arrayParams.params[0]).getName());
 	}
+	server.getUser(clientFd).getMyChannels().push_back(server.getUser(clientFd).getMyChannel());
+
 }

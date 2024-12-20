@@ -22,11 +22,12 @@
 	}
 
 // Getter
-	int			User::getFd(){return this->_fd;}
-	std::string	User::getNickname(){return this->_nickname;}
-	std::string	User::getUsername(){return this->_username;}
-	std::string	User::getBuffer(){return this->_buffer;}
-	std::string	User::getMyChannel(){return this->_myChannel;}
+	int							User::getFd(){return this->_fd;}
+	std::string					User::getNickname(){return this->_nickname;}
+	std::string					User::getUsername(){return this->_username;}
+	std::string					User::getBuffer(){return this->_buffer;}
+	std::string					User::getMyChannel(){return this->_myChannel;}
+	std::vector<std::string>	User::getMyChannels(){return this->_myChannels;}
 
 
 //Setter

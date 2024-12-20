@@ -336,6 +336,8 @@ void	Server::run(){
 				else if (server._arrayParams.command == "/MODE")
 					std::cout << "Enter MODE methode" << std::endl;
 				server.getUser(clientFd).setBuffer("");
+				std::vector<std::string>::iterator it = server.getUser(clientFd).getMyChannels().begin();
+				std::cout << *it << std::endl;
 			}
 		}
 	}
