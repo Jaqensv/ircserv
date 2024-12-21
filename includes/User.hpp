@@ -23,7 +23,7 @@ class User{
 		std::string					getUsername();
 		std::string					getBuffer();
 		std::string					getMyChannel();
-		std::vector<std::string>	getMyChannels();
+		std::vector<std::string>	&getMyChannels();
 
 	//Setter
 		void	setFd(unsigned int fd);

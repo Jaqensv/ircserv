@@ -337,7 +337,7 @@ void	Server::run(){
 					std::cout << "Enter MODE methode" << std::endl;
 				server.getUser(clientFd).setBuffer("");
 				std::vector<std::string>::iterator it = server.getUser(clientFd).getMyChannels().begin();
-				std::cout << *it << std::endl;
+				std::cout << "get test : " << *it << std::endl;
 			}
 		}
 	}

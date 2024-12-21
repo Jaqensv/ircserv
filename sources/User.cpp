@@ -6,7 +6,7 @@
 #include "../includes/Channel.hpp"
 
 //Constructor & Destructor
-	User::User(){}
+	User::User() {}
 	User::User(User const &copy){(void)copy;}
 	User::User(unsigned int fd) : _fd(fd), _buffer(""), _myChannel(""){}
 	User::~User(){}
@@ -27,7 +27,7 @@
 	std::string					User::getUsername(){return this->_username;}
 	std::string					User::getBuffer(){return this->_buffer;}
 	std::string					User::getMyChannel(){return this->_myChannel;}
-	std::vector<std::string>	User::getMyChannels(){return this->_myChannels;}
+	std::vector<std::string>	&User::getMyChannels(){return this->_myChannels;}
 
 
 //Setter
