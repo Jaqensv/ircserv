@@ -80,22 +80,7 @@
 			std::cerr << "Error: user doesn't exist" << std::endl;
 	}
 
-	void	Channel::invite(Server &server, std::string nickname, std::string channel) {
-		unsigned int user_fd = server.getTargetUserFd(nickname);
-		if (server.isUser(user_fd) == true) {
-			std::cout << "channel >>>>> " << channel << std::endl;
-			if (server.isChannel(channel) == true) {
-				User user = server.getUser(user_fd);
-				user.getMyChannels().push_back(channel);
-				std::vector<std::string>::iterator it = user.getMyChannels().begin();
-				std::cout << "Channel " << *it << " added" << std::endl;
-			}
-			else
-				std::cout << "Error: channel " << channel << " doesn't exist" << std::endl;
-		}
-		else
-			std::cout << "Error: user " << nickname << " doesn't exist" << std::endl;
-	}
+
 
 // INVITE message
 //      Command: INVITE

@@ -323,7 +323,7 @@ void	Server::run(){
 					std::cout << getChannel(getUser(clientFd).getMyChannel()).getName() << std::endl;
 					getChannel(getUser(clientFd).getMyChannel()).kick(server, clientFd, server._arrayParams.params[0]);
 				} else if (server._arrayParams.command == "/INVITE")
-					getChannel(server._arrayParams.params[1]).invite(server, server._arrayParams.params[0], server._arrayParams.params[1]);
+					invite(server._arrayParams.params[0], server._arrayParams.params[1]);
 				else if (server._arrayParams.command == "/TOPIC") {
 					parseTopic(server, clientFd);
 					//channelTopicTester(server._arrayParams.params[0]);
