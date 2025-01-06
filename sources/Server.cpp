@@ -282,8 +282,7 @@ void	Server::run(){
 		//find postname and fill in nickname
 			findNickName(clientFd);
 
-		}
-		else{
+		} else {
 		//handle client message
 			clientFd = events[0].data.fd;
 			char	buffer[512];
@@ -296,20 +295,16 @@ void	Server::run(){
 				close(clientFd);
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 				deleteUser(clientFd);
-			}
-			else if (bytesRead == 0){
+			} else if (bytesRead == 0){
 				close(clientFd);
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 				deleteUser(clientFd);
-			}
-			else if(mss.empty()){
+			} else if (mss.empty())
 				std::cout << "control D" << std::endl;
-			}
-			else if(mss[mss.size() - 1] != '\n'){
+			else if (mss[mss.size() - 1] != '\n'){
 				server.getUser(clientFd).setBuffer(mss);
 				send(clientFd, "^D", 2, 0);
-			}
-			else{
+			} else {
 				std::string	input = server.getUser(clientFd).getBuffer() + mss;
 				server._arrayParams = parseIrcMessage(input);
 				std::cout << server._arrayUser[clientFd]->getNickname() << ": " << server._arrayParams.params[0] << std::flush;
@@ -322,13 +317,13 @@ void	Server::run(){
 						server.getChannel(server.getUser(clientFd).getMyChannel()).broadcastChannel(clientFd, server._arrayParams.params[0]);
 					}
 				}
-				else if(server._arrayParams.command == "/JOIN")
+				else if (server._arrayParams.command == "/JOIN")
 					join(clientFd);
 				else if (server._arrayParams.command == "/KICK") {
 					std::cout << getChannel(getUser(clientFd).getMyChannel()).getName() << std::endl;
 					getChannel(getUser(clientFd).getMyChannel()).kick(server, clientFd, server._arrayParams.params[0]);
 				} else if (server._arrayParams.command == "/INVITE")
-					std::cout << "Enter INVITE methode" << std::endl;
+					getChannel(server._arrayParams.params[1]).invite(server, server._arrayParams.params[0], server._arrayParams.params[1]);
 				else if (server._arrayParams.command == "/TOPIC") {
 					parseTopic(server, clientFd);
 					//channelTopicTester(server._arrayParams.params[0]);
