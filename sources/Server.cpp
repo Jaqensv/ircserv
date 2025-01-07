@@ -21,7 +21,7 @@
 	Server::Server() : _port(0){
 		this->_invitationOnly = false;
 		this->setNeedPasswTrue();
-		this->_passw = "3MatAllGui";
+		this->_passw = "jkl";
 	}
 	Server::Server(Server const &copy){(void)copy;}
 
@@ -234,7 +234,7 @@ void	Server::deleteUser(int fd){
 		return;
 	}
 
-	std::cout << "Client " << fd << " deconnected." << std::endl;
+	std::cout << "Client " << fd << " disconnected." << std::endl;
 	if(server.isChannel(getUser(fd).getMyChannel())){
 		server.getChannel(getUser(fd).getMyChannel()).removeUser(fd);
 	}
@@ -293,10 +293,12 @@ void	Server::run(){
 			User* newUser = new User(clientFd);
 			createUser(clientFd, *newUser);
 
-			std::cout << "New client connected : " << clientFd << std::endl;
+		//check password
+			if(identification(clientFd) == true)
+				std::cout << "New client connected : " << clientFd << std::endl;
 
 		//find postname and fill in nickname
-			findNickName(clientFd);
+			// findNickName(clientFd);
 		}
 		else{
 		//handle client message
