@@ -64,10 +64,13 @@ class Server{
 		void	initEpoll();
 		void	run();
 		void	join(int clientFd);
+		void	send_command(int sock, const std::string& command);
+
 
 	//Ping Pong Functions
 		void	sendPing(int clientFd);
-
+		void	handlePong(int clientFd, std::string &token);
+		void	handlePing(int clientFd);
 
 	//void	createChannel(Channel &chan);
 		void	createChannel(Server &server, unsigned int fd, std::string channel_name);

@@ -24,6 +24,7 @@ class User{
 		std::string		getBuffer();
 		std::string		getMyChannel();
 		std::string		getToken();
+		int				getTimeToken();
 
 	//Setter
 		void	setFd(unsigned int fd);
@@ -32,6 +33,7 @@ class User{
 		void	setBuffer(std::string buffer);
 		void	setMyChannel(std::string myChannel);
 		void	setToken(std::string token);
+		void	setTimeToken(int toker);
 
 
 	private :
@@ -43,5 +45,6 @@ class User{
 		std::string		_buffer;
 		std::string		_myChannel;
 		std::string		_token;
+		int				_timeToken;
 
 };
