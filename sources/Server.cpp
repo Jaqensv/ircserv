@@ -328,7 +328,7 @@ void	Server::run(){
 					//channelTopicTester(server._arrayParams.params[0]);
 				}
 				else if (server._arrayParams.command == "/MODE")
-					std::cout << "Enter MODE methode" << std::endl;
+					modeCmdParsing(server._arrayParams.params, clientFd);
 				server.getUser(clientFd).setBuffer("");
 			}
 		}
