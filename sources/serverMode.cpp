@@ -3,7 +3,7 @@
 
 //if params[1] doesn't exist  RPL_CHANNELMODEIS (324)
 bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd) {
-	// Server	&server = Server::getInstance();
+	Server	&server = Server::getInstance();
 	std::string	&chanName = params[0];
 
 	if (chanName[0] == '#') {
@@ -12,7 +12,9 @@ bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd)
 		std::cout << "Command Mode allow only channel in target with '#' prefix" << std::endl;
 		return false;
 	}
-	std::cout << params[0];
+	size_t pos = chanName.find("\r\n");
+	if (pos != std::string::npos)
+		chanName = chanName.substr(0, pos);
 	if (isChannel(chanName) == false) {
 		// ERR_NOSUCHCHANNEL (403)
 		std::cerr << "ERROR: Channel doesn't exist" << std::endl;
@@ -23,7 +25,13 @@ bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd)
 		std::cerr << "ERROR: You are not an operator" << std::endl;
 		return false;
 	}
-
+	if (params.size() == 1) {
+		std::cout << "ERROR: not enougth arguments" << std::endl;
+		return true;
+	}
+	pos = params[1].find("\r\n");
+	if (pos != std::string::npos)
+		params[1] = params[1].substr(0, pos);
 	if (params[1][0] != '+' && params[1][0] != '-') {
 		std::cerr << "ERROR: Mode must start with '+' or '-'" << std::endl;
 		return false;
@@ -35,6 +43,7 @@ bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd)
 	bool isAdd = false;
 	if (params[1][0] == '+')
 		isAdd = true;
+
 	// — t : Définir/supprimer les restrictions de la commande TOPIC pour les opérateurs de canaux
 	if (params[1][1] == 't') {
 		chan.switchCanTopic(isAdd ? true : false);
@@ -52,26 +61,32 @@ bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd)
 			chan.switchKeyMode();
 	}
 	// — o : Donner/retirer le privilège de l’opérateur de canal
-	// else if (params[1][1] == 'o') {
-	// 	User	*userTarget = server.getUser(server.getTargetUserFd(params[2]));
-	// 	if (isAdd) {
-	// 		if (chan.isOperator(userTarget->getFd())) {
-	// 			std::cout << params[2] << " is already operator" << std::endl;
-	// 		} else {
-	// 			chan.addOperator(userTarget->getFd());
-	// 			std::cout << params[2] << " has been added to operator" << std::endl;
-	// 		}
-	// 	} else {
-	// 		if (!chan.isOperator(userTarget->getFd())) {
-	// 			std::cout << params[2] << " is not operator" << std::endl;
-	// 		} else {
-	// 			chan.revokeOperator(myfd, userTarget->getFd());
-	// 			std::cout << params[2] << " has been revoked from operator" << std::endl;
-	// 		}
-	// 	}
-	// }
+	else if (params[1][1] == 'o') {
+		pos = params[2].find("\r\n");
+		if (pos != std::string::npos)
+			params[2] = params[2].substr(0, pos);
+		User	userTarget = server.getUser(server.getTargetUserFd(params[2]));
+		if (isAdd) {
+			if (chan.isOperator(userTarget.getFd())) {
+				std::cout << params[2] << " is already operator" << std::endl;
+			} else {
+				chan.addOperator(userTarget.getFd());
+				std::cout << params[2] << " has been added to operator" << std::endl;
+			}
+		} else {
+			if (!chan.isOperator(userTarget.getFd())) {
+				std::cout << params[2] << " is not operator" << std::endl;
+			} else {
+				chan.revokeOperator(myfd, userTarget.getFd());
+				std::cout << params[2] << " has been revoked from operator" << std::endl;
+			}
+		}
+	}
 	// — l : Définir/supprimer la limite d’utilisateurs pour le canal
 	else if (params[1][1] == 'l') {
+		pos = params[2].find("\r\n");
+		if (pos != std::string::npos)
+			params[2] = params[2].substr(0, pos);
 		if (isAdd) {
 			std::stringstream ss(params[2]);
 			int num;

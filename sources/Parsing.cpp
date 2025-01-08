@@ -7,8 +7,9 @@
 void	Server::parseTopic(Server &server, int clientFd) {
 	if (server._arrayParams.params[0][0] == '#')
 		server._arrayParams.params[0].erase(0, 1);
-	if (server._arrayParams.params.size() == 1 && server._arrayParams.params[0].find("\r\n"))
-		server._arrayParams.params[0] = server._arrayParams.params[0].substr(0, server._arrayParams.params[0].size() - 2);
+	size_t pos = server._arrayParams.params[0].find("\r\n");
+	if (server._arrayParams.params.size() == 1 && pos != std::string::npos)
+		server._arrayParams.params[0] = server._arrayParams.params[0].substr(0, pos);
 	if (isChannel(server._arrayParams.params[0])) {
 		if (server._arrayParams.params.size() >= 1)
 			getChannel(server._arrayParams.params[0]).setTopic(clientFd, server._arrayParams.params);

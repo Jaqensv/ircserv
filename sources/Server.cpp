@@ -329,7 +329,7 @@ void	Server::run(){
 					//channelTopicTester(server._arrayParams.params[0]);
 				}
 				else if (server._arrayParams.command == "/MODE")
-					std::cout << "Enter MODE methode" << std::endl;
+					modeCmdParsing(server._arrayParams.params, clientFd);
 				server.getUser(clientFd).setBuffer("");
 				std::vector<std::string>::iterator it = server.getUser(clientFd).getMyChannels().begin();
 				std::cout << "get test : " << *it << std::endl;

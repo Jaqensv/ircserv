@@ -1,8 +1,9 @@
 	#include "Channel.hpp"
 
 	void 	Channel::kick(Server &server, unsigned int fd, std::string nickname) {
-		if(nickname.find("\r\n"))
-				nickname = nickname.substr(0, nickname.size() - 2);
+		size_t pos = nickname.find("\r\n");
+		if (pos != std::string::npos)
+			nickname = nickname.substr(0, pos);
 		User* user = getUser(fd);
 		User* userTarget = getUser(server.getTargetUserFd(nickname));
 		if (!isOperator(fd))
@@ -34,9 +35,9 @@
 			}
 			if (new_string.size() > 1)
 				new_string.erase(new_string.size() - 2, 1);
-			if (new_string.find("\r\n")) {
-				new_string = new_string.substr(0, new_string.size() - 2);
-			}
+			size_t pos = new_string.find("\r\n");
+			if (pos != std::string::npos)
+				new_string = new_string.substr(0, pos);
 			User* user = _users.find(fd)->second;
 			if (user) {
 				if (_canTopic == true) {
