@@ -320,8 +320,10 @@ void	Server::run(){
 				else if (server._arrayParams.command == "/JOIN")
 					join(clientFd);
 				else if (server._arrayParams.command == "/KICK") {
-					std::cout << getChannel(getUser(clientFd).getMyChannel()).getName() << std::endl;
-					getChannel(getUser(clientFd).getMyChannel()).kick(server, clientFd, server._arrayParams.params[0]);
+					if (server._arrayParams.params[0][0] == '#')
+						server._arrayParams.params[0].erase(0, 1);
+					if (isChannel(server._arrayParams.params[0]))
+						getChannel(server._arrayParams.params[0]).kick(server, clientFd, server._arrayParams.params[1]);
 				} else if (server._arrayParams.command == "/INVITE")
 					invite(server._arrayParams.params[0], server._arrayParams.params[1]);
 				else if (server._arrayParams.command == "/TOPIC") {
