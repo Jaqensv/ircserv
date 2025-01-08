@@ -20,6 +20,7 @@
 			}
 			std::cout << user->getUsername() << " has kicked " << userTarget->getUsername() << std::endl;
 			removeUser(userTarget->getFd());
+			revokeOperator(fd, userTarget->getFd());
 			userTarget->setMyChannel("");
 		}
 	}

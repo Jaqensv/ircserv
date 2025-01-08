@@ -23,6 +23,8 @@ void	Server::join(int clientFd){
 		Channel &chan = getChannel(server._arrayParams.params[0]);
 		if (chan.isInvOnly() == true) {
 			std::cout << "ERROR :channel is invite only." << std::endl;
+
+			
 			return;
 		}
 		if (chan.isLimitMode() == true) {
@@ -63,27 +65,19 @@ void	Server::invite(std::string nickname, std::string channel) {
 	Server	&server = Server::getInstance();
 	unsigned int user_fd = server.getTargetUserFd(nickname);
 
-
-	//////////// tmp
-	std::cout << std::endl << "Channels: " << std::endl;
-	for (std::vector<Channel*>::iterator it = server._arrayChannel.begin(); it != server._arrayChannel.end(); ++it) {
-		std::cout << (*it)->getName() << std::endl;
-	}
-	//////////// tmp
-
-
 	if (server.isUser(user_fd) == true) {
-		std::cout << std::endl << "channel >>>>> " << channel << std::endl;
 		if (channel[0] != '#') {
 			std::cout << "ERROR CHAN : First param after command needs to be a #channel." << std::endl;
 			return;
 		}
 		channel.erase(0, 1);
+		size_t pos = channel.find("\r\n");
+		if (pos != std::string::npos)
+			channel = channel.substr(0, pos);
+		std::cout << std::endl;
 		if (server.isChannel(channel) == true) {
 			User user = server.getUser(user_fd);
 			user.getMyChannels().push_back(channel);
-			std::vector<std::string>::iterator it = user.getMyChannels().begin();
-			std::cout << "Channel " << *it << " added" << std::endl;
 		}
 		else
 			std::cout << "Error: channel " << channel << " doesn't exist" << std::endl;
@@ -91,3 +85,5 @@ void	Server::invite(std::string nickname, std::string channel) {
 	else
 		std::cout << "Error: user " << nickname << " doesn't exist" << std::endl;
 }
+
+//:User is already on that channel

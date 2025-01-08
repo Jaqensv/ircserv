@@ -41,6 +41,7 @@ bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd)
 	}
 	// — i : Définir/supprimer le canal sur invitation uniquement
 	else if (params[1][1] == 'i') {
+		std::cout << "test" << std::endl;
 		chan.switchInvOnly(isAdd ? true : false);
 	}
 	// — k : Définir/supprimer la clé du canal (mot de passe)
