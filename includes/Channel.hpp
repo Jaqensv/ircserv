@@ -23,10 +23,12 @@ class Channel{
 		// matt
 		std::map<int, User*>&	getUsers();
 		std::map<int, User*>&	getOpers();
+		std::map<int, User*>& 	getInvited();
 		//ahans
 		User*		getOper(unsigned int fd);
 		//ahans
 		User*		getUser(unsigned int fd);
+		bool		isInvited(int fd);
 		bool		isKeyMode();
 		std::string	getKey();
 		bool		isLimitMode();
@@ -70,5 +72,6 @@ class Channel{
 		std::string				_key;
 		std::map<int, User*> 	_users;
 		std::map<int, User*>	_operators;
+		std::map<int, User*>	_invited;
 
 };

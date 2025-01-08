@@ -18,7 +18,8 @@
 	std::string				Channel::getName(){return this->_name;}
 	std::map<int, User*>&	Channel::getUsers(){return _users;}
 	std::map<int, User*>&	Channel::getOpers(){return _operators;}
-	bool					Channel::getIsTopic(){return _canTopic;};
+	std::map<int, User*>&	Channel::getInvited() {return _invited;}
+	bool					Channel::getIsTopic(){return _canTopic;}
 
 	//ahans
 	User*		Channel::getOper(unsigned int fd) {
@@ -28,6 +29,15 @@
 				return it->second;
 		}
 		return NULL;
+	}
+
+	bool	Channel::isInvited(int fd) {
+		std::map<int, User*>::iterator it = _invited.begin();
+		for (; it != _invited.end(); it++) {
+			if (it->first == fd)
+				return true;
+		}
+		return false;
 	}
 
 	bool Channel::isKeyMode() {
