@@ -27,6 +27,20 @@
 		}
 	}
 
+	void 	Channel::part(unsigned int fd) {
+
+		User* user = getUser(fd);
+
+		if (!user) {
+			std::cout << ":You're not on that channel" << std::endl;
+			return;
+		}
+		removeUser(user->getFd());
+		removeInvited(user->getFd());
+		revokeOperator(fd, user->getFd());
+		user->setMyChannel("");
+	}
+
 	void	Channel::setTopic(unsigned int fd, std::vector<std::string> topic) {
 			std::string new_string;
 			std::vector<std::string>::iterator it = topic.begin();

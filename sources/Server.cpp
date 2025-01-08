@@ -319,6 +319,12 @@ void	Server::run(){
 				}
 				else if (server._arrayParams.command == "/JOIN")
 					join(clientFd);
+				else if (server._arrayParams.command == "/PART") {
+					if (server._arrayParams.params[0][0] == '#')
+						server._arrayParams.params[0].erase(0, 1);
+					if (isChannel(server._arrayParams.params[0]))
+						getChannel(server._arrayParams.params[0]).part(clientFd);
+				}
 				else if (server._arrayParams.command == "/KICK") {
 					if (server._arrayParams.params[0][0] == '#')
 						server._arrayParams.params[0].erase(0, 1);
