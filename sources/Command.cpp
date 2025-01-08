@@ -23,10 +23,11 @@ void	Server::join(int clientFd){
 	if(isChannel(server._arrayParams.params[0])) {
 		Channel &chan = getChannel(server._arrayParams.params[0]);
 		if (chan.isInvOnly() == true) {
-			std::cout << "ERROR :channel is invite only." << std::endl;
 
-			
-			return;
+			if (server.getChannel(server._arrayParams.params[0]).isInvited(clientFd) == false) {
+				std::cout << "ERROR :channel is invite only." << std::endl;
+				return;
+			}
 		}
 		if (chan.isLimitMode() == true) {
 			if (chan.getUsers().size() == chan.getLimit()) {
@@ -78,7 +79,8 @@ void	Server::invite(std::string nickname, std::string channel) {
 		std::cout << std::endl;
 		if (server.isChannel(channel) == true) {
 			User user = server.getUser(user_fd);
-			user.getMyChannels().push_back(channel);
+			user.getMyChannels().push_back(channel); // a virer ???
+			server.getChannel(channel).getInvited().insert(std::make_pair(user_fd, &user));
 		}
 		else
 			std::cout << "Error: channel " << channel << " doesn't exist" << std::endl;
