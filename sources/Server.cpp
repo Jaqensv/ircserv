@@ -195,11 +195,36 @@ void	Server::createUser(int fd, User &user){
 	this->_arrayUser.insert(std::make_pair(fd, &user));
 }
 
+void	Server::findNickName(int clientFd){
+
+	Server	&server = Server::getInstance();
+	char host[NI_MAXHOST];
+	char service[NI_MAXSERV];
+	int result = getnameinfo((struct sockaddr*)&server._serverAddres, server._addrlen,host, sizeof(host),service, sizeof(service),0);
+	if(result != 0){
+		std::cerr << "ERROR GETNAMEINFO : can't receive nickname." << std::endl;
+		close(clientFd);
+		epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+		deleteUser(clientFd);
+	}
+	std::ostringstream	ossClientFd;
+	ossClientFd << clientFd;
+	std::string	nick;
+	nick = host;
+	size_t	pos;
+	pos = nick.find('.');
+	if(pos != std::string::npos)
+		nick = nick.substr(0, pos);
+	nick += "@" + ossClientFd.str();
+	server._arrayUser[clientFd]->setNickname(nick);
+}
 
 void	Server::deleteUser(int fd){
 	Server	&server = Server::getInstance();
 	std::cout << "Client " << fd << " deconnected." << std::endl;
-	server.getChannel(getUser(fd).getMyChannel()).removeUser(fd);
+	if(server.isChannel(getUser(fd).getMyChannel())){
+		server.getChannel(getUser(fd).getMyChannel()).removeUser(fd);
+	}
 	delete &getUser(fd);
 	this->_arrayUser.erase(fd);
 }
@@ -239,7 +264,6 @@ void	Server::run(){
 			if(clientFd == -1)
 				std::cerr << "ERROR ACCEPT : can't connect to socket." << std::endl;
 
-
 		//add client to epoll
 			struct epoll_event	clientEvent;
 			clientEvent.data.fd = clientFd;
@@ -256,28 +280,9 @@ void	Server::run(){
 			std::cout << "New client connected : " << clientFd << std::endl;
 
 		//find postname and fill in nickname
-			char host[NI_MAXHOST];
-			char service[NI_MAXSERV];
-			int result = getnameinfo((struct sockaddr*)&server._serverAddres, server._addrlen,host, sizeof(host),service, sizeof(service),0);
-			if(result != 0){
-				std::cerr << "ERROR GETNAMEINFO : can't receive nickname." << std::endl;
-				close(clientFd);
-				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-				deleteUser(clientFd);
-			}
-			std::string	nick;
-			nick = host;
-			size_t	pos;
-			pos = nick.find('.');
-			if(pos != std::string::npos)
-				nick = nick.substr(0, pos);
-			if (clientFd == 5) 									// TMP <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-				nick = "Allan";									// TMP <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-			else if (clientFd == 6)								// TMP <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-				nick = "Matt";									// TMP <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-			server._arrayUser[clientFd]->setNickname(nick);
-		}
-		else{
+			findNickName(clientFd);
+
+		} else {
 		//handle client message
 			clientFd = events[0].data.fd;
 			char	buffer[512];
@@ -290,20 +295,16 @@ void	Server::run(){
 				close(clientFd);
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 				deleteUser(clientFd);
-			}
-			else if (bytesRead == 0){
+			} else if (bytesRead == 0){
 				close(clientFd);
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 				deleteUser(clientFd);
-			}
-			else if(mss.empty()){
+			} else if (mss.empty())
 				std::cout << "control D" << std::endl;
-			}
-			else if(mss[mss.size() - 1] != '\n'){
+			else if (mss[mss.size() - 1] != '\n'){
 				server.getUser(clientFd).setBuffer(mss);
 				send(clientFd, "^D", 2, 0);
-			}
-			else{
+			} else {
 				std::string	input = server.getUser(clientFd).getBuffer() + mss;
 				server._arrayParams = parseIrcMessage(input);
 				std::cout << server._arrayUser[clientFd]->getNickname() << ": " << server._arrayParams.params[0] << std::flush;
@@ -316,13 +317,13 @@ void	Server::run(){
 						server.getChannel(server.getUser(clientFd).getMyChannel()).broadcastChannel(clientFd, server._arrayParams.params[0]);
 					}
 				}
-				else if(server._arrayParams.command == "/JOIN")
+				else if (server._arrayParams.command == "/JOIN")
 					join(clientFd);
 				else if (server._arrayParams.command == "/KICK") {
 					std::cout << getChannel(getUser(clientFd).getMyChannel()).getName() << std::endl;
 					getChannel(getUser(clientFd).getMyChannel()).kick(server, clientFd, server._arrayParams.params[0]);
 				} else if (server._arrayParams.command == "/INVITE")
-					std::cout << "Enter INVITE methode" << std::endl;
+					invite(server._arrayParams.params[0], server._arrayParams.params[1]);
 				else if (server._arrayParams.command == "/TOPIC") {
 					parseTopic(server, clientFd);
 					//channelTopicTester(server._arrayParams.params[0]);
@@ -330,6 +331,8 @@ void	Server::run(){
 				else if (server._arrayParams.command == "/MODE")
 					modeCmdParsing(server._arrayParams.params, clientFd);
 				server.getUser(clientFd).setBuffer("");
+				std::vector<std::string>::iterator it = server.getUser(clientFd).getMyChannels().begin();
+				std::cout << "get test : " << *it << std::endl;
 			}
 		}
 	}

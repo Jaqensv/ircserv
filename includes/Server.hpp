@@ -66,12 +66,16 @@ class Server{
 		void	initEpoll();
 		void	run();
 		void	join(int clientFd);
+		void	invite(std::string nickname, std::string channel);
 		void	parseTopic(Server &server, int clientFd);
+
 
 		//void	createChannel(Channel &chan);
 		//ahans
 		void	createChannel(Server &server, unsigned int fd, std::string channel_name);
 		void	createUser(int fd, User &user);
+		void	findNickName(int clientFd);
+
 		void	deleteUser(int fd);
 
 		void	broadcastAll(int senderFd, std::string &message);

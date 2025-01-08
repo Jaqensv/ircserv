@@ -44,6 +44,7 @@ class Channel{
 		void	removeUser(int clientFd);
 		void	addOperator(unsigned int fd);
 		void	kick(Server &server, unsigned int fd, std::string nickname);
+		
 		//ahans
 		void	revokeOperator(unsigned int clientFd, unsigned int userFd);
 		bool	isOperator(unsigned int fd);
