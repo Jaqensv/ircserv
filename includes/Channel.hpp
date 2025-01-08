@@ -44,6 +44,7 @@ class Channel{
 	//Member function
 		void	addUser(Server &server, unsigned int fd);
 		void	removeUser(int clientFd);
+		void	removeInvited(int clientFd);
 		void	addOperator(unsigned int fd);
 		void	kick(Server &server, unsigned int fd, std::string nickname);
 		

@@ -84,6 +84,10 @@
 		this->_users.erase(_users.find(clientFd));
 	}
 
+	void	Channel::removeInvited(int clientFd) {
+		this->_invited.erase(_invited.find(clientFd));
+	}
+
 	//ahans
 	void	Channel::revokeOperator(unsigned int clientFd, unsigned int userFd){
 		if (isOperator(clientFd))
