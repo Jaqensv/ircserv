@@ -20,7 +20,11 @@ void	Server::whoParsing(std::vector<std::string> &params, unsigned int myfd) {
 		std::map<int, User*>::iterator it = chan.getUsers().begin();
 		std::cout << Display::GREEN << "Users on channel " << chan.getName() << " :" << std::endl;
 		for (; it != chan.getUsers().end(); ++it) {
-			std::cout << it->second->getNickname() << std::endl;
+			// si l'utilisateur est un operateur ajouter un @ devant son nickname
+			if (chan.isOperator(it->first))
+				std::cout << "@" << it->second->getNickname() << std::endl;
+			else
+				std::cout << it->second->getNickname() << std::endl;
 		}
 		std::cout << "End of list" << Display::RESET << std::endl;
 		////////////////////////////////////////////////////////////////////////////////////////////////////

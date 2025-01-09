@@ -20,7 +20,7 @@ void	Server::join(int clientFd){
 	size_t pos = server._arrayParams.params[0].find("\r\n");
 	if (pos != std::string::npos)
 		server._arrayParams.params[0] = server._arrayParams.params[0].substr(0, pos);
-	if(isChannel(server._arrayParams.params[0])) {
+	if (isChannel(server._arrayParams.params[0])) {
 		Channel &chan = getChannel(server._arrayParams.params[0]);
 		if (chan.isInvOnly() == true) {
 
