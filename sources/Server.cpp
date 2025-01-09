@@ -103,7 +103,6 @@ unsigned short		Server::getBackLogSize(){
 	return this->_backLogSize;
 }
 
-//ahans
 bool	Server::isChannel(const std::string &channelName) {
 	std::vector<Channel*>::iterator it = _arrayChannel.begin();
 	for (; it != _arrayChannel.end(); ++it) {
@@ -322,8 +321,12 @@ void	Server::run(){
 				else if (server._arrayParams.command == "/PART") {
 					if (server._arrayParams.params[0][0] == '#')
 						server._arrayParams.params[0].erase(0, 1);
-					if (isChannel(server._arrayParams.params[0]))
+					size_t pos = server._arrayParams.params[0].find("\r\n");
+					if (pos != std::string::npos)
+						server._arrayParams.params[0] = server._arrayParams.params[0].substr(0, pos);
+					if (isChannel(server._arrayParams.params[0])) {
 						getChannel(server._arrayParams.params[0]).part(clientFd);
+					}
 				}
 				else if (server._arrayParams.command == "/KICK") {
 					if (server._arrayParams.params[0][0] == '#')

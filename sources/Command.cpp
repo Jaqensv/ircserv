@@ -76,7 +76,6 @@ void	Server::invite(std::string nickname, std::string channel) {
 		size_t pos = channel.find("\r\n");
 		if (pos != std::string::npos)
 			channel = channel.substr(0, pos);
-		std::cout << std::endl;
 		if (server.isChannel(channel) == true) {
 			User user = server.getUser(user_fd);
 			user.getMyChannels().push_back(channel); // a virer ???

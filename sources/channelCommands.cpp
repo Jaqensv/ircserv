@@ -6,6 +6,8 @@
 			nickname = nickname.substr(0, pos);
 		User* user = getUser(fd);
 		User* userTarget = getUser(server.getTargetUserFd(nickname));
+		int userTargetFd = server.getTargetUserFd(nickname);
+		std::cout << "target fd: " << userTargetFd << std::endl;
 		if (!isOperator(fd))
 			std::cout << user->getUsername() << " doesn't have the rights to kick" << std::endl;
 		else {
@@ -35,9 +37,13 @@
 			std::cout << ":You're not on that channel" << std::endl;
 			return;
 		}
+		user->getMyChannels().erase(user->getMyChannels().begin() + user->findChannelIndex(user->getMyChannel()));
+		for (std::vector<std::string>::iterator it = user->getMyChannels().begin(); it != user->getMyChannels().end(); ++it) {
+			std::cout << "my channels " << *it << std::endl;
+		}
 		removeUser(user->getFd());
 		removeInvited(user->getFd());
-		revokeOperator(fd, user->getFd());
+		removeOperator(user->getFd());
 		user->setMyChannel("");
 	}
 

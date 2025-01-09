@@ -24,7 +24,7 @@ class User{
 		std::string					getBuffer();
 		std::string					getMyChannel();
 		std::vector<std::string>	&getMyChannels();
-
+		int 						findChannelIndex(std::string myChannel);
 	//Setter
 		void	setFd(unsigned int fd);
 		void	setNickname(std::string nickname);

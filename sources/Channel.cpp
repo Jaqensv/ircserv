@@ -81,12 +81,19 @@
 	}
 
 	void	Channel::removeUser(int clientFd){
-		this->_users.erase(_users.find(clientFd));
+		_users.erase(_users.find(clientFd));
 	}
 
-	void	Channel::removeInvited(int clientFd) {
-		this->_invited.erase(_invited.find(clientFd));
+	void	Channel::removeOperator(unsigned int userFd) {
+		if (isOperator(userFd))
+			_operators.erase(_operators.find(userFd));
 	}
+
+	void	Channel::removeInvited(unsigned int userFd) {
+		if (isInvited(userFd))
+			_invited.erase(_invited.find(userFd));
+	}
+
 
 	//ahans
 	void	Channel::revokeOperator(unsigned int clientFd, unsigned int userFd){
@@ -94,6 +101,15 @@
 			_operators.erase(userFd);
 		else
 			std::cout << "User " << clientFd << " is not operator can't revoke user " << userFd << std::endl;
+	}
+
+	bool	Channel::isInvited(unsigned int fd){
+		std::map<int, User*>::iterator it = _invited.begin();
+		for (; it != _invited.end(); ++it) {
+			if (fd == static_cast<unsigned int>(it->first))
+				return true;
+		}
+		return false;
 	}
 
 	bool	Channel::isOperator(unsigned int fd){

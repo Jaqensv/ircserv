@@ -28,6 +28,15 @@
 	std::string					User::getBuffer(){return this->_buffer;}
 	std::string					User::getMyChannel(){return this->_myChannel;}
 	std::vector<std::string>	&User::getMyChannels(){return this->_myChannels;}
+	int							User::findChannelIndex(std::string myChannel) {
+		int index = 0;
+		for (std::vector<std::string>::iterator it = _myChannels.begin(); it != _myChannels.end(); ++it) {
+			if (*it == myChannel)
+				return index;
+			index++;
+		}
+		return index;
+	}
 
 
 //Setter
