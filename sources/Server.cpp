@@ -202,29 +202,29 @@ void	Server::createUser(int fd, User &user){
 	this->_arrayUser.insert(std::make_pair(fd, &user));
 }
 
-void	Server::findNickName(int clientFd){
+// void	Server::findNickName(int clientFd){
 
-	Server	&server = Server::getInstance();
-	char host[NI_MAXHOST];
-	char service[NI_MAXSERV];
-	int result = getnameinfo((struct sockaddr*)&server._serverAddres, server._addrlen,host, sizeof(host),service, sizeof(service),0);
-	if(result != 0){
-		std::cerr << "ERROR GETNAMEINFO : can't receive nickname." << std::endl;
-		close(clientFd);
-		epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-		deleteUser(clientFd);
-	}
-	std::ostringstream	ossClientFd;
-	ossClientFd << clientFd;
-	std::string	nick;
-	nick = host;
-	size_t	pos;
-	pos = nick.find('.');
-	if(pos != std::string::npos)
-		nick = nick.substr(0, pos);
-	nick += "@" + ossClientFd.str();
-	server._arrayUser[clientFd]->setNickname(nick);
-}
+// 	Server	&server = Server::getInstance();
+// 	char host[NI_MAXHOST];
+// 	char service[NI_MAXSERV];
+// 	int result = getnameinfo((struct sockaddr*)&server._serverAddres, server._addrlen,host, sizeof(host),service, sizeof(service),0);
+// 	if(result != 0){
+// 		std::cerr << "ERROR GETNAMEINFO : can't receive nickname." << std::endl;
+// 		close(clientFd);
+// 		epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+// 		deleteUser(clientFd);
+// 	}
+// 	std::ostringstream	ossClientFd;
+// 	ossClientFd << clientFd;
+// 	std::string	nick;
+// 	nick = host;
+// 	size_t	pos;
+// 	pos = nick.find('.');
+// 	if(pos != std::string::npos)
+// 		nick = nick.substr(0, pos);
+// 	nick += "@" + ossClientFd.str();
+// 	server._arrayUser[clientFd]->setNickname(nick);
+// }
 
 void	Server::deleteUser(int fd){
 	Server	&server = Server::getInstance();

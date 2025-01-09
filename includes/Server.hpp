@@ -74,7 +74,7 @@ class Server{
 	//Identification functions
 		bool	identification(int clientFd);
 		bool	identPass(int clientFd);
-
+		bool	askNickname(int clientFd);
 
 
 	//void	createChannel(Channel &chan);
