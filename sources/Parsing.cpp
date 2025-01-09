@@ -23,6 +23,12 @@ void	Server::whoParsing(std::vector<std::string> &params, unsigned int myfd) {
 			std::cout << it->second->getNickname() << std::endl;
 		}
 		std::cout << "End of list" << Display::RESET << std::endl;
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		std::cout << Display::BLUE << "Operators on channel " << chan.getName() << " :" << std::endl;
+		for (std::map<int, User*>::iterator it2 = chan.getOpers().begin(); it2 != chan.getOpers().end(); ++it2) {
+			std::cout << it2->first << std::endl;
+		}
+		std::cout << "End of list" << Display::RESET << std::endl;
 	}
 }
 

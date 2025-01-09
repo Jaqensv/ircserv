@@ -64,7 +64,7 @@ bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd)
 		pos = params[2].find("\r\n");
 		if (pos != std::string::npos)
 			params[2] = params[2].substr(0, pos);
-		User	userTarget = server.getUser(server.getTargetUserFd(params[2]));
+		User	&userTarget = server.getUser(server.getTargetUserFd(params[2]));
 		if (isAdd) {
 			if (chan.isOperator(userTarget.getFd())) {
 				std::cout << params[2] << " is already operator" << std::endl;
