@@ -112,11 +112,13 @@
 		} else
 			std::cout << "TOPIC rights are already at this state" << std::endl;
 	}
-	void	Channel::switchInvOnly(bool val) {
+	void	Channel::switchInvOnly(bool val, int fd) {
 		if (val != _invOnly) {
-			if (val == true)
+			if (val == true) {
+				Server	&server = Server::getInstance();
+				_invited.insert(std::make_pair(fd, &server.getUser(fd)));
 				std::cout << "Mode invite only is on" << std::endl;
-			else
+			} else
 				std::cout << "Mode invite only is off" << std::endl;
 			_invOnly = val;
 		} else
