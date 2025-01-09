@@ -55,7 +55,7 @@ class Channel{
 		bool	isOperator(unsigned int fd);
 		bool	isInvited(unsigned int fd);
 		void	switchCanTopic(bool val);
-		void	switchInvOnly(bool val);
+		void	switchInvOnly(bool val, int fd);
 		void	switchKeyMode();
 		void	switchKeyMode(std::string key);
 		void	switchLimitMode();
