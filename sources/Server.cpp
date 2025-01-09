@@ -329,9 +329,10 @@ void	Server::run(){
 				else if (server._arrayParams.command == "/TOPIC") {
 					parseTopic(server, clientFd);
 					//channelTopicTester(server._arrayParams.params[0]);
-				}
-				else if (server._arrayParams.command == "/MODE")
+				} else if (server._arrayParams.command == "/MODE")
 					modeCmdParsing(server._arrayParams.params, clientFd);
+				else if (server._arrayParams.command == "/WHO")
+					whoParsing(server._arrayParams.params, clientFd);
 				server.getUser(clientFd).setBuffer("");
 			}
 		}

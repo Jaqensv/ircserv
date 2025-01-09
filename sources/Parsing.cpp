@@ -2,7 +2,29 @@
 #include <string>
 #include <cstdlib>
 #include "../includes/Server.hpp"
+#include "../includes/display.hpp"
 
+
+void	Server::whoParsing(std::vector<std::string> &params, unsigned int myfd) {
+	if (params[0][0] == '#')
+		params[0].erase(0, 1);
+	size_t pos = params[0].find("\r\n");
+	if (pos != std::string::npos)
+		params[0] = params[0].substr(0, pos);
+	if (isChannel(params[0])) {
+		Channel &chan = getChannel(params[0]);
+		if (chan.getUser(myfd) == NULL) {
+			std::cout << "ERROR : User is not on that channel." << std::endl;
+			return;
+		}
+		std::map<int, User*>::iterator it = chan.getUsers().begin();
+		std::cout << Display::GREEN << "Users on channel " << chan.getName() << " :" << std::endl;
+		for (; it != chan.getUsers().end(); ++it) {
+			std::cout << it->second->getNickname() << std::endl;
+		}
+		std::cout << "End of list" << Display::RESET << std::endl;
+	}
+}
 
 void	Server::parseTopic(Server &server, int clientFd) {
 	if (server._arrayParams.params[0][0] == '#')
