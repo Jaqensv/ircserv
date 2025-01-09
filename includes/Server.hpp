@@ -68,6 +68,7 @@ class Server{
 		void	join(int clientFd);
 		void	invite(std::string nickname, std::string channel);
 		void	parseTopic(Server &server, int clientFd);
+		void	whoParsing(std::vector<std::string> &params, unsigned int myfd);
 
 
 		//void	createChannel(Channel &chan);
