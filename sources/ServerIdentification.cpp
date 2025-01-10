@@ -5,14 +5,48 @@
 
 bool	Server::identPass(int clientFd){
 
-	(void)clientFd;
-	return true;
+	Server	&server = Server::getInstance();
+
+	char	passRecv[100] = {0};
+	ssize_t	bytesRead;
+
+	bytesRead = recv(clientFd, passRecv, sizeof(passRecv), 0);
+	if(bytesRead == -1){
+		std::cerr << "ERROR :password's recv doesn't work." << std::endl;
+		close(clientFd);
+		epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+		deleteUser(clientFd);
+	}
+
+	std::string	wholePassw(passRecv);
+	std::string	cmd(passRecv);
+	std::string	passw(passRecv);
+
+	if(cmd.empty() == false && cmd.size() > 5)
+		cmd = cmd.substr(0, 4);
+	else
+		return false;
+
+	if(cmd.compare("PASS") == 0){
+		passw = passw.substr(5, bytesRead - 6);
+		if(passw.compare(server.getPassw()) == 0)
+			return true;
+	}
+	else
+		return false;
+
+	wholePassw = ": PASS " + passw;
+	wholePassw.append("\r\n");
+
+	send(clientFd, wholePassw.c_str(), wholePassw.size(), 0);
+
+	return false;
 }
 
 
 bool	Server::askNickname(int clientFd){
 
-	(void)clientFd;
+	// (void)clientFd;
 	Server	&server = Server::getInstance();
 
 	char	cmdNickname[100] = {0};
@@ -40,10 +74,20 @@ bool	Server::askNickname(int clientFd){
 	else
 		return false;
 
-	wholeCmd = ": oldkiro nickname newkiro";
+	wholeCmd = ": oldnick nickname newnick";
 	wholeCmd.append("\r\n");
 
 	send(clientFd, wholeCmd.c_str(), wholeCmd.size(), 0);
+	return true;
+}
+
+bool	Server::identification(int clientFd){
+
+	Server	&server = Server::getInstance();
+	std::string	welcome;
+
+	while (askNickname(clientFd) == false)
+		continue;
 
 	welcome = ":server_pika 001 " + server.getUser(clientFd).getNickname() + " :Welcome to the Pika network\r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
@@ -54,12 +98,8 @@ bool	Server::askNickname(int clientFd){
 	welcome = ":server_pika 004 " + server.getUser(clientFd).getNickname() + " server_pika 1.0 itkol\r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
 
-	return true;
-}
-
-bool	Server::identification(int clientFd){
-
-	while (askNickname(clientFd) == false)
+	while (identPass(clientFd) == false)
 		continue;
+
 	return true;
 }
