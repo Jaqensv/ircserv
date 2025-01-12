@@ -76,7 +76,7 @@ class Server{
 		bool	identPass(int clientFd);
 		bool	askNickname(int clientFd);
 		bool	askUser(int clientFd);
-		void	verifCap(int clientFd);
+		bool	verifCap(int clientFd);
 
 
 

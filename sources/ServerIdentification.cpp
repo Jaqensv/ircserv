@@ -13,9 +13,7 @@ bool	Server::identPass(int clientFd){
 	bytesRead = recv(clientFd, passRecv, sizeof(passRecv), 0);
 	if(bytesRead == -1){
 		std::cerr << "ERROR :password's recv doesn't work." << std::endl;
-		close(clientFd);
-		epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-		deleteUser(clientFd);
+		return false;
 	}
 
 	std::string	wholePassw(passRecv);
@@ -28,11 +26,8 @@ bool	Server::identPass(int clientFd){
 		return false;
 	if(cmd.compare("PASS") == 0){
 		passw = passw.substr(5, bytesRead - 7);
-		if(passw.compare(server.getPassw()) == 0){
-			wholePassw = ":server_pika PASS " + passw;
-			wholePassw.append("\r\n");
+		if(passw.compare(server.getPassw()) == 0)
 			return true;
-		}
 	}
 	else{
 		std::string error = ":server_pika 464 * :Incorrect password\r\n";
@@ -55,9 +50,7 @@ bool	Server::askNickname(int clientFd){
 	bytesRead = recv(clientFd, cmdNickname, sizeof(cmdNickname), 0);
 	if(bytesRead == -1){
 		std::cerr << "ERROR : nickname's recv doesn't work." << std::endl;
-		close(clientFd);
-		epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-		deleteUser(clientFd);
+		return false;
 	}
 
 	std::string	wholeCmd(cmdNickname);
@@ -70,8 +63,9 @@ bool	Server::askNickname(int clientFd){
 		nickname = nickname.substr(5, bytesRead - 7);
 		server.getUser(clientFd).setNickname(nickname);
 	}
-	else
+	else{
 		return false;
+	}
 
 	wholeCmd = ":server_pika NICK " + nickname;
 	wholeCmd.append("\r\n");
@@ -82,15 +76,10 @@ bool	Server::askNickname(int clientFd){
 
 bool	Server::askUser(int clientFd){
 
-	Server &server = Server::getInstance();
-
 	char cmdUser[100] = {0};
 	ssize_t bytesRead = recv(clientFd, cmdUser, sizeof(cmdUser), 0);
 	if (bytesRead == -1) {
 		std::cerr << "ERROR : USER command recv failed." << std::endl;
-		close(clientFd);
-		epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-		deleteUser(clientFd);
 		return false;
 	}
 
@@ -114,9 +103,7 @@ bool	Server::askUser(int clientFd){
 
 
 
-void	Server::verifCap(int clientFd){
-
-	Server	&server = Server::getInstance();
+bool	Server::verifCap(int clientFd){
 
 	char	cmdCap[100] = {0};
 	ssize_t	bytesRead;
@@ -125,9 +112,7 @@ void	Server::verifCap(int clientFd){
 	bytesRead = recv(clientFd, cmdCap, sizeof(cmdCap), 0);
 	if(bytesRead == -1){
 		std::cerr << "ERROR : CAP's recv doesn't work." << std::endl;
-		close(clientFd);
-		epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-		deleteUser(clientFd);
+		return false;
 	}
 
 	std::string wholeCmd(cmdCap);
@@ -139,7 +124,9 @@ void	Server::verifCap(int clientFd){
 
 	if (cmd.compare("CAP") != 0){
 		std::cerr << "ERROR: Expected CAP command." << std::endl;
+		return false;
 	}
+	return true;
 }
 
 bool	Server::identification(int clientFd){
@@ -147,15 +134,12 @@ bool	Server::identification(int clientFd){
 	Server	&server = Server::getInstance();
 	std::string	welcome;
 
-	verifCap(clientFd);
-	if(identPass(clientFd) == false){
-		close(clientFd);
-		epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-		deleteUser(clientFd);
+	if(verifCap(clientFd) == false)
 		return false;
-	}
-	while(askNickname(clientFd) == false)
-		continue;
+	if(identPass(clientFd) == false)
+		return false;
+	if(askNickname(clientFd) == false)
+		return false;
 	// while(askUser(clientFd) == false)
 	// 	continue;
 

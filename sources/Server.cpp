@@ -269,6 +269,12 @@ void	Server::run(){
 		//check password, nickname and user
 			if(identification(clientFd) == true)
 				std::cout << "New client connected : " << clientFd << std::endl;
+			else{
+				std::cerr << "Bad identification of client : " << clientFd << std::endl;
+				close(clientFd);
+				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+				deleteUser(clientFd);
+			}
 		}
 		else{
 		//handle client message
