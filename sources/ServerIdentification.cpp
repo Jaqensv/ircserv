@@ -26,20 +26,19 @@ bool	Server::identPass(int clientFd){
 		cmd = cmd.substr(0, 4);
 	else
 		return false;
-
 	if(cmd.compare("PASS") == 0){
-		passw = passw.substr(5, bytesRead - 6);
-		if(passw.compare(server.getPassw()) == 0)
+		passw = passw.substr(5, bytesRead - 7);
+		if(passw.compare(server.getPassw()) == 0){
+			wholePassw = ":server_pika PASS " + passw;
+			wholePassw.append("\r\n");
 			return true;
+		}
 	}
-	else
+	else{
+		std::string error = ":server_pika 464 * :Incorrect password\r\n";
+		send(clientFd, error.c_str(), error.size(), 0);
 		return false;
-
-	wholePassw = ": PASS " + passw;
-	wholePassw.append("\r\n");
-
-	send(clientFd, wholePassw.c_str(), wholePassw.size(), 0);
-
+	}
 	return false;
 }
 
@@ -68,17 +67,79 @@ bool	Server::askNickname(int clientFd){
 	if(cmd.empty() == false && cmd.size() > 5)
 		cmd = cmd.substr(0, 4);
 	if(cmd.compare("NICK") == 0){
-		nickname = nickname.substr(5, bytesRead - 6);
+		nickname = nickname.substr(5, bytesRead - 7);
 		server.getUser(clientFd).setNickname(nickname);
 	}
 	else
 		return false;
 
-	wholeCmd = ": oldnick nickname newnick";
+	wholeCmd = ":server_pika NICK " + nickname;
 	wholeCmd.append("\r\n");
 
 	send(clientFd, wholeCmd.c_str(), wholeCmd.size(), 0);
 	return true;
+}
+
+bool	Server::askUser(int clientFd){
+
+	Server &server = Server::getInstance();
+
+	char cmdUser[100] = {0};
+	ssize_t bytesRead = recv(clientFd, cmdUser, sizeof(cmdUser), 0);
+	if (bytesRead == -1) {
+		std::cerr << "ERROR : USER command recv failed." << std::endl;
+		close(clientFd);
+		epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+		deleteUser(clientFd);
+		return false;
+	}
+
+	std::string wholeCmd(cmdUser);
+	std::string cmd(cmdUser);
+	std::string userInfo(cmdUser);
+
+	if (!cmd.empty() && cmd.size() > 5)
+		cmd = cmd.substr(0, 4);
+	if (cmd.compare("USER") == 0){
+		userInfo = userInfo.substr(5, bytesRead - 7);
+		wholeCmd = ":server_pika USER " + userInfo + "\r\n";
+		send(clientFd, wholeCmd.c_str(), wholeCmd.size(), 0);
+		return true;
+	}
+	else {
+		std::cerr << "ERROR: Expected USER command." << std::endl;
+		return false;
+	}
+}
+
+
+
+void	Server::verifCap(int clientFd){
+
+	Server	&server = Server::getInstance();
+
+	char	cmdCap[100] = {0};
+	ssize_t	bytesRead;
+	// std::string	welcome;
+
+	bytesRead = recv(clientFd, cmdCap, sizeof(cmdCap), 0);
+	if(bytesRead == -1){
+		std::cerr << "ERROR : CAP's recv doesn't work." << std::endl;
+		close(clientFd);
+		epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+		deleteUser(clientFd);
+	}
+
+	std::string wholeCmd(cmdCap);
+	std::string cmd(cmdCap);
+	std::string capInfo(cmdCap);
+
+	if (!cmd.empty() && cmd.size() > 4)
+		cmd = cmd.substr(0, 3);
+
+	if (cmd.compare("CAP") != 0){
+		std::cerr << "ERROR: Expected CAP command." << std::endl;
+	}
 }
 
 bool	Server::identification(int clientFd){
@@ -86,8 +147,17 @@ bool	Server::identification(int clientFd){
 	Server	&server = Server::getInstance();
 	std::string	welcome;
 
-	while (askNickname(clientFd) == false)
+	verifCap(clientFd);
+	if(identPass(clientFd) == false){
+		close(clientFd);
+		epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+		deleteUser(clientFd);
+		return false;
+	}
+	while(askNickname(clientFd) == false)
 		continue;
+	// while(askUser(clientFd) == false)
+	// 	continue;
 
 	welcome = ":server_pika 001 " + server.getUser(clientFd).getNickname() + " :Welcome to the Pika network\r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
@@ -97,9 +167,8 @@ bool	Server::identification(int clientFd){
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
 	welcome = ":server_pika 004 " + server.getUser(clientFd).getNickname() + " server_pika 1.0 itkol\r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
-
-	while (identPass(clientFd) == false)
-		continue;
+	welcome = ":server_pika 005 " + server.getUser(clientFd).getNickname() + " :are supported by this server CHANTYPES=# PREFIX=(ov)@ CHANNELLEN=32 NICKLEN=9 TOPICLEN=307 \r\n";
+	send(clientFd, welcome.c_str(), welcome.size(), 0);
 
 	return true;
 }

@@ -21,7 +21,6 @@
 	Server::Server() : _port(0){
 		this->_invitationOnly = false;
 		this->setNeedPasswTrue();
-		this->_passw = "jkl";
 	}
 	Server::Server(Server const &copy){(void)copy;}
 
@@ -35,7 +34,7 @@
 	void			Server::setPort(unsigned short port){this->_port = port;}
 	unsigned short	Server::getPort(){return this->_port;}
 
-	void			Server::setPassw(std::string password){this->_passw = password;}
+	void			Server::setPassword(std::string password){this->_passw = password;}
 	std::string		Server::getPassw(){return this->_passw;};
 
 	void			Server::setNeedPasswFalse(){this->_needPassw = false;}
@@ -202,30 +201,6 @@ void	Server::createUser(int fd, User &user){
 	this->_arrayUser.insert(std::make_pair(fd, &user));
 }
 
-// void	Server::findNickName(int clientFd){
-
-// 	Server	&server = Server::getInstance();
-// 	char host[NI_MAXHOST];
-// 	char service[NI_MAXSERV];
-// 	int result = getnameinfo((struct sockaddr*)&server._serverAddres, server._addrlen,host, sizeof(host),service, sizeof(service),0);
-// 	if(result != 0){
-// 		std::cerr << "ERROR GETNAMEINFO : can't receive nickname." << std::endl;
-// 		close(clientFd);
-// 		epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-// 		deleteUser(clientFd);
-// 	}
-// 	std::ostringstream	ossClientFd;
-// 	ossClientFd << clientFd;
-// 	std::string	nick;
-// 	nick = host;
-// 	size_t	pos;
-// 	pos = nick.find('.');
-// 	if(pos != std::string::npos)
-// 		nick = nick.substr(0, pos);
-// 	nick += "@" + ossClientFd.str();
-// 	server._arrayUser[clientFd]->setNickname(nick);
-// }
-
 void	Server::deleteUser(int fd){
 	Server	&server = Server::getInstance();
 
@@ -243,7 +218,6 @@ void	Server::deleteUser(int fd){
 	delete user;
 }
 
-
 void	Server::broadcastAll(int senderFd, std::string &message){
 	for(std::map<int, User*>::iterator it = this->_arrayUser.begin(); it != _arrayUser.end(); it++){
 		int clientFd = it->first;
@@ -256,7 +230,6 @@ void	Server::broadcastAll(int senderFd, std::string &message){
 		}
 	}
 }
-
 
 void	Server::run(){
 
@@ -293,12 +266,9 @@ void	Server::run(){
 			User* newUser = new User(clientFd);
 			createUser(clientFd, *newUser);
 
-		//check password
+		//check password, nickname and user
 			if(identification(clientFd) == true)
 				std::cout << "New client connected : " << clientFd << std::endl;
-
-		//find postname and fill in nickname
-			// findNickName(clientFd);
 		}
 		else{
 		//handle client message
@@ -330,9 +300,6 @@ void	Server::run(){
 				std::string	input = server.getUser(clientFd).getBuffer() + mss;
 				server._arrayParams = parseIrcMessage(input);
 
-				// if(server._arrayParams.isCommand == false){
-				// 	broadcastAll(clientFd, server._arrayParams.params[0]);
-				// }
 				if(server._arrayParams.isCommand == false){
 					std::cout << server._arrayUser[clientFd]->getNickname() << ": " << server._arrayParams.params[0] << std::flush;
 					if(server.isChannel(server.getUser(clientFd).getMyChannel())){

@@ -34,7 +34,7 @@ class Server{
 
 	//Setter
 		void				setPort(unsigned short port);
-		void				setPassw(std::string port);
+		void				setPassword(std::string port);
 		void				setNeedPasswFalse();
 		void				setNeedPasswTrue();
 
@@ -75,12 +75,14 @@ class Server{
 		bool	identification(int clientFd);
 		bool	identPass(int clientFd);
 		bool	askNickname(int clientFd);
+		bool	askUser(int clientFd);
+		void	verifCap(int clientFd);
+
 
 
 	//void	createChannel(Channel &chan);
 		void	createChannel(Server &server, unsigned int fd, std::string channel_name);
 		void	createUser(int fd, User &user);
-		void	findNickName(int clientFd);
 		void	deleteUser(int fd);
 
 		void	broadcastAll(int senderFd, std::string &message);
