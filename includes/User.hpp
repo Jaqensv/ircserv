@@ -2,8 +2,11 @@
 #include <iostream>
 #include <string>
 #include "../includes/Channel.hpp"
+#include "../includes/Server.hpp"
 
 class Channel;
+
+class Server;
 
 class User{
 
@@ -31,7 +34,7 @@ class User{
 		void	setUsername(std::string username);
 		void	setBuffer(std::string buffer);
 		void	setMyChannel(std::string myChannel);
-
+		void	PRIVMSG(std::vector<std::string> &params, unsigned int clientFd, Server &other);
 
 	private :
 		User();
