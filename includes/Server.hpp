@@ -67,8 +67,6 @@ class Server{
 
 
 	//Ping Pong Functions
-		void	sendPing(int clientFd);
-		void	handlePong(int clientFd, std::string &token);
 		void	handlePing(int clientFd);
 
 	//Identification functions

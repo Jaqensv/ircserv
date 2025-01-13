@@ -101,8 +101,6 @@ bool	Server::askUser(int clientFd){
 	}
 }
 
-
-
 bool	Server::verifCap(int clientFd){
 
 	char	cmdCap[100] = {0};
