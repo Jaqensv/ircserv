@@ -8,7 +8,7 @@ class Channel;
 
 class Server;
 
-class User{
+class User {
 
 	public :
 
