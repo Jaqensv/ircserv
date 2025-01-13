@@ -102,7 +102,6 @@ unsigned short		Server::getBackLogSize(){
 	return this->_backLogSize;
 }
 
-//ahans
 bool	Server::isChannel(const std::string &channelName) {
 	std::vector<Channel*>::iterator it = _arrayChannel.begin();
 	for (; it != _arrayChannel.end(); ++it) {
@@ -275,8 +274,7 @@ void	Server::run(){
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 				deleteUser(clientFd);
 			}
-		}
-		else{
+		} else {
 		//handle client message
 			clientFd = events[0].data.fd;
 			char	buffer[512];
@@ -289,20 +287,16 @@ void	Server::run(){
 				close(clientFd);
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 				deleteUser(clientFd);
-			}
-			else if (bytesRead == 0){
+			} else if (bytesRead == 0){
 				close(clientFd);
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 				deleteUser(clientFd);
-			}
-			else if(mss.empty()){
+			} else if (mss.empty())
 				std::cout << "control D" << std::endl;
-			}
-			else if(mss[mss.size() - 1] != '\n'){
+			else if (mss[mss.size() - 1] != '\n'){
 				server.getUser(clientFd).setBuffer(mss);
 				send(clientFd, "^D", 2, 0);
-			}
-			else{
+			} else {
 				std::string	input = server.getUser(clientFd).getBuffer() + mss;
 
 
@@ -337,18 +331,36 @@ void	Server::run(){
 						server.getChannel(server.getUser(clientFd).getMyChannel()).broadcastChannel(clientFd, server._arrayParams.params[0]);
 					}
 				}
-				else if(server._arrayParams.command == "/JOIN")
+				else if (server._arrayParams.command == "/JOIN")
 					join(clientFd);
 				else if(server._arrayParams.command == "/PING")
 					handlePing(clientFd);
+				else if (server._arrayParams.command == "/PART") {
+					if (server._arrayParams.params[0][0] == '#')
+						server._arrayParams.params[0].erase(0, 1);
+					size_t pos = server._arrayParams.params[0].find("\r\n");
+					if (pos != std::string::npos)
+						server._arrayParams.params[0] = server._arrayParams.params[0].substr(0, pos);
+					if (isChannel(server._arrayParams.params[0])) {
+						getChannel(server._arrayParams.params[0]).part(clientFd);
+					}
+				}
 				else if (server._arrayParams.command == "/KICK") {
-					std::cout << getChannel(getUser(clientFd).getMyChannel()).getName() << std::endl;
-					getChannel(getUser(clientFd).getMyChannel()).kick(server, clientFd, server._arrayParams.params[0]);
+					if (server._arrayParams.params[0][0] == '#')
+						server._arrayParams.params[0].erase(0, 1);
+					if (isChannel(server._arrayParams.params[0]))
+						getChannel(server._arrayParams.params[0]).kick(server, clientFd, server._arrayParams.params[1]);
 				} else if (server._arrayParams.command == "/INVITE")
-					std::cout << "Enter INVITE methode" << std::endl;
+					invite(server._arrayParams.params[0], server._arrayParams.params[1]);
 				else if (server._arrayParams.command == "/TOPIC") {
 					parseTopic(server, clientFd);
 					//channelTopicTester(server._arrayParams.params[0]);
+				} else if (server._arrayParams.command == "/MODE")
+					modeCmdParsing(server._arrayParams.params, clientFd);
+				else if (server._arrayParams.command == "/WHO")
+					whoParsing(server._arrayParams.params, clientFd);
+				else if (server._arrayParams.command == "/PRIVMSG") {
+					getUser(clientFd).PRIVMSG(server._arrayParams.params, clientFd, server);
 				}
 				else if (server._arrayParams.command == "/MODE")
 					std::cout << "Enter MODE methode" << std::endl;

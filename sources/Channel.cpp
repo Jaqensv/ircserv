@@ -18,7 +18,8 @@
 	std::string				Channel::getName(){return this->_name;}
 	std::map<int, User*>&	Channel::getUsers(){return _users;}
 	std::map<int, User*>&	Channel::getOpers(){return _operators;}
-	bool					Channel::getIsTopic(){return _canTopic;};
+	std::map<int, User*>&	Channel::getInvited() {return _invited;}
+	bool					Channel::getIsTopic(){return _canTopic;}
 
 	//ahans
 	User*		Channel::getOper(unsigned int fd) {
@@ -28,6 +29,15 @@
 				return it->second;
 		}
 		return NULL;
+	}
+
+	bool	Channel::isInvited(int fd) {
+		std::map<int, User*>::iterator it = _invited.begin();
+		for (; it != _invited.end(); it++) {
+			if (it->first == fd)
+				return true;
+		}
+		return false;
 	}
 
 	bool Channel::isKeyMode() {
@@ -71,8 +81,19 @@
 	}
 
 	void	Channel::removeUser(int clientFd){
-		this->_users.erase(_users.find(clientFd));
+		_users.erase(_users.find(clientFd));
 	}
+
+	void	Channel::removeOperator(unsigned int userFd) {
+		if (isOperator(userFd))
+			_operators.erase(_operators.find(userFd));
+	}
+
+	void	Channel::removeInvited(unsigned int userFd) {
+		if (isInvited(userFd))
+			_invited.erase(_invited.find(userFd));
+	}
+
 
 	//ahans
 	void	Channel::revokeOperator(unsigned int clientFd, unsigned int userFd){
@@ -80,6 +101,15 @@
 			_operators.erase(userFd);
 		else
 			std::cout << "User " << clientFd << " is not operator can't revoke user " << userFd << std::endl;
+	}
+
+	bool	Channel::isInvited(unsigned int fd){
+		std::map<int, User*>::iterator it = _invited.begin();
+		for (; it != _invited.end(); ++it) {
+			if (fd == static_cast<unsigned int>(it->first))
+				return true;
+		}
+		return false;
 	}
 
 	bool	Channel::isOperator(unsigned int fd){
@@ -102,11 +132,13 @@
 		} else
 			std::cout << "TOPIC rights are already at this state" << std::endl;
 	}
-	void	Channel::switchInvOnly(bool val) {
+	void	Channel::switchInvOnly(bool val, int fd) {
 		if (val != _invOnly) {
-			if (val == true)
+			if (val == true) {
+				Server	&server = Server::getInstance();
+				_invited.insert(std::make_pair(fd, &server.getUser(fd)));
 				std::cout << "Mode invite only is on" << std::endl;
-			else
+			} else
 				std::cout << "Mode invite only is off" << std::endl;
 			_invOnly = val;
 		} else

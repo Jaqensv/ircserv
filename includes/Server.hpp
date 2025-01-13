@@ -64,7 +64,9 @@ class Server{
 		void	initEpoll();
 		void	run();
 		void	join(int clientFd);
+		void	invite(std::string nickname, std::string channel);
 		void	parseTopic(Server &server, int clientFd);
+		void	whoParsing(std::vector<std::string> &params, unsigned int myfd);
 
 	//Ping Pong Functions
 		void	handlePing(int clientFd);

@@ -2,8 +2,11 @@
 #include <iostream>
 #include <string>
 #include "../includes/Channel.hpp"
+#include "../includes/Server.hpp"
 
 class Channel;
+
+class Server;
 
 class User{
 
@@ -18,14 +21,15 @@ class User{
 		User	&operator=(User const &other);
 
 	// Getter
-		int				getFd();
-		std::string		getNickname();
-		std::string		getUsername();
-		std::string		getBuffer();
-		std::string		getMyChannel();
-		std::string		getToken();
-		int				getTimeToken();
-
+		std::string					getToken();
+		int							getTimeToken();
+		int							getFd();
+		std::string					getNickname();
+		std::string					getUsername();
+		std::string					getBuffer();
+		std::string					getMyChannel();
+		std::vector<std::string>	&getMyChannels();
+		int 						findChannelIndex(std::string myChannel);
 	//Setter
 		void	setFd(unsigned int fd);
 		void	setNickname(std::string nickname);
@@ -35,16 +39,19 @@ class User{
 		void	setToken(std::string token);
 		void	setTimeToken(int toker);
 
+	//Member Function
+		void	PRIVMSG(std::vector<std::string> &params, unsigned int clientFd, Server &other);
 
 	private :
 		User();
 	//Variable member
-		unsigned int	_fd;
-		std::string		_nickname;
-		std::string		_username;
-		std::string		_buffer;
-		std::string		_myChannel;
-		std::string		_token;
-		int				_timeToken;
+		std::string					_token;
+		int							_timeToken;
+		unsigned int				_fd;
+		std::string					_nickname;
+		std::string					_username;
+		std::string					_buffer;
+		std::string					_myChannel;
+		std::vector<std::string>	_myChannels;
 
 };
