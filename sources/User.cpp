@@ -22,6 +22,8 @@
 	}
 
 // Getter
+	std::string					User::getToken(){return this->_token;};
+	int							User::getTimeToken(){return this->_timeToken;};
 	int							User::getFd(){return this->_fd;}
 	std::string					User::getNickname(){return this->_nickname;}
 	std::string					User::getUsername(){return this->_username;}
@@ -50,6 +52,8 @@
 			this->_buffer += buffer;
 	};
 	void	User::setMyChannel(std::string myChannel){this->_myChannel = myChannel;}
+	void	User::setToken(std::string token){this->_token = token;};
+	void	User::setTimeToken(int timeToken){this->_timeToken = timeToken;};
 
 void 	privToUser(std::string user, std::string msg, int clientFd, Server &other)
 {

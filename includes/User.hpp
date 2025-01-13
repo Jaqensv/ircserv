@@ -21,6 +21,8 @@ class User {
 		User	&operator=(User const &other);
 
 	// Getter
+		std::string					getToken();
+		int							getTimeToken();
 		int							getFd();
 		std::string					getNickname();
 		std::string					getUsername();
@@ -34,11 +36,17 @@ class User {
 		void	setUsername(std::string username);
 		void	setBuffer(std::string buffer);
 		void	setMyChannel(std::string myChannel);
+		void	setToken(std::string token);
+		void	setTimeToken(int toker);
+
+	//Member Function
 		void	PRIVMSG(std::vector<std::string> &params, unsigned int clientFd, Server &other);
 
 	private :
 		User();
 	//Variable member
+		std::string					_token;
+		int							_timeToken;
 		unsigned int				_fd;
 		std::string					_nickname;
 		std::string					_username;
