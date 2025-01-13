@@ -228,7 +228,6 @@ void	Server::deleteUser(int fd){
 	this->_arrayUser.erase(fd);
 }
 
-
 void	Server::broadcastAll(int senderFd, std::string &message){
 	for(std::map<int, User*>::iterator it = this->_arrayUser.begin(); it != _arrayUser.end(); it++){
 		int clientFd = it->first;
