@@ -27,6 +27,9 @@
 	std::string	User::getUsername(){return this->_username;}
 	std::string	User::getBuffer(){return this->_buffer;}
 	std::string	User::getMyChannel(){return this->_myChannel;}
+	std::string	User::getToken(){return this->_token;};
+	int			User::getTimeToken(){return this->_timeToken;};
+
 
 
 //Setter
@@ -40,3 +43,5 @@
 			this->_buffer += buffer;
 	};
 	void	User::setMyChannel(std::string myChannel){this->_myChannel = myChannel;}
+	void	User::setToken(std::string token){this->_token = token;};
+	void	User::setTimeToken(int timeToken){this->_timeToken = timeToken;};

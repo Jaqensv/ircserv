@@ -53,15 +53,10 @@ static void	checkParam(int argc, char **argv){
 	}
 
 //Password verification
-	std::string	password;
-	password = static_cast<std::string>(argv[2]);
+	std::string	password(argv[2]);
 
-	Server	&server = Server::getInstance(); //Call of server instance
-	if(password.compare(server.getPassw())){
-		std::cerr << "Bad password, try again." << std::endl;
-		exit(1);
-	}
-
+	Server &server = Server::getInstance();
+	server.setPassword(password);
 }
 
 void	parsing(int argc, char **argv){checkParam(argc, argv);}

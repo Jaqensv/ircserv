@@ -21,7 +21,6 @@
 	Server::Server() : _port(0){
 		this->_invitationOnly = false;
 		this->setNeedPasswTrue();
-		this->_passw = "3MatAllGui";
 	}
 	Server::Server(Server const &copy){(void)copy;}
 
@@ -35,7 +34,7 @@
 	void			Server::setPort(unsigned short port){this->_port = port;}
 	unsigned short	Server::getPort(){return this->_port;}
 
-	void			Server::setPassw(std::string password){this->_passw = password;}
+	void			Server::setPassword(std::string password){this->_passw = password;}
 	std::string		Server::getPassw(){return this->_passw;};
 
 	void			Server::setNeedPasswFalse(){this->_needPassw = false;}
@@ -129,6 +128,13 @@ void	Server::initServer(){
 		exit(1);
 	}
 
+//Allow many sockets on same port
+	int opt = 1;
+	if (setsockopt(this->_serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+		std::cerr << "ERROR : setsockopt (SO_REUSEADDR) failed." << std::endl;
+		exit(1);
+	}
+
 //Address socket creation with sockaddr_in structure
 	memset(&server._serverAddres, 0, sizeof(server._serverAddres));
 	server._serverAddres.sin_family = AF_INET; //AF_INET for IPV4
@@ -195,40 +201,22 @@ void	Server::createUser(int fd, User &user){
 	this->_arrayUser.insert(std::make_pair(fd, &user));
 }
 
-void	Server::findNickName(int clientFd){
-
-	Server	&server = Server::getInstance();
-	char host[NI_MAXHOST];
-	char service[NI_MAXSERV];
-	int result = getnameinfo((struct sockaddr*)&server._serverAddres, server._addrlen,host, sizeof(host),service, sizeof(service),0);
-	if(result != 0){
-		std::cerr << "ERROR GETNAMEINFO : can't receive nickname." << std::endl;
-		close(clientFd);
-		epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-		deleteUser(clientFd);
-	}
-	std::ostringstream	ossClientFd;
-	ossClientFd << clientFd;
-	std::string	nick;
-	nick = host;
-	size_t	pos;
-	pos = nick.find('.');
-	if(pos != std::string::npos)
-		nick = nick.substr(0, pos);
-	nick += "@" + ossClientFd.str();
-	server._arrayUser[clientFd]->setNickname(nick);
-}
-
 void	Server::deleteUser(int fd){
 	Server	&server = Server::getInstance();
-	std::cout << "Client " << fd << " deconnected." << std::endl;
+
+	if (_arrayUser.find(fd) == _arrayUser.end()) {
+		std::cerr << "WARNING : Attempted to delete non-existent user: " << fd << std::endl;
+		return;
+	}
+
+	std::cout << "Client " << fd << " disconnected." << std::endl;
 	if(server.isChannel(getUser(fd).getMyChannel())){
 		server.getChannel(getUser(fd).getMyChannel()).removeUser(fd);
 	}
-	delete &getUser(fd);
+	User *user = _arrayUser[fd];
 	this->_arrayUser.erase(fd);
+	delete user;
 }
-
 
 void	Server::broadcastAll(int senderFd, std::string &message){
 	for(std::map<int, User*>::iterator it = this->_arrayUser.begin(); it != _arrayUser.end(); it++){
@@ -264,6 +252,7 @@ void	Server::run(){
 			if(clientFd == -1)
 				std::cerr << "ERROR ACCEPT : can't connect to socket." << std::endl;
 
+
 		//add client to epoll
 			struct epoll_event	clientEvent;
 			clientEvent.data.fd = clientFd;
@@ -277,11 +266,15 @@ void	Server::run(){
 			User* newUser = new User(clientFd);
 			createUser(clientFd, *newUser);
 
-			std::cout << "New client connected : " << clientFd << std::endl;
-
-		//find postname and fill in nickname
-			findNickName(clientFd);
-
+		//check password, nickname and user
+			if(identification(clientFd) == true)
+				std::cout << "New client connected : " << clientFd << std::endl;
+			else{
+				std::cerr << "Bad identification of client : " << clientFd << std::endl;
+				close(clientFd);
+				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+				deleteUser(clientFd);
+			}
 		}
 		else{
 		//handle client message
@@ -311,19 +304,43 @@ void	Server::run(){
 			}
 			else{
 				std::string	input = server.getUser(clientFd).getBuffer() + mss;
-				server._arrayParams = parseIrcMessage(input);
-				std::cout << server._arrayUser[clientFd]->getNickname() << ": " << server._arrayParams.params[0] << std::flush;
 
-				// if(server._arrayParams.isCommand == false){
-				// 	broadcastAll(clientFd, server._arrayParams.params[0]);
-				// }
+
+
+
+
+
+
+
+				std::string	test = input.substr(0, 4);
+				if(test.compare("PING") == 0){
+					std::string	pongCommand;
+					pongCommand = ":PONG " + input.substr(5, input.size()) + "\r\n";
+					send(clientFd, input.c_str(), input.size(), 0);
+					send(clientFd, pongCommand.c_str(), pongCommand.size(), 0);
+				}
+
+
+
+
+
+
+
+
+
+
+				server._arrayParams = parseIrcMessage(input);
+
 				if(server._arrayParams.isCommand == false){
+					std::cout << server._arrayUser[clientFd]->getNickname() << ": " << server._arrayParams.params[0] << std::flush;
 					if(server.isChannel(server.getUser(clientFd).getMyChannel())){
 						server.getChannel(server.getUser(clientFd).getMyChannel()).broadcastChannel(clientFd, server._arrayParams.params[0]);
 					}
 				}
 				else if(server._arrayParams.command == "/JOIN")
 					join(clientFd);
+				else if(server._arrayParams.command == "/PING")
+					handlePing(clientFd);
 				else if (server._arrayParams.command == "/KICK") {
 					std::cout << getChannel(getUser(clientFd).getMyChannel()).getName() << std::endl;
 					getChannel(getUser(clientFd).getMyChannel()).kick(server, clientFd, server._arrayParams.params[0]);
@@ -335,6 +352,10 @@ void	Server::run(){
 				}
 				else if (server._arrayParams.command == "/MODE")
 					std::cout << "Enter MODE methode" << std::endl;
+				else if(server._arrayParams.command[0] == '/'){
+					std::cout << server._arrayParams.command << " is not a valide command." << std::endl;
+					continue;
+				}
 				server.getUser(clientFd).setBuffer("");
 			}
 		}
