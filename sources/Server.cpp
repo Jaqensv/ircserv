@@ -341,6 +341,9 @@ void	Server::run(){
 					modeCmdParsing(server._arrayParams.params, clientFd);
 				else if (server._arrayParams.command == "/WHO")
 					whoParsing(server._arrayParams.params, clientFd);
+				else if (server._arrayParams.command == "/PRIVMSG") {
+					getUser(clientFd).PRIVMSG(server._arrayParams.params, clientFd, server);
+				}
 				server.getUser(clientFd).setBuffer("");
 			}
 		}

@@ -50,3 +50,60 @@
 			this->_buffer += buffer;
 	};
 	void	User::setMyChannel(std::string myChannel){this->_myChannel = myChannel;}
+
+void 	privToUser(std::string user, std::string msg, int clientFd, Server &other)
+{
+	std::string msgDisplay;
+	int usrTgt = other.getTargetUserFd(user);
+	if (usrTgt == 0) {
+		std::cout << "ERROR: user " << user << " not found" << std::endl;
+		return ;
+	}
+	msgDisplay = other.getUser(clientFd).getNickname() + " -> " + user + " : " + msg;
+	send(usrTgt, msgDisplay.c_str(), msgDisplay.size(), 0);
+	return ;
+};
+
+void 	privToChannel(std::string ChannelName, std::string message, Server &other)
+{
+	std::string msgDisplay;
+	Channel &chan = other.getChannel(ChannelName);
+	std::map<int, User*> users = chan.getUsers();
+	for (std::map<int, User*>::iterator it = users.begin(); it != users.end(); ++it) {
+		msgDisplay = other.getUser(it->first).getNickname() + " -> " + ChannelName + " : " + message;
+		send(it->first, msgDisplay.c_str(), msgDisplay.size(), 0);
+	}
+	return ;
+};
+
+void	User::PRIVMSG(std::vector<std::string> &params, unsigned int clientFd, Server &other) {
+	std::string msg = "";
+	if (params.size() < 2) {
+		std::cout << "ERROR: not enougth arguments" << std::endl;
+		return ;
+	} else {
+		if (params[1][0] == ':') {
+			unsigned int i = 1;
+			while (i < params.size()) {
+				msg.append(params[i]);
+				msg.append(" ");
+				i++;
+			}
+		} else {
+			msg = params[1];
+		size_t pos = params[0].find("\r\n");
+		if (pos != std::string::npos)
+			params[0] = params[0].substr(0, pos);
+		} if (params[0][0] != '#') {
+			privToUser(params[0], msg, clientFd, other);
+			return ;
+		} else {
+			params[0].erase(0, 1);
+			privToChannel(params[0], msg, other);
+			return ;
+		}
+	}
+	return ;
+};
+
+
