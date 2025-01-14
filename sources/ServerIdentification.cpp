@@ -18,29 +18,29 @@ bool	Server::identPass(int clientFd){
 
 	std::string	wholePassw(passRecv);
 	std::string	cmd(passRecv);
-	std::string	passw(passRecv);
+
+	if(wholePassw.find("\r\n") == std::string::npos){
+		wholePassw = wholePassw.substr(0, wholePassw.size() - 1) + "\r\n";
+	}
 
 	if(cmd.empty() == false && cmd.size() > 5)
 		cmd = cmd.substr(0, 4);
 	else
 		return false;
+
 	if(cmd.compare("PASS") == 0){
-		passw = passw.substr(5, bytesRead - 7);
-		if(passw.compare(server.getPassw()) == 0)
+		wholePassw = wholePassw.substr(5, wholePassw.size() - (wholePassw.size() - 5));
+		if(wholePassw.compare(server.getPassw() + "\r\n") == 0)
 			return true;
 	}
-	else{
-		std::string error = ":server_pika 464 * :Incorrect password\r\n";
-		send(clientFd, error.c_str(), error.size(), 0);
-		return false;
-	}
-	return true;
+	std::string error = ":server_pika 464 * :Incorrect password\r\n";
+	send(clientFd, error.c_str(), error.size(), 0);
+	return false;
 }
 
 
 bool	Server::askNickname(int clientFd){
 
-	// (void)clientFd;
 	Server	&server = Server::getInstance();
 
 	char	cmdNickname[100] = {0};
@@ -53,14 +53,21 @@ bool	Server::askNickname(int clientFd){
 		return false;
 	}
 
-	std::string	wholeCmd(cmdNickname);
-	std::string	cmd(cmdNickname);
-	std::string	nickname(cmdNickname);
+	std::string	tmp(cmdNickname);
+	if(tmp.find("\r\n") == std::string::npos){
+		tmp = tmp.substr(0, tmp.size() - 1) + "\r\n";
+	}
+
+	std::string	wholeCmd;
+	std::string	cmd = tmp;
+	std::string	nickname;
 
 	if(cmd.empty() == false && cmd.size() > 5)
 		cmd = cmd.substr(0, 4);
 	if(cmd.compare("NICK") == 0){
-		nickname = nickname.substr(5, bytesRead - 7);
+		nickname = tmp.substr(5, tmp.size() - (tmp.size() - 5) - 1);
+		std::cout << nickname << std::endl;
+		std::cout << nickname.size() << std::endl;
 		server.getUser(clientFd).setNickname(nickname);
 	}
 	else{
@@ -73,6 +80,7 @@ bool	Server::askNickname(int clientFd){
 	send(clientFd, wholeCmd.c_str(), wholeCmd.size(), 0);
 	return true;
 }
+
 
 bool	Server::askUser(int clientFd){
 
@@ -100,6 +108,7 @@ bool	Server::askUser(int clientFd){
 		return false;
 	}
 }
+
 
 bool	Server::verifCap(int clientFd){
 

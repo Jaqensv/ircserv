@@ -298,31 +298,6 @@ void	Server::run(){
 				send(clientFd, "^D", 2, 0);
 			} else {
 				std::string	input = server.getUser(clientFd).getBuffer() + mss;
-
-
-
-
-
-
-
-
-				std::string	test = input.substr(0, 4);
-				if(test.compare("PING") == 0){
-					std::string	pongCommand;
-					pongCommand = ":PONG " + input.substr(5, input.size()) + "\r\n";
-					send(clientFd, input.c_str(), input.size(), 0);
-					send(clientFd, pongCommand.c_str(), pongCommand.size(), 0);
-				}
-
-
-
-
-
-
-
-
-
-
 				server._arrayParams = parseIrcMessage(input);
 
 				if(server._arrayParams.isCommand == false){
