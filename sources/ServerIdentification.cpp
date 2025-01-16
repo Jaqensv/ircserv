@@ -19,19 +19,17 @@ bool	Server::identPass(int clientFd){
 	std::string	wholePassw(passRecv);
 	std::string	cmd(passRecv);
 
-	if(wholePassw.find("\r\n") == std::string::npos){
-		wholePassw = wholePassw.substr(0, wholePassw.size() - 1) + "\r\n";
-	}
-
 	if(cmd.empty() == false && cmd.size() > 5)
 		cmd = cmd.substr(0, 4);
 	else
 		return false;
 
 	if(cmd.compare("PASS") == 0){
-		wholePassw = wholePassw.substr(5, wholePassw.size() - (wholePassw.size() - 5));
+		wholePassw = wholePassw.substr(5, (wholePassw.size() - cmd.size()));
+		std::cout << wholePassw << std::endl;
 		if(wholePassw.compare(server.getPassw() + "\r\n") == 0)
 			return true;
+		std::cout << "testttttttttt" << std::endl;
 	}
 	std::string error = ":server_pika 464 * :Incorrect password\r\n";
 	send(clientFd, error.c_str(), error.size(), 0);
@@ -54,10 +52,6 @@ bool	Server::askNickname(int clientFd){
 	}
 
 	std::string	tmp(cmdNickname);
-	if(tmp.find("\r\n") == std::string::npos){
-		tmp = tmp.substr(0, tmp.size() - 1) + "\r\n";
-	}
-
 	std::string	wholeCmd;
 	std::string	cmd = tmp;
 	std::string	nickname;
@@ -65,9 +59,7 @@ bool	Server::askNickname(int clientFd){
 	if(cmd.empty() == false && cmd.size() > 5)
 		cmd = cmd.substr(0, 4);
 	if(cmd.compare("NICK") == 0){
-		nickname = tmp.substr(5, tmp.size() - (tmp.size() - 5) - 1);
-		std::cout << nickname << std::endl;
-		std::cout << nickname.size() << std::endl;
+		nickname = tmp.substr(5, (bytesRead - (cmd.size() + 3)));
 		server.getUser(clientFd).setNickname(nickname);
 	}
 	else{
