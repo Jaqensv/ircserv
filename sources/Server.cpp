@@ -340,7 +340,7 @@ void	Server::run(){
 					std::cout << server._arrayParams.command << " is not a valide command." << std::endl;
 					continue;
 				} else {
-					std::cout << server._arrayUser[clientFd]->getNickname() << ": " << server._arrayParams.params[0] << std::flush;
+					std::cout << server._arrayUser[clientFd]->getNickname() << ": " << server._arrayParams.command << std::flush;
 				}
 				server.getUser(clientFd).setBuffer("");
 			}
