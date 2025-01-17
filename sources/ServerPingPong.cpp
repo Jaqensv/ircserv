@@ -12,7 +12,7 @@ void	Server::handlePing(int clientFd) {
 		std::cerr << "ERROR CMD PING : just need one argument." << std::endl;
 	else{
 		std::string	pongMessage;
-		pongMessage = "PONG : " + server._arrayParams.params[0];
+		pongMessage = "server_pika PONG " + server._arrayParams.params[0];
 		send(clientFd, pongMessage.c_str(), pongMessage.size(), 0);
 	}
 }

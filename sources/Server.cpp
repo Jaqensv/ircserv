@@ -301,8 +301,9 @@ void	Server::run(){
 				server._arrayParams = parseIrcMessage(input);
 
 
-
-				if (server._arrayParams.command == "JOIN")
+				if (server._arrayParams.isCommand == false) {
+					std::cout << server._arrayUser[clientFd]->getNickname() << ": " << input << std::flush;
+				} else if (server._arrayParams.command == "JOIN")
 					join(clientFd);
 				else if(server._arrayParams.command == "PING")
 					handlePing(clientFd);
@@ -315,8 +316,7 @@ void	Server::run(){
 					if (isChannel(server._arrayParams.params[0])) {
 						getChannel(server._arrayParams.params[0]).part(clientFd);
 					}
-				}
-				else if (server._arrayParams.command == "KICK") {
+				} else if (server._arrayParams.command == "KICK") {
 					if (server._arrayParams.params[0][0] == '#')
 						server._arrayParams.params[0].erase(0, 1);
 					size_t pos = server._arrayParams.params[0].find("\r\n");
@@ -340,7 +340,7 @@ void	Server::run(){
 					std::cout << server._arrayParams.command << " is not a valide command." << std::endl;
 					continue;
 				} else {
-					std::cout << server._arrayUser[clientFd]->getNickname() << ": " << server._arrayParams.command << std::flush;
+					std::cout << server._arrayUser[clientFd]->getNickname() << ": " << input << std::flush;
 				}
 				server.getUser(clientFd).setBuffer("");
 			}
