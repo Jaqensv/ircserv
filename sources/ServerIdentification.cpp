@@ -18,34 +18,32 @@ bool	Server::identPass(int clientFd){
 
 	std::string	wholePassw(passRecv);
 	std::string	cmd(passRecv);
-	std::string	passw(passRecv);
 
+	if (wholePassw.find("\r\n") != std::string::npos)
+		wholePassw = wholePassw.substr(0, wholePassw.size() - 2);
+	if (wholePassw.find("\n") != std::string::npos)
+		wholePassw = wholePassw.substr(0, wholePassw.size() - 1);
 	if(cmd.empty() == false && cmd.size() > 5)
 		cmd = cmd.substr(0, 4);
 	else
 		return false;
+
 	if(cmd.compare("PASS") == 0){
-		passw = passw.substr(5, bytesRead - 7);
-		if(passw.compare(server.getPassw()) == 0)
+		wholePassw = wholePassw.substr(5, (wholePassw.size() - 5));
+		if(wholePassw.compare(server.getPassw()) == 0)
 			return true;
 	}
-	else{
-		std::string error = ":server_pika 464 * :Incorrect password\r\n";
-		send(clientFd, error.c_str(), error.size(), 0);
-		return false;
-	}
+	std::string error = ":server_pika 464 * :Incorrect password\r\n";
+	send(clientFd, error.c_str(), error.size(), 0);
 	return false;
 }
 
-
 bool	Server::askNickname(int clientFd){
 
-	// (void)clientFd;
 	Server	&server = Server::getInstance();
 
 	char	cmdNickname[100] = {0};
 	ssize_t	bytesRead;
-	std::string	welcome;
 
 	bytesRead = recv(clientFd, cmdNickname, sizeof(cmdNickname), 0);
 	if(bytesRead == -1){
@@ -53,20 +51,23 @@ bool	Server::askNickname(int clientFd){
 		return false;
 	}
 
-	std::string	wholeCmd(cmdNickname);
-	std::string	cmd(cmdNickname);
-	std::string	nickname(cmdNickname);
+	std::string	tmp(cmdNickname);
+	if (tmp.find("\r\n") != std::string::npos)
+		tmp = tmp.substr(0, tmp.size() - 2);
+	if (tmp.find("\n") != std::string::npos)
+		tmp = tmp.substr(0, tmp.size() - 1);
+	std::string	wholeCmd;
+	std::string	cmd = tmp;
+	std::string	nickname;
 
 	if(cmd.empty() == false && cmd.size() > 5)
 		cmd = cmd.substr(0, 4);
 	if(cmd.compare("NICK") == 0){
-		nickname = nickname.substr(5, bytesRead - 7);
+		nickname = tmp.substr(5, tmp.size() - 5);
 		server.getUser(clientFd).setNickname(nickname);
-	}
-	else{
+	} else {
 		return false;
 	}
-
 	wholeCmd = ":server_pika NICK " + nickname;
 	wholeCmd.append("\r\n");
 
@@ -147,9 +148,9 @@ bool	Server::identification(int clientFd){
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
 	welcome = ":server_pika 003 " + server.getUser(clientFd).getNickname() + " :This server was created today\r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
-	welcome = ":server_pika 004 " + server.getUser(clientFd).getNickname() + " server_pika 1.0 itkol\r\n";
+	welcome = ":server_pika 004 " + server.getUser(clientFd).getNickname() + " :server_pika 1.0 itkol\r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
-	welcome = ":server_pika 005 " + server.getUser(clientFd).getNickname() + " :are supported by this server CHANTYPES=# PREFIX=(ov)@ CHANNELLEN=32 NICKLEN=9 TOPICLEN=307 \r\n";
+	welcome = ":server_pika 005 " + server.getUser(clientFd).getNickname() + " :are supported by this server CHANTYPES=# PREFIX=(ov)@ CHANNELLEN=32 NICKLEN=9 TOPICLEN=307\r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
 
 	return true;
