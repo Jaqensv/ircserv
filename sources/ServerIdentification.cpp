@@ -84,16 +84,15 @@ bool	Server::askUser(int clientFd){
 		return false;
 	}
 
-	std::string wholeCmd(cmdUser);
 	std::string cmd(cmdUser);
 	std::string userInfo(cmdUser);
 
 	if (!cmd.empty() && cmd.size() > 5)
 		cmd = cmd.substr(0, 4);
 	if (cmd.compare("USER") == 0){
-		userInfo = userInfo.substr(5, bytesRead - 7);
-		wholeCmd = ":server_pika USER " + userInfo + "\r\n";
-		send(clientFd, wholeCmd.c_str(), wholeCmd.size(), 0);
+		userInfo = userInfo.substr(5, userInfo.size() - 5);
+		userInfo = ":server_pika USER " + userInfo + "\r\n";
+		send(clientFd, userInfo.c_str(), userInfo.size(), 0);
 		return true;
 	}
 	else {
@@ -139,6 +138,8 @@ bool	Server::identification(int clientFd){
 		return false;
 	if(askNickname(clientFd) == false)
 		return false;
+	if(askUser(clientFd) == false)
+		return false;
 	// while(askUser(clientFd) == false)
 	// 	continue;
 
@@ -152,6 +153,11 @@ bool	Server::identification(int clientFd){
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
 	welcome = ":server_pika 005 " + server.getUser(clientFd).getNickname() + " :are supported by this server CHANTYPES=# PREFIX=(ov)@ CHANNELLEN=32 NICKLEN=9 TOPICLEN=307\r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
+	welcome = ":server_pika 375 " + server.getUser(clientFd).getNickname() + " :server_pika message of the day starts below\r\n";
+	send(clientFd, welcome.c_str(), welcome.size(), 0);
+	welcome = ":server_pika 372 " + server.getUser(clientFd).getNickname() + " :-  Hello here is the message of the day\r\n";
+	send(clientFd, welcome.c_str(), welcome.size(), 0);
+	welcome = ":server_pika 376 " + server.getUser(clientFd).getNickname() + " :End of message of the day.\r\n";
 
 	return true;
 }
