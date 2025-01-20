@@ -32,10 +32,6 @@ void	sendServerRpl(int const client_fd, std::string client_buffer);
 // # define ERR_CHANOPRIVSNEEDED(client, channel) ("482 " + client + " #" +  channel + " :You're not channel operator\r\n")
 # define RPL_KICK(user_id, channel, kicked, reason) (user_id + " KICK #" + channel + " " + kicked + " " + reason + "\r\n")
 
-// KILL
-# define ERR_NOPRIVILEGES(client) ("481 " + client + " :Permission Denied- You're not an IRC operator\r\n")
-# define RPL_KILL(user_id, killed, comment) (user_id + " KILL " + killed + " " + comment + "\r\n")
-
 // MODE
 /* user mode */
 #define MODE_USERMSG(client, mode) (":" + client + " MODE " + client + " :" + mode + "\r\n")
@@ -51,9 +47,6 @@ void	sendServerRpl(int const client_fd, std::string client_buffer);
 #define ERR_CHANNELISFULL(client, channel) ("471 " + client + " #" + channel + " :Cannot join channel (+l)\r\n")
 #define ERR_CHANOPRIVSNEEDED(client, channel) (":localhost 482 " + client + " #" + channel + " :You're not channel operator\r\n")
 #define ERR_INVALIDMODEPARAM(client, channel, mode, password) ("696 " + client + " #" + channel + " " + mode + " " + password + " : password must only contained alphabetic character\r\n")
-// RPL_ERR a broadcoast quand user pas +v ou operator veut parler
-      // dans notre cas c'était tiff (client) qui voulait send a message
-      // :lair.nl.eu.dal.net 404 tiff #pop :Cannot send to channel
 #define RPL_ADDVOICE(nickname, username, channel, mode, param) (":" + nickname + "!" + username + "@localhost MODE #" + channel + " " + mode + " " + param + "\r\n")
 
 // MOTD
@@ -89,10 +82,6 @@ void	sendServerRpl(int const client_fd, std::string client_buffer);
 
 // PING
 # define RPL_PONG(user_id, token) (user_id + " PONG " + token + "\r\n")
-
-// QUIT
-# define RPL_QUIT(user_id, reason) (user_id + " QUIT :Quit: " + reason + "\r\n")
-# define RPL_ERROR(user_id, reason) (user_id + " ERROR :" + reason + "\r\n")
 
 // PRIVMSG
 # define ERR_NOSUCHNICK(client, target) ("401 " + client + " " + target + " :No such nick/channel\r\n")

@@ -56,8 +56,7 @@ void	Server::join(int clientFd){
 	else {
 		createChannel(server, clientFd, server._arrayParams.params[0]);
 	}
-	std::string toSend = ":" +  server._arrayParams.params[0] + "!ahans@RZ-8gm.037.148.45.IP JOIN :#gen\r\n";
-	send(clientFd, toSend.c_str(), toSend.size(), 0);
+	std::string toSend;
 	toSend = ":server_pika 353 " + server.getUser(clientFd).getNickname() + " = #" + server._arrayParams.params[0] + " :@" + server.getUser(clientFd).getNickname() + "\r\n";
 	send(clientFd, toSend.c_str(), toSend.size(), 0);
 	toSend = ":server_pika 366 " + server.getUser(clientFd).getNickname() + " = #" + server._arrayParams.params[0] + " :End of /NAMES list.\r\n";

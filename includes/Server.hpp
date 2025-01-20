@@ -37,6 +37,9 @@ class Server{
 		void				setPassword(std::string port);
 		void				setNeedPasswFalse();
 		void				setNeedPasswTrue();
+		void				setNameServer(std::string name);
+		void				setVersion(std::string version);
+
 
 	//Getter
 		unsigned short			getPort();
@@ -51,6 +54,9 @@ class Server{
 		std::map<int, User*>&	getUsers();
 		std::string				getUsername();
 		unsigned int			getTargetUserFd(std::string nickname);
+		std::string				getNameServer();
+		std::string				getVersion();
+
 
 		//ahans
 		bool					isUser(int fd);
@@ -72,11 +78,13 @@ class Server{
 		void	handlePing(int clientFd);
 
 	//Identification functions
-		bool	identification(int clientFd);
-		bool	identPass(int clientFd);
-		bool	askNickname(int clientFd);
-		bool	askUser(int clientFd);
-		bool	verifCap(int clientFd);
+		bool		identification(int clientFd);
+		bool		identPass(int clientFd);
+		bool		askNickname(int clientFd);
+		bool		askUser(int clientFd);
+		bool		verifCap(int clientFd);
+		std::string getCurrentDate();
+
 
 
 
@@ -99,6 +107,8 @@ class Server{
 		unsigned short		_backLogSize;
 		bool				_invitationOnly;
 		bool				_needPassw;
+		std::string			_nameServer;
+		std::string			_version;
 
 	//Array of : Channel, User and Operator
 		std::vector<Channel*>		_arrayChannel;

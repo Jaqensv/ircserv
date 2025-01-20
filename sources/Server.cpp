@@ -21,6 +21,8 @@
 	Server::Server() : _port(0){
 		this->_invitationOnly = false;
 		this->setNeedPasswTrue();
+		this->_version = "1.0";
+		this->_nameServer = "pika_server";
 	}
 	Server::Server(Server const &copy){(void)copy;}
 
@@ -33,13 +35,16 @@
 //Getter & Setter
 	void			Server::setPort(unsigned short port){this->_port = port;}
 	unsigned short	Server::getPort(){return this->_port;}
-
 	void			Server::setPassword(std::string password){this->_passw = password;}
 	std::string		Server::getPassw(){return this->_passw;};
-
 	void			Server::setNeedPasswFalse(){this->_needPassw = false;}
 	void			Server::setNeedPasswTrue(){this->_needPassw = true;}
 	bool			Server::getNeedPassw(){return this->_needPassw;}
+	void			Server::setNameServer(std::string name){this->_nameServer = name;}
+	void			Server::setVersion(std::string version){this->_version = version;}
+	std::string		Server::getNameServer(){return this->_nameServer;}
+	std::string		Server::getVersion(){return this->_version;}
+
 
 	const std::vector<Channel*>& Server::getChannels(){
 		return _arrayChannel;
@@ -229,6 +234,7 @@ void	Server::broadcastAll(int senderFd, std::string &message){
 		}
 	}
 }
+
 
 void	Server::run(){
 
