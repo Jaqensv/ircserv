@@ -2,6 +2,7 @@
 #include <string>
 #include <cstring>
 #include <cstdlib>
+#include <cstdio>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -10,6 +11,7 @@
 #include <termios.h>
 #include <csignal>
 #include <netdb.h>
+#include <stdlib.h>
 #include "../includes/IrcMessage.hpp"
 #include "../includes/Server.hpp"
 #include "../includes/Channel.hpp"
@@ -18,11 +20,13 @@
 
 
 //Constructor
-	Server::Server() : _port(0){
+	Server::Server() : _servInfo(NULL), _port(0){
 		this->_invitationOnly = false;
 		this->setNeedPasswTrue();
 		this->_version = "1.0";
 		this->_nameServer = "pika_server";
+		memset(&_hints, 0, sizeof(_hints));
+
 	}
 	Server::Server(Server const &copy){(void)copy;}
 
@@ -116,16 +120,37 @@ bool	Server::isChannel(const std::string &channelName) {
 	return false;
 }
 
+
+int Server::fillServinfo()
+{
+	char	port[6];
+
+	std::sprintf(port, "%d", _port);
+
+	_hints.ai_family = AF_INET;
+	_hints.ai_socktype = SOCK_STREAM;
+	_hints.ai_flags = AI_PASSIVE;
+
+	if(getaddrinfo(NULL, port, &_hints, &_servInfo) != 0)
+		return (1);
+	return (0);
+}
+
+
 //Member functions
 void	Server::initServer(){
 
 //Call of server instance
 	Server	&server = Server::getInstance();
 
+	if(fillServinfo() == 1){
+		std::cerr << "ERROR : addrinfo doesn't work." << std::endl;
+		return;
+	}
 
 //Socket creation : for creating communication point, like a FD
 
-	server._serverSocket = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+	server._serverSocket = socket(_servInfo->ai_family, _servInfo->ai_socktype, _servInfo->ai_protocol);
 	if(server._serverSocket == -1){
 		close(server._serverSocket);
 		std::cerr << "ERROR SOCKET : Socket can't be created." << std::endl;
@@ -139,14 +164,14 @@ void	Server::initServer(){
 		exit(1);
 	}
 
-//Address socket creation with sockaddr_in structure
-	memset(&server._serverAddres, 0, sizeof(server._serverAddres));
-	server._serverAddres.sin_family = AF_INET; //AF_INET for IPV4
-	server._serverAddres.sin_addr.s_addr = INADDR_ANY; //Address to accept any incoming messages
-	server._serverAddres.sin_port = htons(server._port); //Convert local data to network data(network communication : big-endian)
+// //Address socket creation with sockaddr_in structure
+// 	memset(&server._serverAddres, 0, sizeof(server._serverAddres));
+// 	server._serverAddres.sin_family = AF_INET; //AF_INET for IPV4
+// 	server._serverAddres.sin_addr.s_addr = INADDR_ANY; //Address to accept any incoming messages
+// 	server._serverAddres.sin_port = htons(server._port); //Convert local data to network data(network communication : big-endian)
 
 //Bind : bound socket with port
-	if(bind(server._serverSocket, (struct sockaddr *)&server._serverAddres,sizeof(server._serverAddres)) < 0){
+	if(bind(server._serverSocket, _servInfo->ai_addr, _servInfo->ai_addrlen) < 0){
 		close(server._serverSocket);
 		std::cerr << "ERROR BIND : can't create bound between socket and port." << std::endl;
 		exit(1);
@@ -159,7 +184,9 @@ void	Server::initServer(){
 		std::cerr << "ERROR LISTEN : Unable to listen on the socket." << std::endl;
 		exit (1);
 	}
+	freeaddrinfo(_servInfo);
 }
+
 
 void	Server::initEpoll(){
 

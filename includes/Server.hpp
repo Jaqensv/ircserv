@@ -5,6 +5,8 @@
 #include <sys/epoll.h>
 #include <vector>
 #include <map>
+#include <sys/types.h>
+#include <netdb.h>
 #include <sstream> // stringstream
 #include <algorithm> // std::find
 #include <pwd.h> // getuid, getpwuid
@@ -73,6 +75,8 @@ class Server{
 		void	invite(std::string nickname, std::string channel);
 		void	parseTopic(Server &server, int clientFd);
 		void	whoParsing(std::vector<std::string> &params, unsigned int myfd);
+		int		fillServinfo();
+
 
 	//Ping Pong Functions
 		void	handlePing(int clientFd);
@@ -97,6 +101,8 @@ class Server{
 
 	private :
 	//Variable member
+		struct addrinfo		*_servInfo;
+		struct addrinfo		_hints;
 		unsigned short		_port;
 		std::string			_passw;
 		int					_serverSocket;

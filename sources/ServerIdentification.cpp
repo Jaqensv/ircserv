@@ -151,8 +151,8 @@ bool	Server::identification(int clientFd){
 
 	// if(verifCap(clientFd) == false)
 	// 	return false;
-	if(identPass(clientFd) == false)
-		return false;
+	// if(identPass(clientFd) == false)
+	// 	return false;
 	// if(askNickname(clientFd) == false)
 	// 	return false;
 	// if(askUser(clientFd) == false)
