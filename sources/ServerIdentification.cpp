@@ -144,8 +144,8 @@ bool	Server::identification(int clientFd){
 		return false;
 	if(askNickname(clientFd) == false)
 		return false;
-	// while(askUser(clientFd) == false)
-	// 	continue;
+	if(askUser(clientFd) == false)
+		return false;
 
 	welcome = ":server_pika 001 " + server.getUser(clientFd).getNickname() + " :Welcome to the Pika network\r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
@@ -153,7 +153,7 @@ bool	Server::identification(int clientFd){
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
 	welcome = ":server_pika 003 " + server.getUser(clientFd).getNickname() + " :This server was created today\r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
-	welcome = ":server_pika 004 " + server.getUser(clientFd).getNickname() + " server_pika 1.0 itkol\r\n";
+	welcome = ":server_pika 004 " + server.getUser(clientFd).getNickname() + " :server_pika 1.0 itkol\r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
 	welcome = ":server_pika 005 " + server.getUser(clientFd).getNickname() + " :are supported by this server CHANTYPES=# PREFIX=(ov)@ CHANNELLEN=32 NICKLEN=9 TOPICLEN=307 \r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
