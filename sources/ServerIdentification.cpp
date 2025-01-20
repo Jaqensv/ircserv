@@ -38,14 +38,12 @@ bool	Server::identPass(int clientFd){
 	return false;
 }
 
-
 bool	Server::askNickname(int clientFd){
 
 	Server	&server = Server::getInstance();
 
 	char	cmdNickname[100] = {0};
 	ssize_t	bytesRead;
-	std::string	welcome;
 
 	bytesRead = recv(clientFd, cmdNickname, sizeof(cmdNickname), 0);
 	if(bytesRead == -1){
@@ -67,18 +65,15 @@ bool	Server::askNickname(int clientFd){
 	if(cmd.compare("NICK") == 0){
 		nickname = tmp.substr(5, tmp.size() - 5);
 		server.getUser(clientFd).setNickname(nickname);
-	}
-	else{
+	} else {
 		return false;
 	}
-
 	wholeCmd = ":server_pika NICK " + nickname;
 	wholeCmd.append("\r\n");
 
 	send(clientFd, wholeCmd.c_str(), wholeCmd.size(), 0);
 	return true;
 }
-
 
 bool	Server::askUser(int clientFd){
 
@@ -89,16 +84,15 @@ bool	Server::askUser(int clientFd){
 		return false;
 	}
 
-	std::string wholeCmd(cmdUser);
 	std::string cmd(cmdUser);
 	std::string userInfo(cmdUser);
 
 	if (!cmd.empty() && cmd.size() > 5)
 		cmd = cmd.substr(0, 4);
 	if (cmd.compare("USER") == 0){
-		userInfo = userInfo.substr(5, bytesRead - 7);
-		wholeCmd = ":server_pika USER " + userInfo + "\r\n";
-		send(clientFd, wholeCmd.c_str(), wholeCmd.size(), 0);
+		userInfo = userInfo.substr(5, userInfo.size() - 5);
+		userInfo = ":server_pika USER " + userInfo + "\r\n";
+		send(clientFd, userInfo.c_str(), userInfo.size(), 0);
 		return true;
 	}
 	else {
@@ -155,8 +149,13 @@ bool	Server::identification(int clientFd){
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
 	welcome = ":server_pika 004 " + server.getUser(clientFd).getNickname() + " :server_pika 1.0 itkol\r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
-	welcome = ":server_pika 005 " + server.getUser(clientFd).getNickname() + " :are supported by this server CHANTYPES=# PREFIX=(ov)@ CHANNELLEN=32 NICKLEN=9 TOPICLEN=307 \r\n";
+	welcome = ":server_pika 005 " + server.getUser(clientFd).getNickname() + " :are supported by this server CHANTYPES=# PREFIX=(ov)@ CHANNELLEN=32 NICKLEN=9 TOPICLEN=307\r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
+	welcome = ":server_pika 375 " + server.getUser(clientFd).getNickname() + " :server_pika message of the day starts below\r\n";
+	send(clientFd, welcome.c_str(), welcome.size(), 0);
+	welcome = ":server_pika 372 " + server.getUser(clientFd).getNickname() + " :-  Hello here is the message of the day\r\n";
+	send(clientFd, welcome.c_str(), welcome.size(), 0);
+	welcome = ":server_pika 376 " + server.getUser(clientFd).getNickname() + " :End of message of the day.\r\n";
 
 	return true;
 }
