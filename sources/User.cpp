@@ -33,7 +33,7 @@
 	bool						User::getRegisterCap(){return _registerCap;}
 	bool						User::getRegisterPass(){return _registerPass;}
 	bool						User::getRegisterNick(){return _registerNick;}
-	bool						User::getRegisterUSer(){return _registerUser;}
+	bool						User::getRegisterUser(){return _registerUser;}
 	int							User::findChannelIndex(std::string myChannel) {
 		int index = 0;
 		for (std::vector<std::string>::iterator it = _myChannels.begin(); it != _myChannels.end(); ++it) {

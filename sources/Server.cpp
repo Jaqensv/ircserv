@@ -321,7 +321,7 @@ void	Server::run(){
 				server._arrayParams = parseIrcMessage(input);
 
 			//Identification
-				if(server.getUser(clientFd).getRegisterUSer() == false)
+				if(server.getUser(clientFd).getRegisterUser() == false)
 					identification(clientFd, input);
 
 				else if (server._arrayParams.isCommand == false) {

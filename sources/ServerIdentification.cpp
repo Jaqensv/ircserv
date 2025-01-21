@@ -86,6 +86,30 @@ bool	Server::askUser(int clientFd, std::string input){
 	std::string cmd = input;
 	std::string userInfo = input;
 
+
+
+
+	// if(input.empty() == true){
+	// 	char hostname[1024];
+	// 	memset(hostname, 0, sizeof(hostname));
+	// 	if (gethostname(hostname, sizeof(hostname)) == 0) {
+	// 		std::string	userName = hostname;
+	// 		std::string	wholeInfo = ":server_pika USER " + userName + "\r\n";
+	// 		send(clientFd, wholeInfo.c_str(), wholeInfo.size(), 0);
+	// 		server.getUser(clientFd).setRegisterUserTrue();
+	// 		return true;
+	// 	}
+	// 	else{
+	// 		std::cerr << "ERROR: gethostname doesn't work." << std::endl;
+	// 		return false;
+	// 	}
+	// }
+
+
+
+
+
+
 	if (!cmd.empty() && cmd.size() > 5)
 		cmd = cmd.substr(0, 4);
 	if (cmd.compare("USER") == 0){
@@ -167,7 +191,7 @@ bool	Server::identification(int clientFd, std::string input){
 				deleteUser(clientFd);
 			}
 		}
-		else if(server.getUser(clientFd).getRegisterUSer() != true && server.getUser(clientFd).getRegisterNick() == true){
+		else if(server.getUser(clientFd).getRegisterUser() != true && server.getUser(clientFd).getRegisterNick() == true){
 			if(askUser(clientFd, input) == false){
 				close(clientFd);
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
@@ -177,11 +201,13 @@ bool	Server::identification(int clientFd, std::string input){
 		}
 	}//handle IRSSI
 	else{
+		std::cout << "test : " << input << std::endl;
 		if(server.getUser(clientFd).getRegisterCap() != true){
 			if(verifCap(clientFd, input) == false){
 				close(clientFd);
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 				deleteUser(clientFd);
+				return false;
 			}
 		}
 		else if(server.getUser(clientFd).getRegisterPass() != true && server.getUser(clientFd).getRegisterCap() == true){
@@ -199,6 +225,8 @@ bool	Server::identification(int clientFd, std::string input){
 				return false;
 			}
 			cut = cut.substr(cut.find("\r\n") + 2, cut.size() - cut.find("\r\n") + 2);
+			if(cut.substr(0, cut.find("\r\n")).empty())
+				return true;
 			if(askUser(clientFd, cut.substr(0, cut.find("\r\n"))) == false){
 				close(clientFd);
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
@@ -207,8 +235,16 @@ bool	Server::identification(int clientFd, std::string input){
 			}
 			sendCap(clientFd);
 		}
-
+		else if(server.getUser(clientFd).getRegisterPass() == true && server.getUser(clientFd).getRegisterCap() == true
+					&& server.getUser(clientFd).getRegisterNick() == true && server.getUser(clientFd).getRegisterUser() == false){
+			if(askUser(clientFd, input) == false){
+				close(clientFd);
+				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+				deleteUser(clientFd);
+				return false;
+			}
+			sendCap(clientFd);
+		}
 	}
-
 	return true;
 }

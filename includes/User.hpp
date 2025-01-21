@@ -33,7 +33,7 @@ class User{
 		bool						getRegisterCap();
 		bool						getRegisterPass();
 		bool						getRegisterNick();
-		bool						getRegisterUSer();
+		bool						getRegisterUser();
 
 
 	//Setter
