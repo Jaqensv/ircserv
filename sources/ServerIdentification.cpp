@@ -121,12 +121,6 @@ bool	Server::verifCap(int clientFd, std::string input){
 }
 
 
-// bool	Server::cutInThree(int clientFd, std::string input){
-
-
-// }
-
-
 void	Server::sendCap(int clientFd){
 
 	Server	&server = Server::getInstance();
