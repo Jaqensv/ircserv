@@ -82,14 +82,13 @@ class Server{
 		void	handlePing(int clientFd);
 
 	//Identification functions
-		bool		identification(int clientFd);
-		bool		identPass(int clientFd);
-		bool		askNickname(int clientFd);
-		bool		askUser(int clientFd);
-		bool		verifCap(int clientFd);
+		bool		identification(int clientFd, std::string input);
+		bool		identPass(int clientFd, std::string input);
+		bool		askNickname(int clientFd, std::string input);
+		bool		askUser(int clientFd, std::string input);
+		bool		verifCap(int clientFd, std::string input);
 		std::string getCurrentDate();
-
-
+		void		sendCap(int clientFd);
 
 
 	//void	createChannel(Channel &chan);

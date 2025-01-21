@@ -2,8 +2,6 @@
 #include <iostream>
 #include <string>
 
-void	sendServerRpl(int const client_fd, std::string client_buffer);
-
 # define user_id(nickname, username) (":" + nickname + "!" + username + "@localhost")
 
 # define RPL_WELCOME(user_id, nickname) (":localhost 001 " + nickname + " :Welcome to the Internet Relay Network " + user_id + "\r\n")

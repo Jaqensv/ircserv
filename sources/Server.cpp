@@ -131,6 +131,7 @@ int Server::fillServinfo()
 	_hints.ai_socktype = SOCK_STREAM;
 	_hints.ai_flags = AI_PASSIVE;
 
+
 	if(getaddrinfo(NULL, port, &_hints, &_servInfo) != 0)
 		return (1);
 	return (0);
@@ -164,12 +165,6 @@ void	Server::initServer(){
 		exit(1);
 	}
 
-// //Address socket creation with sockaddr_in structure
-// 	memset(&server._serverAddres, 0, sizeof(server._serverAddres));
-// 	server._serverAddres.sin_family = AF_INET; //AF_INET for IPV4
-// 	server._serverAddres.sin_addr.s_addr = INADDR_ANY; //Address to accept any incoming messages
-// 	server._serverAddres.sin_port = htons(server._port); //Convert local data to network data(network communication : big-endian)
-
 //Bind : bound socket with port
 	if(bind(server._serverSocket, _servInfo->ai_addr, _servInfo->ai_addrlen) < 0){
 		close(server._serverSocket);
@@ -184,6 +179,7 @@ void	Server::initServer(){
 		std::cerr << "ERROR LISTEN : Unable to listen on the socket." << std::endl;
 		exit (1);
 	}
+
 	freeaddrinfo(_servInfo);
 }
 
@@ -298,15 +294,6 @@ void	Server::run(){
 			User* newUser = new User(clientFd);
 			createUser(clientFd, *newUser);
 
-		//check password, nickname and user
-			if(identification(clientFd) == true)
-				std::cout << "New client connected : " << clientFd << std::endl;
-			else{
-				std::cerr << "Bad identification of client : " << clientFd << std::endl;
-				close(clientFd);
-				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-				deleteUser(clientFd);
-			}
 		} else {
 		//handle client message
 			clientFd = events[0].data.fd;
@@ -333,8 +320,11 @@ void	Server::run(){
 				std::string	input = server.getUser(clientFd).getBuffer() + mss;
 				server._arrayParams = parseIrcMessage(input);
 
+			//Identification
+				if(server.getUser(clientFd).getRegisterUSer() == false)
+					identification(clientFd, input);
 
-				if (server._arrayParams.isCommand == false) {
+				else if (server._arrayParams.isCommand == false) {
 					std::cout << server._arrayUser[clientFd]->getNickname() << ": " << input << std::flush;
 				} else if (server._arrayParams.command == "JOIN")
 					join(clientFd);

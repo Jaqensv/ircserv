@@ -30,6 +30,12 @@ class User{
 		std::string					getMyChannel();
 		std::vector<std::string>	&getMyChannels();
 		int 						findChannelIndex(std::string myChannel);
+		bool						getRegisterCap();
+		bool						getRegisterPass();
+		bool						getRegisterNick();
+		bool						getRegisterUSer();
+
+
 	//Setter
 		void	setFd(unsigned int fd);
 		void	setNickname(std::string nickname);
@@ -38,6 +44,14 @@ class User{
 		void	setMyChannel(std::string myChannel);
 		void	setToken(std::string token);
 		void	setTimeToken(int toker);
+		void	setRegisterCapTrue();
+		void	setRegisterCapFalse();
+		void	setRegisterPassTrue();
+		void	setRegisterPassFalse();
+		void	setRegisterNickTrue();
+		void	setRegisterNickFalse();
+		void	setRegisterUserTrue();
+		void	setRegisterUserFalse();
 
 	//Member Function
 		void	PRIVMSG(std::vector<std::string> &params, unsigned int clientFd, Server &other);
@@ -53,5 +67,9 @@ class User{
 		std::string					_buffer;
 		std::string					_myChannel;
 		std::vector<std::string>	_myChannels;
+		bool						_registerCap;
+		bool						_registerPass;
+		bool						_registerNick;
+		bool						_registerUser;
 
 };

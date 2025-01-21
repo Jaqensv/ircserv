@@ -16,7 +16,6 @@ IrcMessage	parseIrcMessage(std::string &input){
 	int					countWord = 0;
 
 
-	std::cout << "input: " << input << std::endl;
 	mess.crlf = "\r\n";
 	mess.isCommand = true;
 

@@ -8,7 +8,7 @@
 //Constructor & Destructor
 	User::User() {}
 	User::User(User const &copy){(void)copy;}
-	User::User(unsigned int fd) : _fd(fd), _buffer(""), _myChannel(""){}
+	User::User(unsigned int fd) : _fd(fd), _buffer(""), _myChannel(""), _registerCap(false), _registerPass(false), _registerNick(false), _registerUser(false){}
 	User::~User(){}
 
 //Surcharge operator
@@ -30,6 +30,10 @@
 	std::string					User::getBuffer(){return this->_buffer;}
 	std::string					User::getMyChannel(){return this->_myChannel;}
 	std::vector<std::string>	&User::getMyChannels(){return this->_myChannels;}
+	bool						User::getRegisterCap(){return _registerCap;}
+	bool						User::getRegisterPass(){return _registerPass;}
+	bool						User::getRegisterNick(){return _registerNick;}
+	bool						User::getRegisterUSer(){return _registerUser;}
 	int							User::findChannelIndex(std::string myChannel) {
 		int index = 0;
 		for (std::vector<std::string>::iterator it = _myChannels.begin(); it != _myChannels.end(); ++it) {
@@ -54,6 +58,15 @@
 	void	User::setMyChannel(std::string myChannel){this->_myChannel = myChannel;}
 	void	User::setToken(std::string token){this->_token = token;};
 	void	User::setTimeToken(int timeToken){this->_timeToken = timeToken;};
+
+	void	User::setRegisterCapTrue(){_registerCap = true;}
+	void	User::setRegisterCapFalse(){_registerCap = false;}
+	void	User::setRegisterPassTrue(){_registerPass = true;}
+	void	User::setRegisterPassFalse(){_registerPass = false;}
+	void	User::setRegisterNickTrue(){_registerNick = true;}
+	void	User::setRegisterNickFalse(){_registerNick = false;}
+	void	User::setRegisterUserTrue(){_registerUser = true;}
+	void	User::setRegisterUserFalse(){_registerUser = false;}
 
 void 	privToUser(std::string user, std::string msg, int clientFd, Server &other)
 {

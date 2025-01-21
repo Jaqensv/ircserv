@@ -3,7 +3,9 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <ctime>
+#include <cstring>
 #include "Server.hpp"
+#include "User.hpp"
 #include "Reply.hpp"
 
 std::string Server::getCurrentDate() {
@@ -18,21 +20,12 @@ std::string Server::getCurrentDate() {
 }
 
 
-bool	Server::identPass(int clientFd){
+bool	Server::identPass(int clientFd, std::string passRecv){
 
 	Server	&server = Server::getInstance();
 
-	char	passRecv[100] = {0};
-	ssize_t	bytesRead;
-
-	bytesRead = recv(clientFd, passRecv, sizeof(passRecv), 0);
-	if(bytesRead == -1){
-		std::cerr << "ERROR :password's recv doesn't work." << std::endl;
-		return false;
-	}
-
-	std::string	wholePassw(passRecv);
-	std::string	cmd(passRecv);
+	std::string	wholePassw = passRecv;
+	std::string	cmd = passRecv;
 
 	if (wholePassw.find("\r\n") != std::string::npos)
 		wholePassw = wholePassw.substr(0, wholePassw.size() - 2);
@@ -45,8 +38,10 @@ bool	Server::identPass(int clientFd){
 
 	if(cmd.compare("PASS") == 0){
 		wholePassw = wholePassw.substr(5, (wholePassw.size() - 5));
-		if(wholePassw.compare(server.getPassw()) == 0)
+		if(wholePassw.compare(server.getPassw()) == 0){
+			server.getUser(clientFd).setRegisterPassTrue();
 			return true;
+		}
 	}
 	std::ostringstream	oss;
 	oss << clientFd;
@@ -55,109 +50,86 @@ bool	Server::identPass(int clientFd){
 	return false;
 }
 
-// bool	Server::askNickname(int clientFd){
-
-// 	Server	&server = Server::getInstance();
-
-// 	char	cmdNickname[100] = {0};
-// 	ssize_t	bytesRead;
-
-// 	bytesRead = recv(clientFd, cmdNickname, sizeof(cmdNickname), 0);
-// 	if(bytesRead == -1){
-// 		std::cerr << "ERROR : nickname's recv doesn't work." << std::endl;
-// 		return false;
-// 	}
-
-// 	std::string	tmp(cmdNickname);
-// 	if (tmp.find("\r\n") != std::string::npos)
-// 		tmp = tmp.substr(0, tmp.size() - 2);
-// 	if (tmp.find("\n") != std::string::npos)
-// 		tmp = tmp.substr(0, tmp.size() - 1);
-// 	std::string	wholeCmd;
-// 	std::string	cmd = tmp;
-// 	std::string	nickname;
-
-// 	if(cmd.empty() == false && cmd.size() > 5)
-// 		cmd = cmd.substr(0, 4);
-// 	if(cmd.compare("NICK") == 0){
-// 		nickname = tmp.substr(5, tmp.size() - 5);
-// 		server.getUser(clientFd).setNickname(nickname);
-// 	} else {
-// 		return false;
-// 	}
-// 	wholeCmd = ":server_pika NICK " + nickname;
-// 	wholeCmd.append("\r\n");
-
-// 	// send(clientFd, wholeCmd.c_str(), wholeCmd.size(), 0);
-// 	return true;
-// }
-
-// bool	Server::askUser(int clientFd){
-
-// 	char cmdUser[100] = {0};
-// 	ssize_t bytesRead = recv(clientFd, cmdUser, sizeof(cmdUser), 0);
-// 	if (bytesRead == -1) {
-// 		std::cerr << "ERROR : USER command recv failed." << std::endl;
-// 		return false;
-// 	}
-
-// 	std::string cmd(cmdUser);
-// 	std::string userInfo(cmdUser);
-
-// 	if (!cmd.empty() && cmd.size() > 5)
-// 		cmd = cmd.substr(0, 4);
-// 	if (cmd.compare("USER") == 0){
-// 		userInfo = userInfo.substr(5, userInfo.size() - 5);
-// 		userInfo = ":server_pika USER " + userInfo + "\r\n";
-// 		send(clientFd, userInfo.c_str(), userInfo.size(), 0);
-// 		return true;
-// 	}
-// 	else {
-// 		std::cerr << "ERROR: Expected USER command." << std::endl;
-// 		return false;
-// 	}
-// }
-
-// bool	Server::verifCap(int clientFd){
-
-// 	char	cmdCap[100] = {0};
-// 	ssize_t	bytesRead;
-// 	// std::string	welcome;
-
-// 	bytesRead = recv(clientFd, cmdCap, sizeof(cmdCap), 0);
-// 	if(bytesRead == -1){
-// 		std::cerr << "ERROR : CAP's recv doesn't work." << std::endl;
-// 		return false;
-// 	}
-
-// 	std::string wholeCmd(cmdCap);
-// 	std::string cmd(cmdCap);
-// 	std::string capInfo(cmdCap);
-
-// 	if (!cmd.empty() && cmd.size() > 4)
-// 		cmd = cmd.substr(0, 3);
-
-// 	if (cmd.compare("CAP") != 0){
-// 		std::cerr << "ERROR: Expected CAP command." << std::endl;
-// 		return false;
-// 	}
-// 	return true;
-// }
-
-bool	Server::identification(int clientFd){
+bool	Server::askNickname(int clientFd, std::string input){
 
 	Server	&server = Server::getInstance();
-	std::string	welcome;
 
-	// if(verifCap(clientFd) == false)
-	// 	return false;
-	// if(identPass(clientFd) == false)
-	// 	return false;
-	// if(askNickname(clientFd) == false)
-	// 	return false;
-	// if(askUser(clientFd) == false)
-	// 	return false;
+	std::string	tmp = input;
+	if (tmp.find("\r\n") != std::string::npos)
+		tmp = tmp.substr(0, tmp.size() - 2);
+	if (tmp.find("\n") != std::string::npos)
+		tmp = tmp.substr(0, tmp.size() - 1);
+	std::string	wholeCmd;
+	std::string	cmd = tmp;
+	std::string	nickname;
 
+	if(cmd.empty() == false && cmd.size() > 5)
+		cmd = cmd.substr(0, 4);
+	if(cmd.compare("NICK") == 0){
+		nickname = tmp.substr(5, tmp.size() - 5);
+		server.getUser(clientFd).setNickname(nickname);
+	} else {
+		return false;
+	}
+	wholeCmd = ":server_pika NICK " + nickname;
+	wholeCmd.append("\r\n");
+
+	send(clientFd, wholeCmd.c_str(), wholeCmd.size(), 0);
+	server.getUser(clientFd).setRegisterNickTrue();
+	return true;
+}
+
+bool	Server::askUser(int clientFd, std::string input){
+
+	Server	&server = Server::getInstance();
+
+	std::string cmd = input;
+	std::string userInfo = input;
+
+	if (!cmd.empty() && cmd.size() > 5)
+		cmd = cmd.substr(0, 4);
+	if (cmd.compare("USER") == 0){
+		userInfo = userInfo.substr(5, userInfo.size() - 5);
+		userInfo = ":server_pika USER " + userInfo + "\r\n";
+		send(clientFd, userInfo.c_str(), userInfo.size(), 0);
+		server.getUser(clientFd).setRegisterUserTrue();
+		return true;
+	}
+	else {
+		std::cerr << "ERROR: Expected USER command." << std::endl;
+		return false;
+	}
+}
+
+bool	Server::verifCap(int clientFd, std::string input){
+
+	Server	&server = Server::getInstance();
+
+	std::string wholeCmd = input;
+	std::string cmd = input;
+	std::string capInfo = input;
+
+	if (!cmd.empty() && cmd.size() > 4)
+		cmd = cmd.substr(0, 3);
+
+	if (cmd.compare("CAP") != 0){
+		std::cerr << "ERROR: Expected CAP command." << std::endl;
+		return false;
+	}
+	server.getUser(clientFd).setRegisterCapTrue();
+	return true;
+}
+
+
+// bool	Server::cutInThree(int clientFd, std::string input){
+
+
+// }
+
+
+void	Server::sendCap(int clientFd){
+
+	Server	&server = Server::getInstance();
 
 	std::ostringstream	oss;
 	oss << clientFd;
@@ -171,6 +143,78 @@ bool	Server::identification(int clientFd){
 	send(clientFd, RPL_MOTDSTART(stringFd, server.getNameServer()).c_str(), RPL_MOTDSTART(stringFd, server.getNameServer()).size(), 0);
 	send(clientFd, RPL_MOTD(stringFd, "Hello here is the message of the day").c_str(), RPL_MOTD(stringFd, "Hello here is the message of the day").size(), 0);
 	send(clientFd, RPL_ENDOFMOTD(stringFd).c_str(), RPL_ENDOFMOTD(stringFd).size(), 0);
+}
+
+
+bool	Server::identification(int clientFd, std::string input){
+
+	Server	&server = Server::getInstance();
+
+	//handle NC
+	if(input.find("\r\n") == std::string::npos){
+		if(server.getUser(clientFd).getRegisterCap() != true){
+			if(verifCap(clientFd, input) == false){
+				close(clientFd);
+				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+				deleteUser(clientFd);
+			}
+		}
+		else if(server.getUser(clientFd).getRegisterPass() != true && server.getUser(clientFd).getRegisterCap() == true){
+			if(identPass(clientFd, input) == false){
+				close(clientFd);
+				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+				deleteUser(clientFd);
+			}
+		}
+		else if(server.getUser(clientFd).getRegisterNick() != true && server.getUser(clientFd).getRegisterPass() == true){
+			if(askNickname(clientFd, input) == false){
+				close(clientFd);
+				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+				deleteUser(clientFd);
+			}
+		}
+		else if(server.getUser(clientFd).getRegisterUSer() != true && server.getUser(clientFd).getRegisterNick() == true){
+			if(askUser(clientFd, input) == false){
+				close(clientFd);
+				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+				deleteUser(clientFd);
+			}
+			sendCap(clientFd);
+		}
+	}//handle IRSSI
+	else{
+		if(server.getUser(clientFd).getRegisterCap() != true){
+			if(verifCap(clientFd, input) == false){
+				close(clientFd);
+				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+				deleteUser(clientFd);
+			}
+		}
+		else if(server.getUser(clientFd).getRegisterPass() != true && server.getUser(clientFd).getRegisterCap() == true){
+			if(identPass(clientFd, input.substr(0, input.find("\r\n"))) == false){
+				close(clientFd);
+				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+				deleteUser(clientFd);
+				return false;
+			}
+			std::string	cut = input.substr(input.find("\r\n") + 2, input.size() - input.find("\r\n") + 2);
+			if(askNickname(clientFd, cut.substr(0, cut.find("\r\n"))) == false){
+				close(clientFd);
+				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+				deleteUser(clientFd);
+				return false;
+			}
+			cut = cut.substr(cut.find("\r\n") + 2, cut.size() - cut.find("\r\n") + 2);
+			if(askUser(clientFd, cut.substr(0, cut.find("\r\n"))) == false){
+				close(clientFd);
+				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+				deleteUser(clientFd);
+				return false;
+			}
+			sendCap(clientFd);
+		}
+
+	}
 
 	return true;
 }
