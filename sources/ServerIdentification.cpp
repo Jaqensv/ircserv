@@ -20,7 +20,7 @@ std::string Server::getCurrentDate() {
 }
 
 
-bool	Server::identPass(int clientFd, std::string passRecv){
+bool	Server::identPass(int clientFd, std::string passRecv, std::string &inputBis){
 
 	Server	&server = Server::getInstance();
 
@@ -40,6 +40,7 @@ bool	Server::identPass(int clientFd, std::string passRecv){
 		wholePassw = wholePassw.substr(5, (wholePassw.size() - 5));
 		if(wholePassw.compare(server.getPassw()) == 0){
 			server.getUser(clientFd).setRegisterPassTrue();
+			inputBis = inputBis.substr(inputBis.find("\r\n") + 2, inputBis.size() - inputBis.find("\r\n") + 2);
 			return true;
 		}
 	}
@@ -50,7 +51,7 @@ bool	Server::identPass(int clientFd, std::string passRecv){
 	return false;
 }
 
-bool	Server::askNickname(int clientFd, std::string input){
+bool	Server::askNickname(int clientFd, std::string input, std::string &inputBis){
 
 	Server	&server = Server::getInstance();
 
@@ -76,39 +77,16 @@ bool	Server::askNickname(int clientFd, std::string input){
 
 	send(clientFd, wholeCmd.c_str(), wholeCmd.size(), 0);
 	server.getUser(clientFd).setRegisterNickTrue();
+	inputBis = inputBis.substr(inputBis.find("\r\n") + 2, inputBis.size() - inputBis.find("\r\n") + 2);
 	return true;
 }
 
-bool	Server::askUser(int clientFd, std::string input){
+bool	Server::askUser(int clientFd, std::string input, std::string &inputBis){
 
 	Server	&server = Server::getInstance();
 
 	std::string cmd = input;
 	std::string userInfo = input;
-
-
-
-
-	// if(input.empty() == true){
-	// 	char hostname[1024];
-	// 	memset(hostname, 0, sizeof(hostname));
-	// 	if (gethostname(hostname, sizeof(hostname)) == 0) {
-	// 		std::string	userName = hostname;
-	// 		std::string	wholeInfo = ":server_pika USER " + userName + "\r\n";
-	// 		send(clientFd, wholeInfo.c_str(), wholeInfo.size(), 0);
-	// 		server.getUser(clientFd).setRegisterUserTrue();
-	// 		return true;
-	// 	}
-	// 	else{
-	// 		std::cerr << "ERROR: gethostname doesn't work." << std::endl;
-	// 		return false;
-	// 	}
-	// }
-
-
-
-
-
 
 	if (!cmd.empty() && cmd.size() > 5)
 		cmd = cmd.substr(0, 4);
@@ -117,6 +95,7 @@ bool	Server::askUser(int clientFd, std::string input){
 		userInfo = ":server_pika USER " + userInfo + "\r\n";
 		send(clientFd, userInfo.c_str(), userInfo.size(), 0);
 		server.getUser(clientFd).setRegisterUserTrue();
+		inputBis = inputBis.substr(inputBis.find("\r\n") + 2, inputBis.size() - inputBis.find("\r\n") + 2);
 		return true;
 	}
 	else {
@@ -125,7 +104,7 @@ bool	Server::askUser(int clientFd, std::string input){
 	}
 }
 
-bool	Server::verifCap(int clientFd, std::string input){
+bool	Server::verifCap(int clientFd, std::string input, std::string &inputBis){
 
 	Server	&server = Server::getInstance();
 
@@ -141,6 +120,7 @@ bool	Server::verifCap(int clientFd, std::string input){
 		return false;
 	}
 	server.getUser(clientFd).setRegisterCapTrue();
+	inputBis = inputBis.substr(inputBis.find("\r\n") + 2, inputBis.size() - inputBis.find("\r\n") + 2);
 	return true;
 }
 
@@ -171,28 +151,28 @@ bool	Server::identification(int clientFd, std::string input){
 	//handle NC
 	if(input.find("\r\n") == std::string::npos){
 		if(server.getUser(clientFd).getRegisterCap() != true){
-			if(verifCap(clientFd, input) == false){
+			if(verifCap(clientFd, input, input) == false){
 				close(clientFd);
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 				deleteUser(clientFd);
 			}
 		}
 		else if(server.getUser(clientFd).getRegisterPass() != true && server.getUser(clientFd).getRegisterCap() == true){
-			if(identPass(clientFd, input) == false){
+			if(identPass(clientFd, input, input) == false){
 				close(clientFd);
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 				deleteUser(clientFd);
 			}
 		}
 		else if(server.getUser(clientFd).getRegisterNick() != true && server.getUser(clientFd).getRegisterPass() == true){
-			if(askNickname(clientFd, input) == false){
+			if(askNickname(clientFd, input, input) == false){
 				close(clientFd);
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 				deleteUser(clientFd);
 			}
 		}
 		else if(server.getUser(clientFd).getRegisterUser() != true && server.getUser(clientFd).getRegisterNick() == true){
-			if(askUser(clientFd, input) == false){
+			if(askUser(clientFd, input, input) == false){
 				close(clientFd);
 				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
 				deleteUser(clientFd);
@@ -200,51 +180,51 @@ bool	Server::identification(int clientFd, std::string input){
 			sendCap(clientFd);
 		}
 	}//handle IRSSI
-	else{
+	else if(server.getUser(clientFd).getRegisterCap() == false || server.getUser(clientFd).getRegisterPass() == false
+				|| server.getUser(clientFd).getRegisterNick() == false || server.getUser(clientFd).getRegisterUser() == false){
 		std::cout << "test : " << input << std::endl;
-		if(server.getUser(clientFd).getRegisterCap() != true){
-			if(verifCap(clientFd, input) == false){
-				close(clientFd);
-				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-				deleteUser(clientFd);
-				return false;
-			}
+		if(server.getUser(clientFd).getRegisterCap() == false && verifCap(clientFd, input.substr(0, input.find("\r\n")), input) == false){
+			close(clientFd);
+			epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+			deleteUser(clientFd);
+			return false;
 		}
-		else if(server.getUser(clientFd).getRegisterPass() != true && server.getUser(clientFd).getRegisterCap() == true){
-			if(identPass(clientFd, input.substr(0, input.find("\r\n"))) == false){
-				close(clientFd);
-				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-				deleteUser(clientFd);
-				return false;
-			}
-			std::string	cut = input.substr(input.find("\r\n") + 2, input.size() - input.find("\r\n") + 2);
-			if(askNickname(clientFd, cut.substr(0, cut.find("\r\n"))) == false){
-				close(clientFd);
-				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-				deleteUser(clientFd);
-				return false;
-			}
-			cut = cut.substr(cut.find("\r\n") + 2, cut.size() - cut.find("\r\n") + 2);
-			if(cut.substr(0, cut.find("\r\n")).empty())
-				return true;
-			if(askUser(clientFd, cut.substr(0, cut.find("\r\n"))) == false){
-				close(clientFd);
-				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-				deleteUser(clientFd);
-				return false;
-			}
+		if(input.empty() == true)
+			return true;
+		std::cout << "test2 : " << input << std::endl;
+		if(input.empty() == false && server.getUser(clientFd).getRegisterPass() == false
+				&& server.getUser(clientFd).getRegisterCap() == true
+					&& identPass(clientFd, input.substr(0, input.find("\r\n")), input) == false){
+			close(clientFd);
+			epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+			deleteUser(clientFd);
+			return false;
+		}
+		if(input.empty() == true)
+			return true;
+		std::cout << "test3 : " << input << std::endl;
+		if(server.getUser(clientFd).getRegisterPass() == true
+				&& server.getUser(clientFd).getRegisterNick() == false
+					&& askNickname(clientFd, input.substr(0, input.find("\r\n")), input) == false){
+			close(clientFd);
+			epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+			deleteUser(clientFd);
+			return false;
+		}
+		if(input.empty() == true)
+			return true;
+		std::cout << "test4 : " << input << std::endl;
+		if(input.empty() == false && server.getUser(clientFd).getRegisterNick() == true
+				&& server.getUser(clientFd).getRegisterUser() == false
+					&& askUser(clientFd, input.substr(0, input.find("\r\n")), input) == false){
+			close(clientFd);
+			epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+			deleteUser(clientFd);
+			return false;
+		}
+		else if (server.getUser(clientFd).getRegisterUser() == true)
 			sendCap(clientFd);
-		}
-		else if(server.getUser(clientFd).getRegisterPass() == true && server.getUser(clientFd).getRegisterCap() == true
-					&& server.getUser(clientFd).getRegisterNick() == true && server.getUser(clientFd).getRegisterUser() == false){
-			if(askUser(clientFd, input) == false){
-				close(clientFd);
-				epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
-				deleteUser(clientFd);
-				return false;
-			}
-			sendCap(clientFd);
-		}
+		std::cout << "test5 : " << input << std::endl;
 	}
 	return true;
 }
