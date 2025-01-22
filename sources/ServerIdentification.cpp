@@ -134,13 +134,13 @@ void	Server::sendCap(int clientFd){
 	std::string	stringFd = oss.str();
 	std::string	date = getCurrentDate();
 	send(clientFd, RPL_WELCOME(stringFd, server.getUser(clientFd).getNickname()).c_str(), RPL_WELCOME(stringFd, server.getUser(clientFd).getNickname()).size(), 0);
-	send(clientFd, RPL_YOURHOST(stringFd, server.getNameServer(), server.getVersion()).c_str(), RPL_YOURHOST(stringFd, server.getNameServer(), server.getVersion()).size(), 0);
-	send(clientFd, RPL_CREATED(stringFd, date).c_str(), RPL_CREATED(stringFd, date).size(), 0);
-	send(clientFd, RPL_MYINFO(stringFd, server.getNameServer(), server.getVersion(), "io", "kost", "k").c_str(), RPL_MYINFO(stringFd, server.getNameServer(), server.getVersion(), "io", "kost", "k").size(), 0);
-	send(clientFd, RPL_ISUPPORT(stringFd, "CHANNELLEN=32 NICKLEN=9 TOPICLEN=150").c_str(), RPL_ISUPPORT(stringFd, "CHANNELLEN=32 NICKLEN=9 TOPICLEN=150").size(), 0);
-	send(clientFd, RPL_MOTDSTART(stringFd, server.getNameServer()).c_str(), RPL_MOTDSTART(stringFd, server.getNameServer()).size(), 0);
-	send(clientFd, RPL_MOTD(stringFd, "Hello here is the message of the day").c_str(), RPL_MOTD(stringFd, "Hello here is the message of the day").size(), 0);
-	send(clientFd, RPL_ENDOFMOTD(stringFd).c_str(), RPL_ENDOFMOTD(stringFd).size(), 0);
+	send(clientFd, RPL_YOURHOST(server.getUser(clientFd).getNickname(), server.getNameServer(), server.getVersion()).c_str(), RPL_YOURHOST(server.getUser(clientFd).getNickname(), server.getNameServer(), server.getVersion()).size(), 0);
+	send(clientFd, RPL_CREATED(server.getUser(clientFd).getNickname(), date).c_str(), RPL_CREATED(stringFd, date).size(), 0);
+	send(clientFd, RPL_MYINFO(server.getUser(clientFd).getNickname(), server.getNameServer(), server.getVersion(), "io", "kost", "k").c_str(), RPL_MYINFO(server.getUser(clientFd).getNickname(), server.getNameServer(), server.getVersion(), "io", "kost", "k").size(), 0);
+	send(clientFd, RPL_ISUPPORT(server.getUser(clientFd).getNickname(), "CHANNELLEN=32 NICKLEN=9 TOPICLEN=150").c_str(), RPL_ISUPPORT(server.getUser(clientFd).getNickname(), "CHANNELLEN=32 NICKLEN=9 TOPICLEN=150").size(), 0);
+	send(clientFd, RPL_MOTDSTART(server.getUser(clientFd).getNickname(), server.getNameServer()).c_str(), RPL_MOTDSTART(server.getUser(clientFd).getNickname(), server.getNameServer()).size(), 0);
+	send(clientFd, RPL_MOTD(server.getUser(clientFd).getNickname(), "Hello here is the message of the day").c_str(), RPL_MOTD(server.getUser(clientFd).getNickname(), "Hello here is the message of the day").size(), 0);
+	send(clientFd, RPL_ENDOFMOTD(server.getUser(clientFd).getNickname()).c_str(), RPL_ENDOFMOTD(server.getUser(clientFd).getNickname()).size(), 0);
 }
 
 
