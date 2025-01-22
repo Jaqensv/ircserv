@@ -83,10 +83,10 @@ class Server{
 
 	//Identification functions
 		bool		identification(int clientFd, std::string input);
-		bool		identPass(int clientFd, std::string input);
-		bool		askNickname(int clientFd, std::string input);
-		bool		askUser(int clientFd, std::string input);
-		bool		verifCap(int clientFd, std::string input);
+		bool		identPass(int clientFd, std::string input, std::string &inputBis);
+		bool		askNickname(int clientFd, std::string input, std::string &inputBis);
+		bool		askUser(int clientFd, std::string input, std::string &inputBis);
+		bool		verifCap(int clientFd, std::string input, std::string &inputBis);
 		std::string getCurrentDate();
 		void		sendCap(int clientFd);
 
