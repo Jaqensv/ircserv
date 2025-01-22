@@ -182,7 +182,6 @@ bool	Server::identification(int clientFd, std::string input){
 	}//handle IRSSI
 	else if(server.getUser(clientFd).getRegisterCap() == false || server.getUser(clientFd).getRegisterPass() == false
 				|| server.getUser(clientFd).getRegisterNick() == false || server.getUser(clientFd).getRegisterUser() == false){
-		std::cout << "test : " << input << std::endl;
 		if(server.getUser(clientFd).getRegisterCap() == false && verifCap(clientFd, input.substr(0, input.find("\r\n")), input) == false){
 			close(clientFd);
 			epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
@@ -191,7 +190,6 @@ bool	Server::identification(int clientFd, std::string input){
 		}
 		if(input.empty() == true)
 			return true;
-		std::cout << "test2 : " << input << std::endl;
 		if(input.empty() == false && server.getUser(clientFd).getRegisterPass() == false
 				&& server.getUser(clientFd).getRegisterCap() == true
 					&& identPass(clientFd, input.substr(0, input.find("\r\n")), input) == false){
@@ -202,7 +200,6 @@ bool	Server::identification(int clientFd, std::string input){
 		}
 		if(input.empty() == true)
 			return true;
-		std::cout << "test3 : " << input << std::endl;
 		if(server.getUser(clientFd).getRegisterPass() == true
 				&& server.getUser(clientFd).getRegisterNick() == false
 					&& askNickname(clientFd, input.substr(0, input.find("\r\n")), input) == false){
@@ -213,7 +210,6 @@ bool	Server::identification(int clientFd, std::string input){
 		}
 		if(input.empty() == true)
 			return true;
-		std::cout << "test4 : " << input << std::endl;
 		if(input.empty() == false && server.getUser(clientFd).getRegisterNick() == true
 				&& server.getUser(clientFd).getRegisterUser() == false
 					&& askUser(clientFd, input.substr(0, input.find("\r\n")), input) == false){
@@ -224,7 +220,6 @@ bool	Server::identification(int clientFd, std::string input){
 		}
 		else if (server.getUser(clientFd).getRegisterUser() == true)
 			sendCap(clientFd);
-		std::cout << "test5 : " << input << std::endl;
 	}
 	return true;
 }
