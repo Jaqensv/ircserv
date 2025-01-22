@@ -1,15 +1,17 @@
 #include "Server.hpp"
 #include <string>
+#include <../includes/rpl.hpp>
 
 //if params[1] doesn't exist  RPL_CHANNELMODEIS (324)
 bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd) {
 	Server	&server = Server::getInstance();
 	std::string	&chanName = params[0];
+	std::string	rplToSend = "";
 
 	if (chanName[0] == '#') {
 		chanName.erase(0, 1);
 	} else {
-		std::cout << "Command Mode allow only channel in target with '#' prefix" << std::endl;
+		send(myfd, ERR_NOSUCHCHANNEL(server.getUser(myfd).getNickname(), chanName).c_str(), ERR_NOSUCHCHANNEL(server.getUser(myfd).getNickname(), chanName).size(), 0);
 		return false;
 	}
 	size_t pos = chanName.find("\r\n");
@@ -17,27 +19,36 @@ bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd)
 		chanName = chanName.substr(0, pos);
 	if (isChannel(chanName) == false) {
 		// ERR_NOSUCHCHANNEL (403)
-		std::cerr << "ERROR: Channel doesn't exist" << std::endl;
+		send(myfd, ERR_NOSUCHCHANNEL(server.getUser(myfd).getNickname(), chanName).c_str(), ERR_NOSUCHCHANNEL(server.getUser(myfd).getNickname(), chanName).size(), 0);
 		return false;
 	}
 	Channel	&chan = getChannel(chanName);
 	if (chan.isOperator(myfd) == false) {
-		std::cerr << "ERROR: You are not an operator" << std::endl;
+		send(myfd, ERR_CHANOPRIVSNEEDED(server.getUser(myfd).getNickname(), chanName).c_str(), ERR_CHANOPRIVSNEEDED(server.getUser(myfd).getNickname(), chanName).size(), 0);
 		return false;
 	}
 	if (params.size() == 1) {
-		std::cout << "ERROR: not enougth arguments" << std::endl;
+		std::string mode = "";
+		if (chan.getIsTopic())
+			mode += "t";
+		if (chan.isInvOnly())
+			mode += "i";
+		if (chan.isKeyMode())
+			mode += "k";
+		if (chan.isLimitMode())
+			mode += "l";
+		send(myfd, RPL_CHANNELMODEIS(server.getUser(myfd).getNickname(), chanName, mode).c_str(), RPL_CHANNELMODEIS(server.getUser(myfd).getNickname(), chanName, mode).size(), 0);
 		return true;
 	}
 	pos = params[1].find("\r\n");
 	if (pos != std::string::npos)
 		params[1] = params[1].substr(0, pos);
 	if (params[1][0] != '+' && params[1][0] != '-') {
-		std::cerr << "ERROR: Mode must start with '+' or '-'" << std::endl;
+		send(myfd, ERR_UMODEUNKNOWNFLAG(server.getUser(myfd).getNickname()).c_str(), ERR_UMODEUNKNOWNFLAG(server.getUser(myfd).getNickname()).size(), 0);
 		return false;
 	}
 	if (params[1].size() != 2) {
-		std::cout << "ERROR Bad format: /MODE <#channel> <- or + 'mode letter'>" << std::endl;
+		send(myfd, ERR_UMODEUNKNOWNFLAG(server.getUser(myfd).getNickname()).c_str(), ERR_UMODEUNKNOWNFLAG(server.getUser(myfd).getNickname()).size(), 0);
 		return true;
 	}
 	bool isAdd = false;
@@ -68,16 +79,18 @@ bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd)
 		if (isAdd) {
 			if (chan.isOperator(userTarget.getFd())) {
 				std::cout << params[2] << " is already operator" << std::endl;
+				return false;
 			} else {
 				chan.addOperator(userTarget.getFd());
-				std::cout << params[2] << " has been added to operator" << std::endl;
+				rplToSend = params[2] + " has been added to operator";
 			}
 		} else {
 			if (!chan.isOperator(userTarget.getFd())) {
 				std::cout << params[2] << " is not operator" << std::endl;
+				return false;
 			} else {
 				chan.revokeOperator(myfd, userTarget.getFd());
-				std::cout << params[2] << " has been revoked from operator" << std::endl;
+				rplToSend = params[2] + " has been revoked from operator";
 			}
 		}
 	}
@@ -94,6 +107,11 @@ bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd)
 		} else {
 			chan.switchLimitMode();
 		}
+	} else {
+		send(myfd, ERR_UMODEUNKNOWNFLAG(server.getUser(myfd).getNickname()).c_str(), ERR_UMODEUNKNOWNFLAG(server.getUser(myfd).getNickname()).size(), 0);
+		return false;
 	}
+	send(myfd, RPL_CHANNELMODEIS(server.getUser(myfd).getNickname(), chanName, params[1]).c_str(), RPL_CHANNELMODEIS(server.getUser(myfd).getNickname(), chanName, params[1]).size(), 0);
+
 	return true;
 }

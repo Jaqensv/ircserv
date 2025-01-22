@@ -325,7 +325,7 @@ void	Server::run(){
 					if (isChannel(server._arrayParams.params[0]))
 						getChannel(server._arrayParams.params[0]).kick(server, clientFd, server._arrayParams.params[1]);
 				} else if (server._arrayParams.command == "INVITE")
-					invite(server._arrayParams.params[0], server._arrayParams.params[1]);
+					invite(server._arrayParams.params[0], server._arrayParams.params[1], clientFd);
 				else if (server._arrayParams.command == "TOPIC") {
 					parseTopic(server, clientFd);
 					//channelTopicTester(server._arrayParams.params[0]);

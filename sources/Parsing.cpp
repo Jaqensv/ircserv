@@ -3,9 +3,10 @@
 #include <cstdlib>
 #include "../includes/Server.hpp"
 #include "../includes/display.hpp"
-
+#include "../includes/rpl.hpp"
 
 void	Server::whoParsing(std::vector<std::string> &params, unsigned int myfd) {
+	Server	&server = Server::getInstance();
 	if (params[0][0] == '#')
 		params[0].erase(0, 1);
 	size_t pos = params[0].find("\r\n");
@@ -17,16 +18,16 @@ void	Server::whoParsing(std::vector<std::string> &params, unsigned int myfd) {
 			std::cout << "ERROR : User is not on that channel." << std::endl;
 			return;
 		}
-		std::map<int, User*>::iterator it = chan.getUsers().begin();
-		std::cout << Display::GREEN << "Users on channel " << chan.getName() << " :" << std::endl;
-		for (; it != chan.getUsers().end(); ++it) {
-			// si l'utilisateur est un operateur ajouter un @ devant son nickname
-			if (chan.isOperator(it->first))
-				std::cout << "@" << it->second->getNickname() << std::endl;
+		//concatenate the nickname of the users in the channel
+		std::string list_of_nicks = "";
+		for (std::map<int, User*>::iterator it = chan.getUsers().begin(); it != chan.getUsers().end(); it++) {
+			if (chan.isOperator(it->second->getFd()))
+				list_of_nicks += "@" + it->second->getNickname() + " ";
 			else
-				std::cout << it->second->getNickname() << std::endl;
+				list_of_nicks += it->second->getNickname() + " ";
 		}
-		std::cout << "End of list" << Display::RESET << std::endl;
+		send(myfd, RPL_NAMREPLY(server.getUser(myfd).getNickname(), chan.getName(), list_of_nicks).c_str(), RPL_NAMREPLY(server.getUser(myfd).getNickname(), chan.getName(), list_of_nicks).size(), 0);
+		send(myfd, RPL_ENDOFNAMES(server.getUser(myfd).getNickname(), chan.getName()).c_str(), RPL_ENDOFNAMES(server.getUser(myfd).getNickname(), chan.getName()).size(), 0);
 	}
 }
 

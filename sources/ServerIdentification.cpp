@@ -2,6 +2,7 @@
 #include <string>
 #include <unistd.h>
 #include "Server.hpp"
+#include "rpl.hpp"
 
 bool	Server::identPass(int clientFd){
 
@@ -143,8 +144,11 @@ bool	Server::identification(int clientFd){
 	// while(askUser(clientFd) == false)
 	// 	continue;
 
-	welcome = ":server_pika 001 " + server.getUser(clientFd).getNickname() + " :Welcome to the Pika network\r\n";
-	send(clientFd, welcome.c_str(), welcome.size(), 0);
+
+	std::ostringstream oss;
+	oss << clientFd;
+	std::string fd = oss.str();
+	send(clientFd, RPL_WELCOME(fd, server.getUser(clientFd).getNickname()).c_str(), RPL_WELCOME(fd, server.getUser(clientFd).getNickname()).size(), 0);
 	welcome = ":server_pika 002 " + server.getUser(clientFd).getNickname() + " :Your host is server_pika, running version 1.0\r\n";
 	send(clientFd, welcome.c_str(), welcome.size(), 0);
 	welcome = ":server_pika 003 " + server.getUser(clientFd).getNickname() + " :This server was created today\r\n";
