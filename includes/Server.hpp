@@ -72,7 +72,7 @@ class Server{
 		void	initEpoll();
 		void	run();
 		void	join(int clientFd);
-		void	invite(std::string nickname, std::string channel);
+		void	invite(std::string nickname, std::string channel, int clientFd);
 		void	parseTopic(Server &server, int clientFd);
 		void	whoParsing(std::vector<std::string> &params, unsigned int myfd);
 		int		fillServinfo();

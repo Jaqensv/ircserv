@@ -2,53 +2,50 @@
 #include <string>
 #include "../includes/Server.hpp"
 #include "../includes/Channel.hpp"
+#include "../includes/rpl.hpp"
 
 void	Server::join(int clientFd){
 
 	Server	&server = Server::getInstance();
 	if (server._arrayParams.params.empty())
 	{
-		std::cout << "ERROR: No channel specified" << std::endl;
+		send(clientFd, ERR_NEEDMOREPARAMS(server.getUser(clientFd).getNickname(), "JOIN").c_str(), ERR_NEEDMOREPARAMS(server.getUser(clientFd).getNickname(), "JOIN").size(), 0);
 		return;
 	}
-	if (server._arrayParams.params[0][0] != '#')
+	if (server._arrayParams.params[0][0] == '#')
 	{
-		std::cout << "ERROR CHAN : First param after command needs to be a #channel." << std::endl;
-		return;
+		server._arrayParams.params[0].erase(0, 1);
 	}
-	server._arrayParams.params[0].erase(0, 1);
 	size_t pos = server._arrayParams.params[0].find("\r\n");
 	if (pos != std::string::npos)
 		server._arrayParams.params[0] = server._arrayParams.params[0].substr(0, pos);
 	if (isChannel(server._arrayParams.params[0])) {
 		Channel &chan = getChannel(server._arrayParams.params[0]);
 		if (chan.isInvOnly() == true) {
-
 			if (server.getChannel(server._arrayParams.params[0]).isInvited(clientFd) == false) {
-				std::cout << "ERROR :channel is invite only." << std::endl;
+				send(clientFd, ERR_INVITEONLYCHAN(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).c_str(), ERR_INVITEONLYCHAN(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).size(), 0);
 				return;
 			}
 		}
 		if (chan.isLimitMode() == true) {
 			if (chan.getUsers().size() == chan.getLimit()) {
-				std::cout << "ERROR : channel is full." << std::endl;
+				send(clientFd, ERR_CHANNELISFULL(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).c_str(), ERR_CHANNELISFULL(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).size(), 0);
 				return;
 			}
 		}
 		if (chan.isKeyMode() == true) {
 			if (server._arrayParams.params.size() == 2) {
 				if (server._arrayParams.params[1] != chan.getKey()) {
-					std::cout << "ERROR : wrong password." << std::endl;
+					send(clientFd, ERR_BADCHANNELKEY(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).c_str(), ERR_BADCHANNELKEY(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).size(), 0);
 					return;
 				}
 			}
 			else {
-				std::cout << "ERROR : need password." << std::endl;
+				send(clientFd, ERR_BADCHANNELKEY(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).c_str(), ERR_BADCHANNELKEY(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).size(), 0);
 				return;
 			}
 		}
 		if (chan.getUser(clientFd) != NULL) {
-			std::cout << "ERROR :User is already on that channel." << std::endl;
 			return;
 		}
 		chan.addUser(server, clientFd);
@@ -56,21 +53,32 @@ void	Server::join(int clientFd){
 	else {
 		createChannel(server, clientFd, server._arrayParams.params[0]);
 	}
-	std::string toSend;
-	toSend = ":server_pika 353 " + server.getUser(clientFd).getNickname() + " = #" + server._arrayParams.params[0] + " :@" + server.getUser(clientFd).getNickname() + "\r\n";
-	send(clientFd, toSend.c_str(), toSend.size(), 0);
-	toSend = ":server_pika 366 " + server.getUser(clientFd).getNickname() + " = #" + server._arrayParams.params[0] + " :End of /NAMES list.\r\n";
-	send(clientFd, toSend.c_str(), toSend.size(), 0);
+	std::ostringstream oss;
+	oss << clientFd;
+	std::string fd = oss.str();
+
+	//concatenate the nickname of the users in the channel
+	std::string list_of_nicks = "";
+	for (std::map<int, User*>::iterator it = server.getChannel(server._arrayParams.params[0]).getUsers().begin(); it != server.getChannel(server._arrayParams.params[0]).getUsers().end(); it++) {
+		if (server.getChannel(server._arrayParams.params[0]).isOperator(it->second->getFd()))
+			list_of_nicks += "@" + it->second->getNickname() + " ";
+		else
+			list_of_nicks += it->second->getNickname() + " ";
+	}
+
+	send(clientFd, RPL_JOIN(fd, server.getChannel(server._arrayParams.params[0]).getName()).c_str(), RPL_JOIN(fd, server.getChannel(server._arrayParams.params[0]).getName()).size(), 0);
+	send(clientFd, RPL_NAMREPLY(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName(), list_of_nicks).c_str(), RPL_NAMREPLY(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName(), list_of_nicks).size(), 0);
+	send(clientFd, RPL_ENDOFNAMES(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).c_str(), RPL_ENDOFNAMES(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).size(), 0);
 	server.getUser(clientFd).getMyChannels().push_back(server._arrayParams.params[0]);
 }
 
-void	Server::invite(std::string nickname, std::string channel) {
+void	Server::invite(std::string nickname, std::string channel, int clientFd) {
 	Server	&server = Server::getInstance();
 	unsigned int user_fd = server.getTargetUserFd(nickname);
 
 	if (server.isUser(user_fd) == true) {
 		if (channel[0] != '#') {
-			std::cout << "ERROR CHAN : First param after command needs to be a #channel." << std::endl;
+			send(clientFd, ERR_NOSUCHCHANNEL(server.getUser(clientFd).getNickname(), channel).c_str(), ERR_NOSUCHCHANNEL(server.getUser(clientFd).getNickname(), channel).size(), 0);
 			return;
 		}
 		channel.erase(0, 1);
@@ -81,12 +89,13 @@ void	Server::invite(std::string nickname, std::string channel) {
 			User user = server.getUser(user_fd);
 			user.getMyChannels().push_back(channel); // a virer ???
 			server.getChannel(channel).getInvited().insert(std::make_pair(user_fd, &user));
+			send(clientFd, RPL_INVITING(server.getUser(clientFd).getNickname(), server.getUser(user_fd).getNickname(), channel).c_str(), RPL_INVITING(server.getUser(clientFd).getNickname(), server.getUser(user_fd).getNickname(), channel).size(), 0);
 		}
 		else
-			std::cout << "Error: channel " << channel << " doesn't exist" << std::endl;
+			send(clientFd, ERR_NOSUCHCHANNEL(server.getUser(clientFd).getNickname(), channel).c_str(), ERR_NOSUCHCHANNEL(server.getUser(clientFd).getNickname(), channel).size(), 0);
 	}
 	else
-		std::cout << "Error: user " << nickname << " doesn't exist" << std::endl;
+		send(clientFd, ERR_NOSUCHNICK(server.getUser(clientFd).getNickname(), nickname).c_str(), ERR_NOSUCHNICK(server.getUser(clientFd).getNickname(), nickname).size(), 0);
 }
 
 //:User is already on that channel
