@@ -17,6 +17,7 @@
 #include "../includes/Channel.hpp"
 #include "../includes/Tester.hpp"
 #include "../includes/handleInclude.hpp"
+#include "../includes/rpl.hpp"
 
 
 //Constructor
@@ -337,7 +338,10 @@ void	Server::run(){
 					if (pos != std::string::npos)
 						server._arrayParams.params[0] = server._arrayParams.params[0].substr(0, pos);
 					if (isChannel(server._arrayParams.params[0])) {
-						getChannel(server._arrayParams.params[0]).part(clientFd);
+						getChannel(server._arrayParams.params[0]).part(server, clientFd, _arrayParams.params[0]);
+					} else {
+						send(clientFd, ERR_NOSUCHNICK(server.getUser(clientFd).getNickname(), server._arrayParams.params[0]).c_str(), ERR_NOSUCHNICK(server.getUser(clientFd).getNickname(), server._arrayParams.params[0]).size(), 0);
+						std::cerr << ": No such channel" << std::endl;
 					}
 				} else if (server._arrayParams.command == "KICK") {
 					if (server._arrayParams.params[0][0] == '#')
@@ -346,7 +350,11 @@ void	Server::run(){
 					if (pos != std::string::npos)
 						server._arrayParams.params[0] = server._arrayParams.params[0].substr(0, pos);
 					if (isChannel(server._arrayParams.params[0]))
-						getChannel(server._arrayParams.params[0]).kick(server, clientFd, server._arrayParams.params[1]);
+						getChannel(server._arrayParams.params[0]).kick(server, clientFd, server._arrayParams.params[1], server._arrayParams.params[0]);
+					else {
+						send(clientFd, ERR_NOSUCHNICK(server.getUser(clientFd).getNickname(), server._arrayParams.params[0]).c_str(), ERR_NOSUCHNICK(server.getUser(clientFd).getNickname(), server._arrayParams.params[0]).size(), 0);
+						std::cerr << ": No such channel" << std::endl;
+					}
 				} else if (server._arrayParams.command == "INVITE")
 					invite(server._arrayParams.params[0], server._arrayParams.params[1], clientFd);
 				else if (server._arrayParams.command == "TOPIC") {

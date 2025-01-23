@@ -60,10 +60,10 @@
 		return _invOnly;
 	}
 
-	User*		Channel::getUser(unsigned int fd) {
+	User*		Channel::getUser(int fd) {
 		std::map<int, User*>::iterator it = _users.begin();
 		for (; it != _users.end(); ++it) {
-			if (fd == static_cast<unsigned int>(it->first)) {
+			if (fd == it->first) {
 				return it->second;
 			}
 		}

@@ -27,7 +27,7 @@ class Channel{
 		//ahans
 		User*		getOper(unsigned int fd);
 		//ahans
-		User*		getUser(unsigned int fd);
+		User*		getUser(int fd);
 		bool		isInvited(int fd);
 		bool		isKeyMode();
 		std::string	getKey();
@@ -47,8 +47,8 @@ class Channel{
 		void	removeOperator(unsigned int userFd);
 		void	removeInvited(unsigned int userFd);
 		void	addOperator(unsigned int fd);
-		void	kick(Server &server, unsigned int fd, std::string nickname);
-		void	part(unsigned int fd);
+		void	kick(Server &server, int clientFd, std::string nickname, std::string channel_name);
+		void	part(Server &server, int clientFd, std::string channel_name);
 		
 		//ahans
 		void	revokeOperator(unsigned int clientFd, unsigned int userFd);

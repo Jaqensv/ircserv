@@ -1,20 +1,22 @@
-	#include "Channel.hpp"
+	#include "../includes/Channel.hpp"
+	#include "../includes/rpl.hpp"
 
-	void 	Channel::kick(Server &server, unsigned int fd, std::string nickname) {
+	void 	Channel::kick(Server &server, int clientFd, std::string nickname, std::string channel_name) {
 		size_t pos = nickname.find("\r\n");
 		if (pos != std::string::npos)
 			nickname = nickname.substr(0, pos);
-		User* user = getUser(fd);
+		User* user = getUser(clientFd);
 		User* userTarget = getUser(server.getTargetUserFd(nickname));
 		int userTargetFd = server.getTargetUserFd(nickname);
-		std::cout << "target fd: " << userTargetFd << std::endl;
-		if (!isOperator(fd))
-			std::cout << user->getUsername() << " doesn't have the rights to kick" << std::endl;
+		if (!isOperator(clientFd))
+			send(clientFd, ERR_CHANOPRIVSNEEDED(server.getUser(clientFd).getNickname(), channel_name).c_str(), ERR_CHANOPRIVSNEEDED(server.getUser(clientFd).getNickname(), channel_name).size(), 0);
 		else {
 			if (userTarget == NULL) {
-				std::cout << "User " << nickname << " not found" << std::endl;
+				send(clientFd, ERR_USERNOTINCHANNEL(server.getUser(clientFd).getNickname(), nickname, channel_name).c_str(), ERR_USERNOTINCHANNEL(server.getUser(clientFd).getNickname(), nickname, channel_name).size(), 0);
+				std::cerr << "User " << nickname << " not found" << std::endl;
 				return;
 			}
+			send(clientFd, RPL_KICK(server.getUser(clientFd).getNickname(), channel_name, nickname).c_str(), RPL_KICK(server.getUser(clientFd).getNickname(), channel_name, nickname).size(), 0);
 			std::string message = "KICK " + _name + " " + userTarget->getNickname() + " :You have been kicked by " + user->getNickname() + "\r\n";
 			ssize_t bytesSent = send(userTarget->getFd(), message.c_str(), message.size(), 0);
 			if (bytesSent == -1) {
@@ -22,29 +24,27 @@
 				return;
 			}
 			std::cout << user->getUsername() << " has kicked " << userTarget->getUsername() << std::endl;
-			removeUser(userTarget->getFd());
-			removeInvited(userTarget->getFd());
-			revokeOperator(fd, userTarget->getFd());
+			removeUser(userTargetFd);
+			removeInvited(userTargetFd);
+			revokeOperator(clientFd, userTargetFd);
 			userTarget->setMyChannel("");
 		}
 	}
 
-	void 	Channel::part(unsigned int fd) {
+	void 	Channel::part(Server &server, int clientFd, std::string channel_name) {
+		User* user = getUser(clientFd);
 
-		User* user = getUser(fd);
-
-		if (!user) {
+		if (server.getChannel(channel_name).getUser(clientFd) == NULL) {
+			send(clientFd, ERR_NOTONCHANNEL(server.getUser(clientFd).getNickname(), channel_name).c_str(), ERR_NOTONCHANNEL(server.getUser(clientFd).getNickname(), channel_name).size(), 0);
 			std::cout << ":You're not on that channel" << std::endl;
 			return;
 		}
 		user->getMyChannels().erase(user->getMyChannels().begin() + user->findChannelIndex(user->getMyChannel()));
-		for (std::vector<std::string>::iterator it = user->getMyChannels().begin(); it != user->getMyChannels().end(); ++it) {
-			std::cout << "my channels " << *it << std::endl;
-		}
-		removeUser(user->getFd());
-		removeInvited(user->getFd());
-		removeOperator(user->getFd());
+		removeUser(clientFd);
+		removeInvited(clientFd);
+		removeOperator(clientFd);
 		user->setMyChannel("");
+		send(clientFd, RPL_PART(server.getUser(clientFd).getNickname(), channel_name).c_str(), RPL_PART(server.getUser(clientFd).getNickname(), channel_name).size(), 0);
 	}
 
 	void	Channel::setTopic(unsigned int fd, std::vector<std::string> topic) {
