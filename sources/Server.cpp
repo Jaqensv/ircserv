@@ -55,7 +55,6 @@
 		return _arrayChannel;
 	}
 
-//ahans
 Channel	&Server::getChannel(const std::string channelName){
 	std::vector<Channel*>::iterator it = _arrayChannel.begin();
 	for (; it != _arrayChannel.end(); ++it) {
@@ -66,7 +65,6 @@ Channel	&Server::getChannel(const std::string channelName){
 	return **it;
 }
 
-//ahans
 User	&Server::getUser(int fd) {
 	for (std::map<int, User*>::iterator it = this->_arrayUser.begin(); it != _arrayUser.end(); it++) {
 		if (it->first == fd)
@@ -75,7 +73,6 @@ User	&Server::getUser(int fd) {
 	return *_arrayUser.end()->second;
 }
 
-//matt
 std::map<int, User*>& Server::getUsers() {return _arrayUser;}
 
 std::string		Server::getUsername() {
@@ -98,7 +95,6 @@ unsigned int	Server::getTargetUserFd(std::string nickname) {
 	return 0;
 }
 
-//ahans
 bool	Server::isUser(int fd) {
 	std::map<int, User*>::iterator it = _arrayUser.begin();
 	for (; it != _arrayUser.end(); it++) {
@@ -207,7 +203,6 @@ void	Server::initEpoll(){
 	}
 }
 
-//ahans
 void	Server::createChannel(Server &server, unsigned int fd, std::string channel_name){
 	if (isChannel(channel_name) == true) {
 		std::cerr << "ERROR: Channel already exists" << std::endl;
@@ -369,6 +364,9 @@ void	Server::run(){
 					whoParsing(server._arrayParams.params, clientFd);
 				else if (server._arrayParams.command == "PRIVMSG") {
 					getUser(clientFd).PRIVMSG(server._arrayParams.params, clientFd, server);
+				}
+				else if(server._arrayParams.command == "QUIT"){
+					quit(clientFd);
 				}
 				else if(server._arrayParams.command[0] == '/'){
 					std::cout << server._arrayParams.command << " is not a valide command." << std::endl;

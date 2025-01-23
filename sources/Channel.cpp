@@ -21,7 +21,6 @@
 	std::map<int, User*>&	Channel::getInvited() {return _invited;}
 	bool					Channel::getIsTopic(){return _canTopic;}
 
-	//ahans
 	User*		Channel::getOper(unsigned int fd) {
 		std::map<int, User*>::iterator it = _operators.begin();
 		for (; it != _operators.end(); ++it) {
@@ -95,7 +94,6 @@
 	}
 
 
-	//ahans
 	void	Channel::revokeOperator(unsigned int clientFd, unsigned int userFd){
 		if (isOperator(clientFd))
 			_operators.erase(userFd);
@@ -121,7 +119,6 @@
 		return false;
 	}
 
-	//ahans
 	void	Channel::switchCanTopic(bool val){
 		if (val != _canTopic) {
 			if (val == true)

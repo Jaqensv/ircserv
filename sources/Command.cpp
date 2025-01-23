@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <unistd.h>
 #include "../includes/Server.hpp"
 #include "../includes/Channel.hpp"
 #include "../includes/rpl.hpp"
@@ -86,7 +87,7 @@ void	Server::invite(std::string nickname, std::string channel, int clientFd) {
 			channel = channel.substr(0, pos);
 		if (server.isChannel(channel) == true) {
 			User user = server.getUser(user_fd);
-			user.getMyChannels().push_back(channel); // a virer ???
+			user.getMyChannels().push_back(channel);
 			server.getChannel(channel).getInvited().insert(std::make_pair(user_fd, &user));
 			send(clientFd, RPL_INVITING(server.getUser(clientFd).getNickname(), server.getUser(user_fd).getNickname(), channel).c_str(), RPL_INVITING(server.getUser(clientFd).getNickname(), server.getUser(user_fd).getNickname(), channel).size(), 0);
 		}
@@ -97,4 +98,11 @@ void	Server::invite(std::string nickname, std::string channel, int clientFd) {
 		send(clientFd, ERR_NOSUCHNICK(server.getUser(clientFd).getNickname(), nickname).c_str(), ERR_NOSUCHNICK(server.getUser(clientFd).getNickname(), nickname).size(), 0);
 }
 
-//:User is already on that channel
+void	Server::quit(int clientFd){
+
+	Server	&server = Server::getInstance();
+
+	close(clientFd);
+	epoll_ctl(server._epollFd, EPOLL_CTL_DEL, clientFd, NULL);
+	deleteUser(clientFd);
+}

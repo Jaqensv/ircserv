@@ -7,9 +7,9 @@
 #include <map>
 #include <sys/types.h>
 #include <netdb.h>
-#include <sstream> // stringstream
-#include <algorithm> // std::find
-#include <pwd.h> // getuid, getpwuid
+#include <sstream>
+#include <algorithm>
+#include <pwd.h>
 #include "Channel.hpp"
 #include "User.hpp"
 #include "IrcMessage.hpp"
@@ -21,7 +21,6 @@ class Server{
 
 	public :
 
-	//Instance unique, singleton
 	static Server &getInstance() {
 		static Server instance;
 		return instance;
@@ -52,18 +51,14 @@ class Server{
 		Channel					&getChannel(const std::string channelName);
 		bool					isChannel(const std::string &channelName);
 		User					&getUser(int fd);
-		//void					addServerUser(unsigned int fd);
 		std::map<int, User*>&	getUsers();
 		std::string				getUsername();
 		unsigned int			getTargetUserFd(std::string nickname);
 		std::string				getNameServer();
 		std::string				getVersion();
-
-
-		//ahans
 		bool					isUser(int fd);
-	//commmands functions
 		bool	modeCmdParsing(std::vector<std::string> &params, unsigned int myfd);
+
 	//Surcharge operator
 		Server	&operator=(Server const &other);
 
@@ -76,6 +71,7 @@ class Server{
 		void	parseTopic(Server &server, int clientFd);
 		void	whoParsing(std::vector<std::string> &params, unsigned int myfd);
 		int		fillServinfo();
+		void	quit(int clientFd);
 
 
 	//Ping Pong Functions
@@ -90,14 +86,9 @@ class Server{
 		std::string getCurrentDate();
 		void		sendCap(int clientFd);
 		bool		checkNickname(std::string nickname, int clientFd);
-
-
-
-	//void	createChannel(Channel &chan);
 		void	createChannel(Server &server, unsigned int fd, std::string channel_name);
 		void	createUser(int fd, User &user);
 		void	deleteUser(int fd);
-
 		void	broadcastAll(int senderFd, std::string &message);
 
 	private :

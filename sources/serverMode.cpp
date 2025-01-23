@@ -2,11 +2,13 @@
 #include <string>
 #include <../includes/rpl.hpp>
 
-//if params[1] doesn't exist  RPL_CHANNELMODEIS (324)
 bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd) {
 	Server	&server = Server::getInstance();
 	std::string	&chanName = params[0];
 	std::string	rplToSend = "";
+
+	if(chanName == server.getUser(myfd).getNickname())
+		return true;
 
 	if (chanName[0] == '#') {
 		chanName.erase(0, 1);
@@ -14,11 +16,11 @@ bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd)
 		send(myfd, ERR_NOSUCHCHANNEL(server.getUser(myfd).getNickname(), chanName).c_str(), ERR_NOSUCHCHANNEL(server.getUser(myfd).getNickname(), chanName).size(), 0);
 		return false;
 	}
+
 	size_t pos = chanName.find("\r\n");
 	if (pos != std::string::npos)
 		chanName = chanName.substr(0, pos);
 	if (isChannel(chanName) == false) {
-		// ERR_NOSUCHCHANNEL (403)
 		send(myfd, ERR_NOSUCHCHANNEL(server.getUser(myfd).getNickname(), chanName).c_str(), ERR_NOSUCHCHANNEL(server.getUser(myfd).getNickname(), chanName).size(), 0);
 		return false;
 	}
@@ -55,22 +57,18 @@ bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd)
 	if (params[1][0] == '+')
 		isAdd = true;
 
-	// — t : Définir/supprimer les restrictions de la commande TOPIC pour les opérateurs de canaux
 	if (params[1][1] == 't') {
 		chan.switchCanTopic(isAdd ? true : false);
 	}
-	// — i : Définir/supprimer le canal sur invitation uniquement
 	else if (params[1][1] == 'i') {
 		chan.switchInvOnly(isAdd ? true : false, myfd);
 	}
-	// — k : Définir/supprimer la clé du canal (mot de passe)
 	else if (params[1][1] == 'k') {
 		if (isAdd)
 			chan.switchKeyMode(params[2]);
 		else
 			chan.switchKeyMode();
 	}
-	// — o : Donner/retirer le privilège de l’opérateur de canal
 	else if (params[1][1] == 'o') {
 		pos = params[2].find("\r\n");
 		if (pos != std::string::npos)
@@ -94,7 +92,6 @@ bool	Server::modeCmdParsing(std::vector<std::string> &params, unsigned int myfd)
 			}
 		}
 	}
-	// — l : Définir/supprimer la limite d’utilisateurs pour le canal
 	else if (params[1][1] == 'l') {
 		pos = params[2].find("\r\n");
 		if (pos != std::string::npos)

@@ -4,7 +4,7 @@
 #include <string>
 #include <algorithm>
 
-// *
+
 # define user_id(nickname, username) (":" + nickname + "!" + username + "@server_pika")
 
 # define RPL_WELCOME(user_id, nickname) (":server_pika 001 " + nickname + " :Welcome to the Internet Relay Network " + user_id + "\r\n")
@@ -15,7 +15,7 @@
 
 # define ERR_UNKNOWNCOMMAND(client, command) (":server_pika 421 " + client + " " + command + " :Unknown command\r\n")
 
-// INVITE *
+// INVITE
 # define ERR_NEEDMOREPARAMS(client, command) (":server_pika 461 " + client + " " + command + " :Not enough parameters.\r\n")
 # define ERR_INVITEONLYCHAN(client, channel) (":server_pika 473 " + client + " " + channel + " :Cannot join channel (+i)\r\n")
 # define ERR_NOSUCHCHANNEL(client, channel) (":server_pika 403 " + client + " #" + channel + " :No such channel\r\n")
@@ -52,12 +52,9 @@
 #define ERR_CANNOTSENDTOCHAN(client, channel) ("404 " + client + " #" + channel + " :Cannot send to channel\r\n")
 #define ERR_CHANNELISFULL(client, channel) ("471 " + client + " #" + channel + " :Cannot join channel (+l)\r\n")
 #define ERR_INVALIDMODEPARAM(client, channel, mode, password) ("696 " + client + " #" + channel + " " + mode + " " + password + " : password must only contained alphabetic character\r\n")
-// RPL_ERR a broadcoast quand user pas +v ou operator veut parler
-      // dans notre cas c'était tiff (client) qui voulait send a message
-      // :lair.nl.eu.dal.net 404 tiff #pop :Cannot send to channel
 #define RPL_ADDVOICE(nickname, username, channel, mode, param) (":" + nickname + "!" + username + "@server_pika MODE #" + channel + " " + mode + " " + param + "\r\n")
 
-// MOTD *
+// MOTD
 #define ERR_NOSUCHSERVER(client, servername) (":server_pika 402 " + client + " " + servername + " :No such server\r\n")
 #define ERR_NOMOTD(client) (":server_pika 422 " + client + " :MOTD File is missing\r\n")
 #define RPL_MOTDSTART(client, servername) (":server_pika 375 " + client + " :- " + servername + " Message of the day - \r\n")
@@ -89,7 +86,7 @@
 # define ERR_PASSWDMISMATCH(client) (":server_pika 464 " + client + " :Password incorrect.\r\n")
 
 // PING
-# define RPL_PONG(user_id, token) (user_id + " PONG " + token + "\r\n")
+# define RPL_PONG(user_id, token) (":" + user_id + " :PONG " + token + "\r\n")
 
 // QUIT
 # define RPL_QUIT(user_id, reason) (user_id + " QUIT :Quit: " + reason + "\r\n")

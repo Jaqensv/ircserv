@@ -20,13 +20,10 @@ class Channel{
 	//Getter
 		std::string				getTopic();
 		std::string				getName();
-		// matt
 		std::map<int, User*>&	getUsers();
 		std::map<int, User*>&	getOpers();
 		std::map<int, User*>& 	getInvited();
-		//ahans
 		User*		getOper(unsigned int fd);
-		//ahans
 		User*		getUser(int fd);
 		bool		isInvited(int fd);
 		bool		isKeyMode();
@@ -37,7 +34,6 @@ class Channel{
 		bool		getIsTopic();
 
 	//Setter
-		//matt
 		void	setTopic(unsigned int fd, std::vector<std::string> topic);
 		void	setTopic(unsigned int fd);
 
@@ -49,8 +45,7 @@ class Channel{
 		void	addOperator(unsigned int fd);
 		void	kick(Server &server, int clientFd, std::string nickname, std::string channel_name);
 		void	part(Server &server, int clientFd, std::string channel_name);
-		
-		//ahans
+
 		void	revokeOperator(unsigned int clientFd, unsigned int userFd);
 		bool	isOperator(unsigned int fd);
 		bool	isInvited(unsigned int fd);
@@ -68,7 +63,7 @@ class Channel{
 		Channel();
 		std::string				_name;
 		std::string				_topic;
-		bool					_canTopic; // false pour que les OP, true pour tout le monde
+		bool					_canTopic;
 		bool					_invOnly;
 		bool					_keyMode;
 		bool					_limitMode;

@@ -6,7 +6,20 @@ SRC_DIR		= sources
 OBJ_DIR		= object
 INC_DIR		= includes
 
-SRC_FILES	= $(wildcard $(SRC_DIR)/*.cpp)
+SRC_FILES	= sources/main.cpp \
+				sources/Server.cpp \
+				sources/Channel.cpp \
+				sources/channelCommands.cpp \
+				sources/Command.cpp \
+				sources/display.cpp \
+				sources/IrcMessage.cpp \
+				sources/Parsing.cpp \
+				sources/ServerIdentification.cpp \
+				sources/serverMode.cpp \
+				sources/ServerPingPong.cpp \
+				sources/User.cpp
+
+
 OBJ_FILES	= $(SRC_FILES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 
 all: $(NAME)
