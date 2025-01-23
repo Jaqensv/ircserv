@@ -24,8 +24,8 @@
 # define RPL_INVITING(client, nick, channel) (":server_pika 341 " + client + " " + nick + " #" + channel + "\r\n")
 # define RPL_INVITE(user_id, invited, channel) (user_id + " INVITE " + invited + " #" + channel + "\r\n")
 
-// JOIN *
-# define RPL_JOIN(user_id, channel) (user_id + " JOIN :#" +  channel + "\r\n")
+// JOIN
+# define RPL_JOIN(user_id, channel) (":" + user_id + " JOIN :#" +  channel + "\r\n")
 # define ERR_BANNEDFROMCHAN(client, channel) ("474 " + client + " #" + channel + " :Cannot join channel (+b)\r\n")
 # define ERR_BADCHANNELKEY(client, channel) ("475 " + client + " #" + channel + " :Cannot join channel (+k)\r\n")
 
@@ -98,7 +98,7 @@
 // PRIVMSG
 # define ERR_NORECIPIENT(client) ("411 " + client + " :No recipient given PRIVMSG\r\n")
 # define ERR_NOTEXTTOSEND(client) ("412 " + client + " :No text to send\r\n")
-# define RPL_PRIVMSG(nick, username, target, message) (":" + nick + "!" + username + "@server_pika PRIVMSG " + target + " " + message + "\r\n")
+# define RPL_PRIVMSG(nick, target, message) (":" + nick + " PRIVMSG " + target + " " + message + "\r\n")
 
 // TOPIC
 # define RPL_TOPIC(client, channel, topic) (":server_pika 332 " + client + " #" + channel + " " + topic + "\r\n")

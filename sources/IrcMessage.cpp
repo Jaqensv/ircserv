@@ -44,7 +44,7 @@ IrcMessage	parseIrcMessage(std::string &input){
 				stash += tmp;
 			}
 			stash += mess.crlf;
-			mess.params.push_back(tmp);
+			mess.params.push_back(stash);
 		} else {
 			mess.params.push_back(tmp);
 		}

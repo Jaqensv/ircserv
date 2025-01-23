@@ -65,8 +65,7 @@ void	Server::join(int clientFd){
 		else
 			list_of_nicks += it->second->getNickname() + " ";
 	}
-
-	send(clientFd, RPL_JOIN(fd, server.getChannel(server._arrayParams.params[0]).getName()).c_str(), RPL_JOIN(fd, server.getChannel(server._arrayParams.params[0]).getName()).size(), 0);
+	send(clientFd, RPL_JOIN(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).c_str(), RPL_JOIN(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).size(), 0);
 	send(clientFd, RPL_NAMREPLY(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName(), list_of_nicks).c_str(), RPL_NAMREPLY(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName(), list_of_nicks).size(), 0);
 	send(clientFd, RPL_ENDOFNAMES(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).c_str(), RPL_ENDOFNAMES(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).size(), 0);
 	server.getUser(clientFd).getMyChannels().push_back(server._arrayParams.params[0]);
