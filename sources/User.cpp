@@ -4,6 +4,7 @@
 #include <cstring>
 #include "../includes/User.hpp"
 #include "../includes/Channel.hpp"
+#include "../includes/rpl.hpp"
 
 //Constructor & Destructor
 	User::User() {}
@@ -70,25 +71,30 @@
 
 void 	privToUser(std::string user, std::string msg, int clientFd, Server &other)
 {
-	std::string msgDisplay;
 	int usrTgt = other.getTargetUserFd(user);
 	if (usrTgt == 0) {
-		std::cout << "ERROR: user " << user << " not found" << std::endl;
+		send(clientFd, ERR_NOSUCHNICK(other.getUser(clientFd).getNickname(), user).c_str(), ERR_NOSUCHNICK(other.getUser(clientFd).getNickname(), user).size(), 0);
 		return ;
 	}
-	msgDisplay = other.getUser(clientFd).getNickname() + " -> " + user + " : " + msg;
-	send(usrTgt, msgDisplay.c_str(), msgDisplay.size(), 0);
+	send(usrTgt, RPL_PRIVMSG(other.getUser(clientFd).getNickname(), other.getUser(usrTgt).getNickname(), msg).c_str(), RPL_PRIVMSG(other.getUser(clientFd).getNickname(), other.getUser(usrTgt).getNickname(), msg).size(), 0);
 	return ;
 };
 
-void 	privToChannel(std::string ChannelName, std::string message, Server &other)
+void 	privToChannel(std::string ChannelName, std::string message, Server &other, int clientFd)
 {
-	std::string msgDisplay;
+	if (!other.isChannel(ChannelName)) {
+		send(clientFd, ERR_NOSUCHNICK(other.getUser(clientFd).getNickname(), ChannelName).c_str(), ERR_NOSUCHNICK(other.getUser(clientFd).getNickname(), ChannelName).size(), 0);
+		return ;
+	}
 	Channel &chan = other.getChannel(ChannelName);
+	if (chan.getUser(clientFd) == NULL) {
+		send(clientFd, ERR_NOTONCHANNEL(other.getUser(clientFd).getNickname(), ChannelName).c_str(), ERR_NOTONCHANNEL(other.getUser(clientFd).getNickname(), ChannelName).size(), 0);
+		return ;
+	}
 	std::map<int, User*> users = chan.getUsers();
 	for (std::map<int, User*>::iterator it = users.begin(); it != users.end(); ++it) {
-		msgDisplay = other.getUser(it->first).getNickname() + " -> " + ChannelName + " : " + message;
-		send(it->first, msgDisplay.c_str(), msgDisplay.size(), 0);
+		if (it->first != clientFd)
+			send(it->first, RPL_PRIVMSG(other.getUser(clientFd).getNickname(), "#" + ChannelName, message).c_str(), RPL_PRIVMSG(other.getUser(clientFd).getNickname(), "#" + ChannelName, message).size(), 0);
 	}
 	return ;
 };
@@ -116,7 +122,7 @@ void	User::PRIVMSG(std::vector<std::string> &params, unsigned int clientFd, Serv
 			return ;
 		} else {
 			params[0].erase(0, 1);
-			privToChannel(params[0], msg, other);
+			privToChannel(params[0], msg, other, clientFd);
 			return ;
 		}
 	}
