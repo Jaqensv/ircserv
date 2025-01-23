@@ -6,7 +6,7 @@
 #include "../includes/rpl.hpp"
 
 void	Server::join(int clientFd){
-
+	bool tkfd = false;
 	Server	&server = Server::getInstance();
 	if (server._arrayParams.params.empty())
 	{
@@ -50,6 +50,7 @@ void	Server::join(int clientFd){
 			return;
 		}
 		chan.addUser(server, clientFd);
+		tkfd = true;
 	}
 	else {
 		createChannel(server, clientFd, server._arrayParams.params[0]);
@@ -69,6 +70,8 @@ void	Server::join(int clientFd){
 	send(clientFd, RPL_JOIN(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).c_str(), RPL_JOIN(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).size(), 0);
 	send(clientFd, RPL_NAMREPLY(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName(), list_of_nicks).c_str(), RPL_NAMREPLY(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName(), list_of_nicks).size(), 0);
 	send(clientFd, RPL_ENDOFNAMES(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).c_str(), RPL_ENDOFNAMES(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName()).size(), 0);
+	if (tkfd == true)
+		send(clientFd, RPL_TOPIC(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName(), server.getChannel(server._arrayParams.params[0]).getTopic()).c_str(), RPL_TOPIC(server.getUser(clientFd).getNickname(), server.getChannel(server._arrayParams.params[0]).getName(), server.getChannel(server._arrayParams.params[0]).getTopic()).size(), 0);
 	server.getUser(clientFd).getMyChannels().push_back(server._arrayParams.params[0]);
 }
 

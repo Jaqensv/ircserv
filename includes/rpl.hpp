@@ -80,7 +80,7 @@
 # define RPL_YOUREOPER(client) ("381 " + client + " :You are now an IRC operator\r\n")
 
 // PART
-# define RPL_PART(user_id, channel) (":" + user_id + " PART #" + channel + "\r\n")
+# define RPL_PART(user_id, user_name, channel) (":" + user_id + "!" + user_name + " PART #" + channel + "\r\n")
 
 // PASS
 # define ERR_PASSWDMISMATCH(client) (":server_pika 464 " + client + " :Password incorrect.\r\n")

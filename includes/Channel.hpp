@@ -35,7 +35,7 @@ class Channel{
 
 	//Setter
 		void	setTopic(unsigned int fd, std::vector<std::string> topic);
-		void	setTopic(unsigned int fd);
+		void	displayTopic(unsigned int clientFd, std::string chanName);
 
 	//Member function
 		void	addUser(Server &server, unsigned int fd);
