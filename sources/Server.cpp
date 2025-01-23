@@ -51,7 +51,7 @@
 	std::string		Server::getVersion(){return this->_version;}
 
 
-	const std::vector<Channel*>& Server::getChannels(){
+	std::vector<Channel*>& Server::getChannels(){
 		return _arrayChannel;
 	}
 
@@ -235,12 +235,14 @@ void	Server::deleteUser(int fd){
 		std::cerr << "WARNING : Attempted to delete non-existent user: " << fd << std::endl;
 		return;
 	}
-	for(std::vector<Channel*>::iterator it = this->_arrayChannel.begin(); it != _arrayChannel.end(); it++){
-		Channel	*chan = *it;
-		if(chan->getUser(fd) != NULL){
-			chan->removeUser(fd);
-			if(chan->isOperator(fd))
-				chan->removeOperator(fd);
+	for(std::vector<Channel*>::iterator it = this->_arrayChannel.begin(); !_arrayChannel.empty() && it != _arrayChannel.end(); it++){
+		if((*it)->getUser(fd) != NULL){
+			(*it)->removeUser(fd);
+			if((*it)->isOperator(fd))
+				(*it)->removeOperator(fd);
+			if ((*it)->getUsers().empty()) {
+				_arrayChannel.erase(it);
+			}
 		}
 	}
 	std::cout << "Client " << fd << " disconnected." << std::endl;

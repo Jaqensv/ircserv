@@ -36,15 +36,22 @@
 
 		if (server.getChannel(channel_name).getUser(clientFd) == NULL) {
 			send(clientFd, ERR_NOTONCHANNEL(server.getUser(clientFd).getNickname(), channel_name).c_str(), ERR_NOTONCHANNEL(server.getUser(clientFd).getNickname(), channel_name).size(), 0);
-			std::cout << ":You're not on that channel" << std::endl;
+			std::cerr << ":You're not on that channel" << std::endl;
 			return;
 		}
 		user->getMyChannels().erase(user->getMyChannels().begin() + user->findChannelIndex(user->getMyChannel()));
 		removeUser(clientFd);
 		removeInvited(clientFd);
 		removeOperator(clientFd);
+		std::vector<Channel*>::iterator it = server.getChannels().begin();
+		for (; it != server.getChannels().end(); ++it) {
+			if ((*it)->getName() == channel_name)
+				break;
+		}
+		if (_users.empty())
+			server.getChannels().erase(it);
 		user->setMyChannel("");
-		send(clientFd, RPL_PART(server.getUser(clientFd).getNickname(), channel_name).c_str(), RPL_PART(server.getUser(clientFd).getNickname(), channel_name).size(), 0);
+		send(clientFd, RPL_PART(server.getUser(clientFd).getNickname(), server.getUser(clientFd).getUsername(), channel_name).c_str(), RPL_PART(server.getUser(clientFd).getNickname(), server.getUser(clientFd).getUsername(), channel_name).size(), 0);
 	}
 
 	void	Channel::setTopic(unsigned int fd, std::vector<std::string> topic) {

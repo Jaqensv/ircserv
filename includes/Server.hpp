@@ -46,7 +46,7 @@ class Server{
 	//Getter
 		unsigned short			getPort();
 		std::string				getPassw();
-		const std::vector<Channel*>&	getChannels();
+		std::vector<Channel*>&	getChannels();
 		bool					getNeedPassw();
 		unsigned short			getBackLogSize();
 		Channel					&getChannel(const std::string channelName);
