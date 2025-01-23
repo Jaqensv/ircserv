@@ -51,6 +51,29 @@ bool	Server::identPass(int clientFd, std::string passRecv, std::string &inputBis
 	return false;
 }
 
+bool	Server::checkNickname(std::string nickname, int clientFd){
+
+	Server	&server = Server::getInstance();
+	std::ostringstream	oss;
+	oss << clientFd;
+	std::string	stringFd = oss.str();
+
+	if(nickname.empty() == true){
+		send(clientFd, ERR_NONICKNAMEGIVEN(stringFd).c_str(), ERR_NONICKNAMEGIVEN(stringFd).size(), 0);
+		return false;
+	}
+	else if (server.getTargetUserFd(nickname) != 0){
+		send(clientFd, ERR_NICKNAMEINUSE(stringFd, nickname).c_str(), ERR_NICKNAMEINUSE(stringFd, nickname).size(), 0);
+		return false;
+	}
+	else if(isdigit(nickname.at(0)) || nickname.size() > 9 || nickname.find(" ") != std::string::npos || nickname.find("#") != std::string::npos){
+		send(clientFd, ERR_ERRONEUSNICKNAME(stringFd, nickname).c_str(), ERR_ERRONEUSNICKNAME(stringFd, nickname).size(), 0);
+		return false;
+	}
+	return true;
+}
+
+
 bool	Server::askNickname(int clientFd, std::string input, std::string &inputBis){
 
 	Server	&server = Server::getInstance();
@@ -67,11 +90,14 @@ bool	Server::askNickname(int clientFd, std::string input, std::string &inputBis)
 	if(cmd.empty() == false && cmd.size() > 5)
 		cmd = cmd.substr(0, 4);
 	if(cmd.compare("NICK") == 0){
-		nickname = tmp.substr(5, tmp.size() - 5);
+		if(input.size() > 5)
+			nickname = tmp.substr(5, tmp.size() - 5);
+		if (checkNickname(nickname, clientFd) == false)
+			return false;
 		server.getUser(clientFd).setNickname(nickname);
-	} else {
+	} else
 		return false;
-	}
+
 	wholeCmd = ":server_pika NICK " + nickname;
 	wholeCmd.append("\r\n");
 
