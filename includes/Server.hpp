@@ -89,6 +89,8 @@ class Server{
 		bool		verifCap(int clientFd, std::string input, std::string &inputBis);
 		std::string getCurrentDate();
 		void		sendCap(int clientFd);
+		bool		checkNickname(std::string nickname, int clientFd);
+
 
 
 	//void	createChannel(Channel &chan);

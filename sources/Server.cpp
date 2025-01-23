@@ -230,17 +230,21 @@ void	Server::createUser(int fd, User &user){
 }
 
 void	Server::deleteUser(int fd){
-	Server	&server = Server::getInstance();
 
 	if (_arrayUser.find(fd) == _arrayUser.end()) {
 		std::cerr << "WARNING : Attempted to delete non-existent user: " << fd << std::endl;
 		return;
 	}
-
-	std::cout << "Client " << fd << " disconnected." << std::endl;
-	if(server.isChannel(getUser(fd).getMyChannel())){
-		server.getChannel(getUser(fd).getMyChannel()).removeUser(fd);
+	for(std::vector<Channel*>::iterator it = this->_arrayChannel.begin(); it != _arrayChannel.end(); it++){
+		Channel	*chan = *it;
+		if(chan->getUser(fd) != NULL){
+			chan->removeUser(fd);
+			if(chan->isOperator(fd))
+				chan->removeOperator(fd);
+		}
 	}
+	std::cout << "Client " << fd << " disconnected." << std::endl;
+
 	User *user = _arrayUser[fd];
 	this->_arrayUser.erase(fd);
 	delete user;
@@ -359,7 +363,6 @@ void	Server::run(){
 					invite(server._arrayParams.params[0], server._arrayParams.params[1], clientFd);
 				else if (server._arrayParams.command == "TOPIC") {
 					parseTopic(server, clientFd);
-					//channelTopicTester(server._arrayParams.params[0]);
 				} else if (server._arrayParams.command == "MODE")
 					modeCmdParsing(server._arrayParams.params, clientFd);
 				else if (server._arrayParams.command == "WHO")
