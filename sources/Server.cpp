@@ -373,7 +373,7 @@ void	Server::run(){
 					getUser(clientFd).PRIVMSG(server._arrayParams.params, clientFd, server);
 				}
 				else if(server._arrayParams.command[0] == '/'){
-					std::cout << server._arrayParams.command << " is not a valide command." << std::endl;
+					std::cout << server._arrayParams.command << " is not a valid command." << std::endl;
 					continue;
 				} else {
 					std::cout << server._arrayUser[clientFd]->getNickname() << ": " << input << std::flush;

@@ -39,7 +39,7 @@ class Channel{
 	//Setter
 		//matt
 		void	setTopic(unsigned int fd, std::vector<std::string> topic);
-		void	setTopic(unsigned int fd);
+		void	displayTopic(unsigned int clientFd, std::string chanName);
 
 	//Member function
 		void	addUser(Server &server, unsigned int fd);
@@ -49,7 +49,7 @@ class Channel{
 		void	addOperator(unsigned int fd);
 		void	kick(Server &server, int clientFd, std::string nickname, std::string channel_name);
 		void	part(Server &server, int clientFd, std::string channel_name);
-		
+
 		//ahans
 		void	revokeOperator(unsigned int clientFd, unsigned int userFd);
 		bool	isOperator(unsigned int fd);

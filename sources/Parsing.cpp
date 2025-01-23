@@ -32,16 +32,28 @@ void	Server::whoParsing(std::vector<std::string> &params, unsigned int myfd) {
 }
 
 void	Server::parseTopic(Server &server, int clientFd) {
+	if (server._arrayParams.params.size() == 0) {
+		send(clientFd, ERR_NEEDMOREPARAMS(server.getUser(clientFd).getNickname(), "TOPIC").c_str(), ERR_NEEDMOREPARAMS(server.getUser(clientFd).getNickname(), "TOPIC").size(), 0);
+		return;
+	}
 	if (server._arrayParams.params[0][0] == '#')
 		server._arrayParams.params[0].erase(0, 1);
 	size_t pos = server._arrayParams.params[0].find("\r\n");
 	if (server._arrayParams.params.size() == 1 && pos != std::string::npos)
 		server._arrayParams.params[0] = server._arrayParams.params[0].substr(0, pos);
+	if (server.isChannel(server._arrayParams.params[0]) == false) {
+		send(clientFd, ERR_NOSUCHNICK(server.getUser(clientFd).getNickname(), server._arrayParams.params[0]).c_str(), ERR_NOSUCHCHANNEL(server.getUser(clientFd).getNickname(), server._arrayParams.params[0]).size(), 0);
+		return;
+	}
+	if (server.getChannel(server._arrayParams.params[0]).getUser(clientFd) == NULL) {
+		send(clientFd, ERR_NOTONCHANNEL(server.getUser(clientFd).getNickname(), server._arrayParams.params[0]).c_str(), ERR_NOTONCHANNEL(server.getUser(clientFd).getNickname(), server._arrayParams.params[0]).size(), 0);
+		return;
+	}
 	if (isChannel(server._arrayParams.params[0])) {
-		if (server._arrayParams.params.size() >= 1)
+		if (server._arrayParams.params.size() >= 2)
 			getChannel(server._arrayParams.params[0]).setTopic(clientFd, server._arrayParams.params);
 		else
-			getChannel(server._arrayParams.params[0]).setTopic(clientFd);
+			getChannel(server._arrayParams.params[0]).displayTopic(clientFd, server._arrayParams.params[0]);
 	}
 }
 

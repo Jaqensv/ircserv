@@ -55,59 +55,44 @@
 	}
 
 	void	Channel::setTopic(unsigned int fd, std::vector<std::string> topic) {
-			std::string new_string;
-			std::vector<std::string>::iterator it = topic.begin();
-			std::advance(it, 1);
-			for (; it != topic.end(); ++it) {
-				new_string += *it + " ";
-			}
-			if (new_string.size() > 1)
-				new_string.erase(new_string.size() - 2, 1);
-			size_t pos = new_string.find("\r\n");
-			if (pos != std::string::npos)
-				new_string = new_string.substr(0, pos);
-			User* user = _users.find(fd)->second;
-			if (user) {
-				if (_canTopic == true) {
-					std::cout << "true" << std::endl;
-					_topic = new_string;
-					std::cout << user->getUsername() << " has changed the topic: " << _topic << std::endl;
-				}
-				else {
-					std::cout << "false" << std::endl;
-					if (isOperator(fd)) {
-						_topic = new_string;
-						std::cout << user->getUsername() << " has changed the topic: " << _topic << std::endl;
-					}
-					else
-						std::cout << user->getUsername() <<  " doesn't have the rights to change the topic" << std::endl;
-				}
-			}
-			else
-				std::cerr << "Error: user doesn't exist" << std::endl;
-	}
+		std::string new_string;
+		std::vector<std::string>::iterator it = topic.begin();
+		std::advance(it, 1);
 
-	void	Channel::setTopic(unsigned int fd) {
-		std::string new_string = "";
+		for (; it != topic.end(); ++it) {
+			new_string += *it + " ";
+		}
+		if (new_string.size() > 1)
+			new_string.erase(new_string.size() - 2, 1);
 		User* user = _users.find(fd)->second;
 		if (user) {
 			if (_canTopic == true) {
-				std::cout << "true" << std::endl;
 				_topic = new_string;
-				std::cout << user->getUsername() << " has changed the topic: " << _topic << std::endl;
+				for (std::map<int, User*>::iterator itone = _users.begin(); itone != _users.end(); ++itone) {
+					send(itone->first, RPL_TOPIC(user->getNickname(), _name, new_string).c_str(), RPL_TOPIC(user->getNickname(), _name, new_string).size(), 0);
+				}
 			}
 			else {
-				std::cout << "false" << std::endl;
 				if (isOperator(fd)) {
 					_topic = new_string;
-					std::cout << user->getUsername() << " has changed the topic: " << _topic << std::endl;
+					for (std::map<int, User*>::iterator ittwo = _users.begin(); ittwo != _users.end(); ++ittwo) {
+						send(ittwo->first, RPL_TOPIC(user->getNickname(), _name, new_string).c_str(), RPL_TOPIC(user->getNickname(), _name, new_string).size(), 0);
+					}
 				}
 				else
-					std::cout << user->getUsername() <<  " doesn't have the rights to change the topic" << std::endl;
+					send(fd, ERR_CHANOPRIVSNEEDED(user->getNickname(), _name).c_str(), ERR_CHANOPRIVSNEEDED(user->getNickname(), _name).size(), 0);
 			}
 		}
-		else
-			std::cerr << "Error: user doesn't exist" << std::endl;
+	}
+
+	void	Channel::displayTopic(unsigned int clientFd, std::string chanName) {
+		User* user = getUser(clientFd);
+		if (user) {
+			if (_topic.empty())
+				send(clientFd, RPL_NOTOPIC(user->getNickname(), chanName).c_str(), RPL_NOTOPIC(user->getNickname(), chanName).size(), 0);
+			else
+				send(clientFd, RPL_TOPIC(user->getNickname(), chanName, _topic).c_str(), RPL_TOPIC(user->getNickname(), chanName, _topic).size(), 0);
+		}
 	}
 
 
